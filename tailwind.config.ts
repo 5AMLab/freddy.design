@@ -9,8 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        black: "#0f0f0f",
+        red: "#E8222E",
+        cream: "#FFF8EE",
+        yellow: "#FFD93D",
+        ink: "#1a1a1a",
+      },
+      fontFamily: {
+        fredoka: ["'Fredoka One'", "cursive"],
+        nunito: ["'Nunito'", "sans-serif"],
       },
     },
   },
