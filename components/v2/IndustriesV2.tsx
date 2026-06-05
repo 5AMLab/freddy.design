@@ -24,7 +24,7 @@ const industries = [
   },
 ];
 
-function IndustryCard({ industry, index }: { industry: (typeof industries)[0]; index: number }) {
+function IndustryCard({ industry }: { industry: (typeof industries)[0] }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -170,7 +170,7 @@ export default function IndustriesV2() {
 
         <div style={{ borderTop: "1px solid rgba(245,240,232,0.06)" }}>
           {industries.map((industry, i) => (
-            <IndustryCard key={industry.name} industry={industry} index={i} />
+            <IndustryCard key={industry.name} industry={industry} />
           ))}
         </div>
       </section>

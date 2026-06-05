@@ -28,7 +28,7 @@ const services = [
   },
 ];
 
-function ServiceRow({ service, index }: { service: (typeof services)[0]; index: number }) {
+function ServiceRow({ service }: { service: (typeof services)[0] }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -212,7 +212,7 @@ export default function ServicesV2() {
 
         <div style={{ borderTop: "1px solid rgba(245,240,232,0.06)" }}>
           {services.map((service, i) => (
-            <ServiceRow key={service.num} service={service} index={i} />
+            <ServiceRow key={service.num} service={service} />
           ))}
         </div>
       </section>
