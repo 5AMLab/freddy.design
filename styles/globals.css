@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* ── CANELA FONT FACES ── */
 @font-face {
   font-family: 'Canela';
@@ -121,15 +120,6 @@
   font-display: swap;
 }
 
-:root {
-  --black: #0f0f0f;
-  --red: #E8222E;
-  --cream: #FFF8EE;
-  --yellow: #FFD93D;
-  --ink: #1a1a1a;
-  --white: #ffffff;
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -142,81 +132,15 @@ html {
 }
 
 body {
-  background: var(--cream);
-  font-family: 'Nunito', sans-serif;
-  color: var(--ink);
+  background: #0D0D0D;
+  color: #F5F0E8;
   overflow-x: hidden;
 }
 
-/* Fonts */
-.font-fredoka {
-  font-family: 'Fredoka One', cursive;
-}
-
-.font-nunito {
-  font-family: 'Nunito', sans-serif;
-}
-
-/* ── ANIMATIONS ── */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
-}
-
-@keyframes float-rotate-1 {
-  0%, 100% { transform: rotate(6deg) translateY(0px); }
-  50% { transform: rotate(6deg) translateY(-12px); }
-}
-
-@keyframes float-rotate-2 {
-  0%, 100% { transform: rotate(-5deg) translateY(0px); }
-  50% { transform: rotate(-5deg) translateY(-12px); }
-}
-
-@keyframes float-rotate-3 {
-  0%, 100% { transform: rotate(3deg) translateY(0px); }
-  50% { transform: rotate(3deg) translateY(-12px); }
-}
-
-@keyframes wiggle {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
-}
-
+/* ── MARQUEE ── */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.4); }
-}
-
-@keyframes hero-card-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
-}
-
-/* ── ANIMATION CLASSES ── */
-.animate-float {
-  animation: float 5s ease-in-out infinite;
-}
-
-.animate-float-rotate-1 {
-  animation: float-rotate-1 4s ease-in-out infinite 0.5s;
-}
-
-.animate-float-rotate-2 {
-  animation: float-rotate-2 4s ease-in-out infinite 1s;
-}
-
-.animate-float-rotate-3 {
-  animation: float-rotate-3 4s ease-in-out infinite 1.5s;
-}
-
-.animate-wiggle {
-  animation: wiggle 3s ease-in-out infinite;
 }
 
 .animate-marquee {
@@ -224,151 +148,7 @@ body {
   width: max-content;
 }
 
-.animate-pulse-dot {
-  animation: pulse-dot 2s infinite;
-}
-
-/* ── FADE IN ON SCROLL ── */
-.fade-in {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
-}
-
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── DOTS BACKGROUND ── */
-.dots-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(circle, #0f0f0f15 1px, transparent 1px);
-  background-size: 28px 28px;
-  pointer-events: none;
-}
-
-/* ── NAV ── */
-.nav-links a {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 0.85rem;
-  color: white;
-  text-decoration: none;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  position: relative;
-  transition: color 0.2s;
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--red);
-  transition: width 0.3s;
-}
-
-.nav-links a:hover {
-  color: var(--red);
-}
-
-.nav-links a:hover::after {
-  width: 100%;
-}
-
-.nav-cta {
-  background: var(--red) !important;
-  color: white !important;
-  padding: 10px 24px;
-  border-radius: 50px;
-  border: 2px solid var(--red);
-  transition: background 0.2s !important;
-}
-
-.nav-cta:hover {
-  background: transparent !important;
-  color: var(--red) !important;
-}
-
-.nav-cta::after {
-  display: none !important;
-}
-
-/* ── HERO ── */
-.hero-highlight::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 0;
-  width: 100%;
-  height: 8px;
-  background: var(--yellow);
-  z-index: -1;
-  border-radius: 4px;
-}
-
-/* ── PRICING ── */
-.plan-features li::before {
-  content: '✓';
-  font-weight: 800;
-  color: var(--red);
-  flex-shrink: 0;
-}
-
-.plan-features-featured li::before {
-  content: '✓';
-  font-weight: 800;
-  color: var(--yellow);
-  flex-shrink: 0;
-}
-
-/* ── STATUS DOT ── */
-.status-dot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.status-dot::before {
-  content: '';
-  width: 9px;
-  height: 9px;
-  background: #22c55e;
-  border-radius: 50%;
-  display: inline-block;
-  animation: pulse-dot 2s infinite;
-  flex-shrink: 0;
-}
-
-/* ── CTA SECTION ── */
-.cta-stars::before {
-  content: '★ ★ ★ ★ ★ ★ ★ ★ ★';
-  position: absolute;
-  top: 30px;
-  left: 0;
-  right: 0;
-  font-size: 1rem;
-  color: rgba(255,255,255,0.12);
-  letter-spacing: 24px;
-  text-align: center;
-}
-
-/* ── V2 DARK EDITORIAL ── */
-
-/* Fade-in animation */
+/* ── V2 FADE-IN ON SCROLL ── */
 .v2-fade {
   opacity: 0;
   transform: translateY(20px);
@@ -379,23 +159,9 @@ body {
   transform: translateY(0);
 }
 
-/* Eyebrow labels — all uppercase section labels use Sohne Breit */
-.v2-eyebrow {
-  font-family: 'Sohne Breit', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #C9A96E;
-  margin-bottom: 20px;
-}
-
 /* Hero */
 .hero-v2-label {
   font-family: 'Sohne Breit', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.22em;
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.2em;
@@ -415,12 +181,7 @@ body {
   color: #C9A96E;
 }
 
-/* V2 page — override body background so cream doesn't bleed through */
-body:has(.hero-v2-section) {
-  background: #0D0D0D;
-}
-
-/* V2 global — clip all section overflow so inline grid widths can't bleed */
+/* Clip all section overflow */
 .hero-v2-section, .logos-v2-section, .services-v2-section,
 .portfolio-v2-section, .how-v2-section, .pricing-v2-section,
 .industries-v2-section, .cta-v2-section {
