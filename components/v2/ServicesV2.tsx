@@ -211,7 +211,7 @@ export default function ServicesV2() {
         </div>
 
         <div style={{ borderTop: "1px solid rgba(245,240,232,0.06)" }}>
-          {services.map((service, i) => (
+          {services.map((service) => (
             <ServiceRow key={service.num} service={service} />
           ))}
         </div>

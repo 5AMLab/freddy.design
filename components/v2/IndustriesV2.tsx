@@ -169,7 +169,7 @@ export default function IndustriesV2() {
         </div>
 
         <div style={{ borderTop: "1px solid rgba(245,240,232,0.06)" }}>
-          {industries.map((industry, i) => (
+          {industries.map((industry) => (
             <IndustryCard key={industry.name} industry={industry} />
           ))}
         </div>
