@@ -1,5 +1,6 @@
 import NavbarV2 from "@/components/v2/NavbarV2";
 import HeroV2 from "@/components/v2/HeroV2";
+import CookieBanner from "@/components/v2/CookieBanner";
 import MarqueeV2 from "@/components/v2/MarqueeV2";
 import LogosV2 from "@/components/v2/LogosV2";
 import ServicesV2 from "@/components/v2/ServicesV2";
@@ -26,6 +27,7 @@ export default function Home() {
         <CTAV2 />
       </main>
       <FooterV2 />
+      <CookieBanner />
     </div>
   );
 }
