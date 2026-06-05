@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 const projects = [
   {
@@ -25,24 +26,24 @@ const projects = [
   },
   {
     id: "04",
-    title: "Coming Soon",
-    client: "—",
-    category: "TBA",
-    image: "",
+    title: "Terre d'Hermès Campaign",
+    client: "Hermès",
+    category: "OOH & Campaign",
+    image: "/portfolio/hermes-01.jpg",
   },
   {
     id: "05",
-    title: "Coming Soon",
-    client: "—",
-    category: "TBA",
-    image: "",
+    title: "Ethiopia Guji Cold Brew",
+    client: "Maison Freddy",
+    category: "Packaging",
+    image: "/portfolio/maison-01.jpg",
   },
   {
     id: "06",
-    title: "Coming Soon",
-    client: "—",
-    category: "TBA",
-    image: "",
+    title: "Serum Product Campaign",
+    client: "Touchup",
+    category: "Product & Campaign",
+    image: "/portfolio/touchup-01.jpg",
   },
 ];
 
@@ -63,11 +64,7 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
         style={{
           width: "100%",
           aspectRatio: "3/2",
-          height: "auto",
-          backgroundImage: hasImage ? `url('${project.image}')` : "none",
-          backgroundColor: hasImage ? "transparent" : "#141414",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundColor: "#141414",
           borderRadius: "2px",
           border: "1px solid",
           borderColor: hovered ? "rgba(201,169,110,0.3)" : "rgba(245,240,232,0.06)",
@@ -76,20 +73,28 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
           transition: "border-color 0.35s",
         }}
       >
-        {/* Hover overlay on image */}
         {hasImage && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "rgba(13,13,13,0.35)",
-              opacity: hovered ? 1 : 0,
-              transition: "opacity 0.35s",
-            }}
-          />
+          <>
+            <Image
+              src={project.image}
+              alt={`${project.title} — ${project.client}`}
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              style={{ objectFit: "cover", objectPosition: "center" }}
+              loading="lazy"
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(13,13,13,0.35)",
+                opacity: hovered ? 1 : 0,
+                transition: "opacity 0.35s",
+              }}
+            />
+          </>
         )}
 
-        {/* Coming soon label */}
         {!hasImage && (
           <div
             style={{
