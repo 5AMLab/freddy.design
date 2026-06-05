@@ -281,3 +281,10 @@ body {
 @media (max-width: 768px) {
   .footer-v2-inner { flex-direction: column !important; gap: 28px !important; padding: 36px 24px !important; }
 }
+
+/* Legal pages */
+@media (max-width: 768px) {
+  .legal-header { padding: 120px 24px 60px !important; }
+  .legal-content { padding: 60px 24px 80px !important; }
+  .legal-footer { padding: 32px 24px !important; flex-direction: column !important; align-items: flex-start !important; }
+}

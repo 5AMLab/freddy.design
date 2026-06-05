@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 export default function FooterV2() {
   return (
@@ -46,7 +47,7 @@ export default function FooterV2() {
             © 2025 freddy.design · Singapore
           </p>
 
-          <ul style={{ display: "flex", gap: "28px", listStyle: "none" }}>
+          <ul style={{ display: "flex", gap: "28px", listStyle: "none", flexWrap: "wrap" }}>
             {["Instagram", "LinkedIn", "WhatsApp"].map((link) => (
               <li key={link}>
                 <a
@@ -70,6 +71,38 @@ export default function FooterV2() {
                 >
                   {link}
                 </a>
+              </li>
+            ))}
+          </ul>
+
+          <ul style={{ display: "flex", gap: "20px", listStyle: "none", flexWrap: "wrap" }}>
+            {[
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms", href: "/terms" },
+              { label: "Cookies", href: "/cookies" },
+            ].map(({ label, href }) => (
+              <li key={label}>
+                <Link
+                  href={href}
+                  style={{
+                    fontFamily: "'Sohne', sans-serif",
+                    fontSize: "0.65rem",
+                    fontWeight: 400,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "rgba(245,240,232,0.15)",
+                    textDecoration: "none",
+                    transition: "color 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,240,232,0.4)")
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,240,232,0.15)")
+                  }
+                >
+                  {label}
+                </Link>
               </li>
             ))}
           </ul>
