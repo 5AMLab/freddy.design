@@ -1,50 +1,22 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 
-// Replace these with real client/brand SVG logos when available
 const logos = [
-  { name: "Marriott", width: 90 },
-  { name: "Shopee", width: 72 },
-  { name: "Deliveroo", width: 88 },
-  { name: "DBS", width: 52 },
-  { name: "Tiger Beer", width: 66 },
-  { name: "Grab", width: 56 },
-  { name: "Lazada", width: 74 },
-  { name: "OCBC", width: 60 },
+  { name: "SK-II", src: "/logos/SK-II.svg" },
+  { name: "Digital Realty", src: "/logos/digital realty.svg" },
+  { name: "LVMH", src: "/logos/lvmh.svg" },
+  { name: "Samsung", src: "/logos/samsung.svg" },
+  { name: "ANZ", src: "/logos/anz.svg" },
+  { name: "MBS", src: "/logos/mbs.svg" },
+  { name: "Epson", src: "/logos/epson.svg" },
+  { name: "Lacoste", src: "/logos/lacoste.svg" },
 ];
 
-function LogoPlaceholder({ name, width }: { name: string; width: number }) {
+function LogoItem({ name, src }: { name: string; src: string }) {
   return (
-    <div
-      style={{
-        width,
-        height: 28,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        opacity: 0.28,
-        filter: "grayscale(1)",
-        transition: "opacity 0.3s",
-        cursor: "default",
-        flexShrink: 0,
-      }}
-      onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = "0.55")}
-      onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.opacity = "0.28")}
-    >
-      {/* Wordmark placeholder — replace <span> with <img src="…" alt={name} /> when ready */}
-      <span
-        style={{
-          fontFamily: "'Sohne', sans-serif",
-          fontWeight: 600,
-          fontSize: "0.78rem",
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
-          color: "#F5F0E8",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {name}
-      </span>
+    <div className="logo-item">
+      <Image src={src} alt={name} width={0} height={28} style={{ width: "auto", height: "28px" }} />
     </div>
   );
 }
@@ -99,13 +71,13 @@ export default function LogosV2() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: "48px",
-          maxWidth: "960px",
+          gap: "32px",
+          maxWidth: "1200px",
           margin: "0 auto",
         }}
       >
         {logos.map((logo) => (
-          <LogoPlaceholder key={logo.name} name={logo.name} width={logo.width} />
+          <LogoItem key={logo.name} name={logo.name} src={logo.src} />
         ))}
       </div>
     </section>

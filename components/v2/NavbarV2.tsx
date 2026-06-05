@@ -38,7 +38,7 @@ export default function NavbarV2() {
     >
 
       <a
-        href="/v2"
+        href="/"
         style={{
           fontFamily: "'Canela', serif",
           fontSize: "1.5rem",

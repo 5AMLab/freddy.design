@@ -5,49 +5,49 @@
 /* ── CANELA FONT FACES ── */
 @font-face {
   font-family: 'Canela';
-  src: url('/fonts/canela/Canela-Light-Trial.otf') format('opentype');
+  src: url('/fonts/canela-woff2/Canela-Light-Trial.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Canela';
-  src: url('/fonts/canela/Canela-LightItalic-Trial.otf') format('opentype');
+  src: url('/fonts/canela-woff2/Canela-LightItalic-Trial.woff2') format('woff2');
   font-weight: 300;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: 'Canela';
-  src: url('/fonts/canela/Canela-Regular-Trial.otf') format('opentype');
+  src: url('/fonts/canela-woff2/Canela-Regular-Trial.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Canela';
-  src: url('/fonts/canela/Canela-RegularItalic-Trial.otf') format('opentype');
+  src: url('/fonts/canela-woff2/Canela-RegularItalic-Trial.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: 'Canela Deck';
-  src: url('/fonts/canela/CanelaDeck-Light-Trial.otf') format('opentype');
+  src: url('/fonts/canela-woff2/CanelaDeck-Light-Trial.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Canela Deck';
-  src: url('/fonts/canela/CanelaDeck-Regular-Trial.otf') format('opentype');
+  src: url('/fonts/canela-woff2/CanelaDeck-Regular-Trial.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Canela Deck';
-  src: url('/fonts/canela/CanelaDeck-RegularItalic-Trial.otf') format('opentype');
+  src: url('/fonts/canela-woff2/CanelaDeck-RegularItalic-Trial.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -56,42 +56,42 @@
 /* ── SÖHNE FONT FACES ── */
 @font-face {
   font-family: 'Sohne';
-  src: url('/fonts/sohne/TestSohne-Leicht-BF663d89cd4952e.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohne-Leicht-BF663d89cd4952e.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Sohne';
-  src: url('/fonts/sohne/TestSohne-LeichtKursiv-BF663d89cd9a361.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohne-LeichtKursiv-BF663d89cd9a361.woff2') format('woff2');
   font-weight: 300;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: 'Sohne';
-  src: url('/fonts/sohne/TestSohne-Buch-BF663d89cd32e6a.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohne-Buch-BF663d89cd32e6a.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Sohne';
-  src: url('/fonts/sohne/TestSohne-BuchKursiv-BF663d89cd3e887.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohne-BuchKursiv-BF663d89cd3e887.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: 'Sohne';
-  src: url('/fonts/sohne/TestSohne-Kraftig-BF663d89cd37e26.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohne-Kraftig-BF663d89cd37e26.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Sohne';
-  src: url('/fonts/sohne/TestSohne-Halbfett-BF663d89cd2d67b.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohne-Halbfett-BF663d89cd2d67b.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -100,21 +100,21 @@
 /* ── SÖHNE BREIT FONT FACES ── */
 @font-face {
   font-family: 'Sohne Breit';
-  src: url('/fonts/sohne/TestSohneBreit-Leicht-BF663d89cae7333.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohneBreit-Leicht-BF663d89cae7333.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Sohne Breit';
-  src: url('/fonts/sohne/TestSohneBreit-Buch-BF663d89ca2ff42.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohneBreit-Buch-BF663d89ca2ff42.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Sohne Breit';
-  src: url('/fonts/sohne/TestSohneBreit-Kraftig-BF663d89caa6b6c.otf') format('opentype');
+  src: url('/fonts/sohne-woff2/TestSohneBreit-Kraftig-BF663d89caa6b6c.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -227,6 +227,19 @@ body {
 }
 
 /* Logos */
+.logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.25;
+  transition: opacity 0.4s ease;
+  cursor: default;
+}
+.logo-item:hover {
+  opacity: 0.7;
+}
+
 @media (max-width: 768px) {
   .logos-v2-section { padding: 48px 24px !important; }
   .logos-v2-row { gap: 36px !important; flex-wrap: wrap !important; justify-content: center !important; }
