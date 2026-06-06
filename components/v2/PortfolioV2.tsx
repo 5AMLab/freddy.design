@@ -282,6 +282,7 @@ function Lightbox({
           onClick={(e) => e.stopPropagation()}
           style={{
             display: "flex",
+            justifyContent: "center",
             gap: "8px",
             flexWrap: "nowrap",
             overflowX: "auto",
