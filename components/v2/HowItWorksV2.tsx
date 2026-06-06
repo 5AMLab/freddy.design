@@ -121,7 +121,7 @@ export default function HowItWorksV2() {
                   fontFamily: "'Canela', serif",
                   fontSize: "1.65rem",
                   fontWeight: 400,
-                  color: i === 3 ? "#C9A96E" : "#F5F0E8",
+                  color: "#F5F0E8",
                   marginBottom: "14px",
                   lineHeight: 1.15,
                 }}
@@ -133,8 +133,8 @@ export default function HowItWorksV2() {
                   fontFamily: "'Sohne', sans-serif",
                   fontSize: "0.88rem",
                   lineHeight: 1.75,
-                  color: "rgba(245,240,232,0.55)",
-                  fontWeight: 300,
+                  color: "rgba(245,240,232,0.70)",
+                  fontWeight: 400,
                 }}
               >
                 {step.desc}
@@ -157,6 +157,36 @@ export default function HowItWorksV2() {
               )}
             </div>
           ))}
+        </div>
+
+        <div className="v2-fade" style={{ marginTop: "56px" }}>
+          <a
+            href="#pricing"
+            style={{
+              fontFamily: "'Sohne', sans-serif",
+              fontSize: "0.85rem",
+              fontWeight: 400,
+              letterSpacing: "0.08em",
+              color: "#C9A96E",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderBottom: "1px solid rgba(201,169,110,0.3)",
+              paddingBottom: "2px",
+              transition: "border-color 0.2s, gap 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "#C9A96E";
+              (e.currentTarget as HTMLAnchorElement).style.gap = "14px";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(201,169,110,0.3)";
+              (e.currentTarget as HTMLAnchorElement).style.gap = "8px";
+            }}
+          >
+            See plans & pricing →
+          </a>
         </div>
       </section>
     </>

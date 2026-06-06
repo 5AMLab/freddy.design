@@ -79,7 +79,7 @@ export default function CTAV2() {
                 fontSize: "1rem",
                 fontWeight: 300,
                 lineHeight: 1.7,
-                color: "rgba(245,240,232,0.4)",
+                color: "rgba(245,240,232,0.65)",
                 maxWidth: "440px",
               }}
             >

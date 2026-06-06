@@ -144,7 +144,7 @@ export default function PricingV2() {
                   fontWeight: 500,
                   letterSpacing: "0.2em",
                   textTransform: "uppercase",
-                  color: "rgba(245,240,232,0.3)",
+                  color: "rgba(245,240,232,0.55)",
                   marginBottom: "8px",
                 }}
               >
@@ -214,8 +214,8 @@ export default function PricingV2() {
                     style={{
                       fontFamily: "'Sohne', sans-serif",
                       fontSize: "0.88rem",
-                      fontWeight: 300,
-                      color: "rgba(245,240,232,0.55)",
+                      fontWeight: 400,
+                      color: "rgba(245,240,232,0.70)",
                       padding: "10px 0",
                       borderBottom: "1px solid rgba(245,240,232,0.05)",
                       display: "flex",
@@ -279,6 +279,21 @@ export default function PricingV2() {
               </a>
             </div>
           ))}
+        </div>
+
+        <div
+          className="v2-fade"
+          style={{
+            marginTop: "28px",
+            fontFamily: "'Sohne', sans-serif",
+            fontSize: "0.75rem",
+            fontWeight: 400,
+            color: "rgba(245,240,232,0.40)",
+            letterSpacing: "0.04em",
+            lineHeight: 1.6,
+          }}
+        >
+          A design hour covers any task — deck slides, social assets, print files, brand work. Hours are tracked per deliverable and shared transparently. Unused hours do not roll over.
         </div>
       </section>
     </>

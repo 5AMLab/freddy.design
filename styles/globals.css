@@ -249,9 +249,7 @@ body {
 @media (max-width: 768px) {
   .services-v2-section { padding: 80px 24px !important; }
   .service-v2-row { grid-template-columns: 48px 1fr !important; padding: 28px 0 !important; }
-  .service-v2-row > div:last-child { display: none; }
-  .service-v2-desc-wrap { display: block !important; grid-template-rows: unset !important; }
-  .service-v2-desc { opacity: 1 !important; margin-top: 16px !important; max-width: 100% !important; }
+  .service-v2-tag { display: none !important; }
 }
 
 /* Portfolio */
@@ -281,6 +279,11 @@ body {
 /* Industries */
 @media (max-width: 768px) {
   .industries-v2-section { padding: 80px 24px !important; }
+  .industry-arrow-col { display: none !important; }
+  .industry-desc {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* CTA */

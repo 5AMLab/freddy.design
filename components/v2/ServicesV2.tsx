@@ -37,10 +37,10 @@ function ServiceRow({ service }: { service: (typeof services)[0] }) {
       style={{
         display: "grid",
         gridTemplateColumns: "80px 1fr auto",
-        alignItems: "center",
+        alignItems: "start",
         gap: "32px",
-        padding: "36px 0 36px 0",
-        borderBottom: "1px solid rgba(245,240,232,0.06)",
+        padding: "36px 0",
+        borderBottom: "1px solid rgba(245,240,232,0.12)",
         cursor: "default",
         position: "relative",
         transition: "background 0.4s",
@@ -63,14 +63,13 @@ function ServiceRow({ service }: { service: (typeof services)[0] }) {
         }}
       />
 
-      {/* Number — color only, no size change to avoid reflow */}
       <div
         style={{
           fontFamily: "'Canela', serif",
           fontSize: "1rem",
           fontWeight: 300,
-          color: hovered ? "#C9A96E" : "rgba(245,240,232,0.18)",
-          paddingTop: "2px",
+          color: hovered ? "#C9A96E" : "rgba(245,240,232,0.25)",
+          paddingTop: "6px",
           transition: "color 0.3s ease",
           letterSpacing: "0.05em",
           textAlign: "right",
@@ -79,7 +78,6 @@ function ServiceRow({ service }: { service: (typeof services)[0] }) {
         {service.num}
       </div>
 
-      {/* Title + desc — subtle translate only, no margin animation */}
       <div
         style={{
           transform: hovered ? "translateX(4px)" : "translateX(0px)",
@@ -91,61 +89,48 @@ function ServiceRow({ service }: { service: (typeof services)[0] }) {
             fontFamily: "'Canela', serif",
             fontSize: "clamp(1.6rem, 2.5vw, 2.2rem)",
             fontWeight: 400,
-            color: hovered ? "#F5F0E8" : "rgba(245,240,232,0.6)",
+            color: hovered ? "#F5F0E8" : "rgba(245,240,232,0.85)",
             lineHeight: 1.1,
             transition: "color 0.3s ease",
+            marginBottom: "12px",
           }}
         >
           {service.title}
         </div>
-        {/* grid-template-rows accordion: smooth expand without max-height imprecision */}
-        <div
-          className="service-v2-desc-wrap"
+        <p
           style={{
-            display: "grid",
-            gridTemplateRows: hovered ? "1fr" : "0fr",
-            transition: "grid-template-rows 0.4s cubic-bezier(0.16,1,0.3,1)",
+            fontFamily: "'Sohne', sans-serif",
+            fontSize: "0.95rem",
+            lineHeight: 1.75,
+            color: "rgba(245,240,232,0.70)",
+            fontWeight: 400,
+            maxWidth: "520px",
           }}
         >
-          <div style={{ overflow: "hidden" }}>
-            <p
-              className="service-v2-desc"
-              style={{
-                fontFamily: "'Sohne', sans-serif",
-                fontSize: "0.88rem",
-                lineHeight: 1.75,
-                color: "rgba(245,240,232,0.5)",
-                fontWeight: 300,
-                maxWidth: "520px",
-                marginTop: "10px",
-                opacity: hovered ? 1 : 0,
-                transition: "opacity 0.3s ease 0.05s",
-              }}
-            >
-              {service.desc}
-            </p>
-          </div>
-        </div>
+          {service.desc}
+        </p>
       </div>
 
       {/* Tag */}
       <div
+        className="service-v2-tag"
         style={{
           fontFamily: "'Sohne', sans-serif",
           fontSize: "0.62rem",
           fontWeight: 500,
           letterSpacing: "0.16em",
           textTransform: "uppercase",
-          color: hovered ? "#0D0D0D" : "rgba(201,169,110,0.4)",
+          color: hovered ? "#0D0D0D" : "rgba(201,169,110,0.7)",
           background: hovered ? "#C9A96E" : "transparent",
-          border: "1px solid rgba(201,169,110,0.25)",
+          border: "1px solid rgba(201,169,110,0.35)",
           padding: "7px 20px 7px 16px",
           borderRadius: "2px",
           whiteSpace: "nowrap",
-          alignSelf: "center",
+          alignSelf: "start",
+          marginTop: "8px",
           marginRight: "48px",
           transition: "color 0.3s ease, background 0.3s ease, border-color 0.3s ease",
-          borderColor: hovered ? "#C9A96E" : "rgba(201,169,110,0.25)",
+          borderColor: hovered ? "#C9A96E" : "rgba(201,169,110,0.35)",
         }}
       >
         {service.tag}
@@ -158,64 +143,96 @@ export default function ServicesV2() {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const cards = ref.current
+      ? Array.from(ref.current.querySelectorAll<Element>(".v2-fade"))
+      : [];
+
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry, i) => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add("v2-visible"), i * 100);
+            const i = cards.indexOf(entry.target);
+            setTimeout(() => entry.target.classList.add("v2-visible"), Math.max(i, 0) * 100);
           }
         });
       },
       { threshold: 0.05 }
     );
-    ref.current?.querySelectorAll(".v2-fade").forEach((el) => observer.observe(el));
+    cards.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
   return (
-    <>
-
-      <section
-        id="services"
-        ref={ref}
-        className="services-v2-section"
-        style={{ padding: "120px 72px", background: "#0D0D0D" }}
-      >
-        <div className="v2-fade" style={{ marginBottom: "72px" }}>
-          <div
-            style={{
-              fontFamily: "'Sohne Breit', sans-serif",
-              fontSize: "0.65rem",
-              fontWeight: 400,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "#C9A96E",
-              marginBottom: "20px",
-            }}
-          >
-            What I Do
-          </div>
-          <h2
-            style={{
-              fontFamily: "'Canela', serif",
-              fontSize: "clamp(2.4rem, 4vw, 3.8rem)",
-              fontWeight: 300,
-              lineHeight: 1.1,
-              color: "#F5F0E8",
-            }}
-          >
-            Design for every brief,
-            <br />
-            every industry.
-          </h2>
+    <section
+      id="services"
+      ref={ref}
+      className="services-v2-section"
+      style={{ padding: "120px 72px", background: "#0D0D0D" }}
+    >
+      <div className="v2-fade" style={{ marginBottom: "72px" }}>
+        <div
+          style={{
+            fontFamily: "'Sohne Breit', sans-serif",
+            fontSize: "0.65rem",
+            fontWeight: 400,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "#C9A96E",
+            marginBottom: "20px",
+          }}
+        >
+          What I Do
         </div>
+        <h2
+          style={{
+            fontFamily: "'Canela', serif",
+            fontSize: "clamp(2.4rem, 4vw, 3.8rem)",
+            fontWeight: 300,
+            lineHeight: 1.1,
+            color: "#F5F0E8",
+          }}
+        >
+          Design for every brief,
+          <br />
+          every industry.
+        </h2>
+      </div>
 
-        <div style={{ borderTop: "1px solid rgba(245,240,232,0.06)" }}>
-          {services.map((service) => (
-            <ServiceRow key={service.num} service={service} />
-          ))}
-        </div>
-      </section>
-    </>
+      <div style={{ borderTop: "1px solid rgba(245,240,232,0.12)" }}>
+        {services.map((service) => (
+          <ServiceRow key={service.num} service={service} />
+        ))}
+      </div>
+
+      <div className="v2-fade" style={{ marginTop: "48px" }}>
+        <a
+          href="#pricing"
+          style={{
+            fontFamily: "'Sohne', sans-serif",
+            fontSize: "0.85rem",
+            fontWeight: 400,
+            letterSpacing: "0.08em",
+            color: "#C9A96E",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            borderBottom: "1px solid rgba(201,169,110,0.3)",
+            paddingBottom: "2px",
+            transition: "border-color 0.2s, gap 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "#C9A96E";
+            (e.currentTarget as HTMLAnchorElement).style.gap = "14px";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(201,169,110,0.3)";
+            (e.currentTarget as HTMLAnchorElement).style.gap = "8px";
+          }}
+        >
+          See pricing & plans →
+        </a>
+      </div>
+    </section>
   );
 }

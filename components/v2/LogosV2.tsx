@@ -57,7 +57,7 @@ export default function LogosV2() {
           fontWeight: 400,
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: "rgba(245,240,232,0.2)",
+          color: "rgba(245,240,232,0.45)",
           textAlign: "center",
           marginBottom: "36px",
         }}
@@ -70,7 +70,7 @@ export default function LogosV2() {
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: "center",
           gap: "32px",
           maxWidth: "1200px",
           margin: "0 auto",

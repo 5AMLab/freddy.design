@@ -472,8 +472,8 @@ function ProjectCard({
             style={{
               fontFamily: "'Sohne', sans-serif",
               fontSize: "0.72rem",
-              fontWeight: 300,
-              color: "rgba(245,240,232,0.3)",
+              fontWeight: 400,
+              color: "rgba(245,240,232,0.55)",
               letterSpacing: "0.04em",
             }}
           >
@@ -612,8 +612,8 @@ export default function PortfolioV2() {
             style={{
               fontFamily: "'Sohne', sans-serif",
               fontSize: "0.7rem",
-              fontWeight: 300,
-              color: "rgba(245,240,232,0.35)",
+              fontWeight: 400,
+              color: "rgba(245,240,232,0.50)",
               letterSpacing: "0.06em",
             }}
           >
@@ -624,28 +624,27 @@ export default function PortfolioV2() {
             href="#cta"
             style={{
               fontFamily: "'Sohne', sans-serif",
-              fontSize: "0.75rem",
-              fontWeight: 500,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "rgba(245,240,232,0.4)",
+              fontSize: "0.85rem",
+              fontWeight: 400,
+              letterSpacing: "0.08em",
+              color: "#C9A96E",
               textDecoration: "none",
               display: "inline-flex",
               alignItems: "center",
               gap: "8px",
               paddingBottom: "2px",
-              borderBottom: "1px solid rgba(245,240,232,0.15)",
-              transition: "color 0.2s, border-color 0.2s",
+              borderBottom: "1px solid rgba(201,169,110,0.3)",
+              transition: "border-color 0.2s, gap 0.2s",
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLAnchorElement;
-              el.style.color = "#C9A96E";
-              el.style.borderColor = "rgba(201,169,110,0.4)";
+              el.style.borderColor = "#C9A96E";
+              el.style.gap = "14px";
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLAnchorElement;
-              el.style.color = "rgba(245,240,232,0.4)";
-              el.style.borderColor = "rgba(245,240,232,0.15)";
+              el.style.borderColor = "rgba(201,169,110,0.3)";
+              el.style.gap = "8px";
             }}
           >
             Start a project →

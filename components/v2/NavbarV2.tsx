@@ -59,7 +59,7 @@ export default function NavbarV2() {
           alignItems: "center",
         }}
       >
-        {["Services", "How It Works", "Pricing", "Industries"].map((item) => (
+        {["Services", "Portfolio", "How It Works", "Pricing", "Industries"].map((item) => (
           <li key={item}>
             <a
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
@@ -68,14 +68,14 @@ export default function NavbarV2() {
                 fontFamily: "'Sohne', sans-serif",
                 fontWeight: 400,
                 fontSize: "0.8rem",
-                color: "rgba(245,240,232,0.6)",
+                color: "rgba(245,240,232,0.75)",
                 textDecoration: "none",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 transition: "color 0.2s",
               }}
               onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#C9A96E")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,240,232,0.6)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,240,232,0.75)")}
             >
               {item}
             </a>

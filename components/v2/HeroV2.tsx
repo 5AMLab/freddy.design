@@ -77,10 +77,10 @@ export default function HeroV2() {
                 fontFamily: "'Sohne', sans-serif",
                 fontSize: "1.05rem",
                 lineHeight: 1.8,
-                color: "rgba(245,240,232,0.55)",
+                color: "rgba(245,240,232,0.70)",
                 maxWidth: "440px",
                 marginBottom: "48px",
-                fontWeight: 300,
+                fontWeight: 400,
               }}
             >
               Skip the overhead of a full-time hire. A dedicated designer on speed dial —
@@ -119,27 +119,6 @@ export default function HeroV2() {
                 }}
               >
                 View Retainer Plans
-              </a>
-              <a
-                href="#services"
-                style={{
-                  fontFamily: "'Sohne', sans-serif",
-                  fontWeight: 400,
-                  fontSize: "0.8rem",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "rgba(245,240,232,0.5)",
-                  textDecoration: "none",
-                  transition: "color 0.2s",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#C9A96E")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,240,232,0.5)")}
-              >
-                Explore Services
-                <span style={{ fontSize: "1rem" }}>↓</span>
               </a>
             </div>
           </div>
