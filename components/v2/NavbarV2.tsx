@@ -1,24 +1,128 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
+import Magnetic from "@/components/motion/Magnetic";
+import { prefersReducedMotion } from "@/components/motion/MotionProvider";
+import { openBrief } from "@/components/v2/BriefFlow";
+import { CONTACT_EMAIL } from "@/lib/site";
+
+const MENU_ITEMS = ["Services", "Portfolio", "How It Works", "Pricing", "Industries"];
 
 export default function NavbarV2() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
+
+  // Full-page mobile menu: gold accent wipes down first, the dark panel
+  // chases it, then the links reveal line-by-line (MOTION.md). Close runs
+  // the same choreography upward.
+  useEffect(() => {
+    const el = menuRef.current;
+    if (!el) return;
+    if (!mounted.current) {
+      mounted.current = true;
+      if (!open) return; // don't play the close animation on first render
+    }
+    document.body.style.overflow = open ? "hidden" : "";
+
+    const q = gsap.utils.selector(el);
+    if (prefersReducedMotion()) {
+      gsap.set(el, { visibility: open ? "visible" : "hidden", pointerEvents: open ? "auto" : "none" });
+      gsap.set([q(".mobile-menu-accent"), q(".mobile-menu-bg")], { yPercent: open ? 0 : -100 });
+      gsap.set(q(".mobile-menu-link .line"), { yPercent: 0 });
+      gsap.set(q(".mobile-menu-foot"), { opacity: 1 });
+      return;
+    }
+
+    const tl = gsap.timeline();
+    if (open) {
+      tl.set(el, { visibility: "visible", pointerEvents: "auto" })
+        // y: 0 clears the CSS translateY(-100%) fallback, which GSAP would
+        // otherwise keep as a resolved px base offset under yPercent
+        .fromTo(q(".mobile-menu-accent"), { yPercent: -100, y: 0 }, { yPercent: 0, duration: 0.5, ease: "expo.inOut" }, 0)
+        .fromTo(q(".mobile-menu-bg"), { yPercent: -100, y: 0 }, { yPercent: 0, duration: 0.55, ease: "expo.inOut" }, 0.08)
+        .fromTo(
+          q(".mobile-menu-link .line"),
+          { yPercent: 110 },
+          { yPercent: 0, duration: 0.8, ease: "expo.out", stagger: 0.07 },
+          0.42
+        )
+        .fromTo(
+          q(".mobile-menu-foot"),
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "expo.out" },
+          0.75
+        );
+    } else {
+      tl.to(q(".mobile-menu-link .line"), { yPercent: -110, duration: 0.3, ease: "expo.in", stagger: 0.04 }, 0)
+        .to(q(".mobile-menu-foot"), { opacity: 0, duration: 0.25 }, 0)
+        .to(q(".mobile-menu-bg"), { yPercent: -100, duration: 0.5, ease: "expo.inOut" }, 0.22)
+        .to(q(".mobile-menu-accent"), { yPercent: -100, duration: 0.5, ease: "expo.inOut" }, 0.3)
+        .set(el, { visibility: "hidden", pointerEvents: "none" });
+    }
+    return () => {
+      tl.kill();
+    };
+  }, [open]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 40);
+      // hide when scrolling down past the hero, reveal on any upward scroll
+      setHidden(y > 200 && y > lastY.current);
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <>
-    {open && (
-      <div
-        onClick={() => setOpen(false)}
-        style={{ position: "fixed", inset: 0, zIndex: 99 }}
-      />
-    )}
+    {/* Full-page mobile menu (hidden ≥769px via CSS) */}
+    <div ref={menuRef} className="mobile-menu" aria-hidden={!open}>
+      <div className="mobile-menu-accent" aria-hidden />
+      <div className="mobile-menu-bg" aria-hidden />
+      <div className="mobile-menu-content">
+        <nav aria-label="Mobile">
+          {MENU_ITEMS.map((item, i) => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+              className="mobile-menu-link"
+              onClick={() => setOpen(false)}
+            >
+              <span className="mobile-menu-num">{String(i + 1).padStart(2, "0")}</span>
+              <span className="line-mask">
+                <span className="line">{item}</span>
+              </span>
+            </a>
+          ))}
+        </nav>
+
+        <div className="mobile-menu-foot">
+          <div className="mobile-menu-status">
+            <span className="mobile-menu-dot" />
+            Available for new clients
+          </div>
+          <button
+            className="mobile-menu-cta"
+            onClick={() => {
+              setOpen(false);
+              openBrief();
+            }}
+          >
+            Brief Me in 20 Seconds
+          </button>
+          <a className="mobile-menu-mail" href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
+          </a>
+        </div>
+      </div>
+    </div>
     <nav
       style={{
         display: "flex",
@@ -32,7 +136,9 @@ export default function NavbarV2() {
         right: 0,
         zIndex: 100,
         borderBottom: scrolled ? "1px solid rgba(201,169,110,0.15)" : "none",
-        transition: "background 0.4s, border-color 0.4s, backdrop-filter 0.4s",
+        transform: hidden && !open ? "translateY(-100%)" : "translateY(0)",
+        transition:
+          "background 0.4s, border-color 0.4s, backdrop-filter 0.4s, transform 0.5s cubic-bezier(0.16,1,0.3,1)",
       }}
       className="nav-v2-wrapper"
     >
@@ -64,24 +170,22 @@ export default function NavbarV2() {
             <a
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
               onClick={() => setOpen(false)}
+              className="nav-link"
               style={{
                 fontFamily: "'Sohne', sans-serif",
                 fontWeight: 400,
                 fontSize: "0.8rem",
-                color: "rgba(245,240,232,0.75)",
                 textDecoration: "none",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
-                transition: "color 0.2s",
               }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "#C9A96E")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,240,232,0.75)")}
             >
               {item}
             </a>
           </li>
         ))}
         <li>
+          <Magnetic strength={8}>
           <a
             href="#cta"
             onClick={() => setOpen(false)}
@@ -111,6 +215,7 @@ export default function NavbarV2() {
           >
             Let&apos;s Talk
           </a>
+          </Magnetic>
         </li>
       </ul>
 

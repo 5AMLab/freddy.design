@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 const logos = [
   { name: "SK-II", src: "/logos/SK-II.svg" },
@@ -23,19 +23,6 @@ function LogoItem({ name, src }: { name: string; src: string }) {
 
 export default function LogosV2() {
   const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("v2-visible");
-        });
-      },
-      { threshold: 0.2 }
-    );
-    ref.current?.querySelectorAll(".v2-fade").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <section

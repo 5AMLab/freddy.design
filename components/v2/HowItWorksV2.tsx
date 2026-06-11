@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 const steps = [
   {
@@ -26,21 +26,6 @@ const steps = [
 
 export default function HowItWorksV2() {
   const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add("v2-visible"), i * 120);
-          }
-        });
-      },
-      { threshold: 0.05 }
-    );
-    ref.current?.querySelectorAll(".v2-fade").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <>

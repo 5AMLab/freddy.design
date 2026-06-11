@@ -1,22 +1,75 @@
 "use client";
 import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { prefersReducedMotion } from "@/components/motion/MotionProvider";
+import { PRELOADER_DONE_EVENT } from "@/components/motion/Preloader";
+import Magnetic from "@/components/motion/Magnetic";
+import HeroDistortion from "@/components/motion/HeroDistortion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroV2() {
   const ref = useRef<HTMLElement>(null);
 
+  // Entrance choreography (MOTION.md): label → headline lines → body → CTA
+  // → credibility column → scroll indicator. Plays once, after the preloader
+  // hands off.
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add("v2-visible"), i * 120);
-          }
-        });
-      },
-      { threshold: 0.05 }
-    );
-    ref.current?.querySelectorAll(".v2-fade").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    if (prefersReducedMotion() || !ref.current) return;
+    const q = gsap.utils.selector(ref.current);
+    let tl: gsap.core.Timeline | undefined;
+
+    const begin = () => {
+      tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+      tl.to(q(".hero-el-label"), { opacity: 1, y: 0, duration: 0.9 }, 0.1)
+        .fromTo(
+          q(".hero-v2-h1 .line"),
+          // y: 0 clears the CSS translateY(110%) fallback, which GSAP would
+          // otherwise keep as a resolved px base offset under yPercent
+          { yPercent: 110, y: 0 },
+          { yPercent: 0, duration: 1.1, stagger: 0.12 },
+          0.2
+        )
+        .to(q(".hero-el-body"), { opacity: 1, y: 0, duration: 0.9 }, 0.7)
+        .to(q(".hero-el-cta"), { opacity: 1, y: 0, duration: 0.9 }, 0.85)
+        .to(q(".hero-el-aside"), { opacity: 1, y: 0, duration: 0.9 }, 1.0)
+        .to(q(".hero-el-scroll"), { opacity: 1, y: 0, duration: 0.9 }, 1.2);
+    };
+
+    if (document.documentElement.dataset.preloaderDone) begin();
+    else window.addEventListener(PRELOADER_DONE_EVENT, begin, { once: true });
+
+    // drift (MOTION.md): on scroll-out the copy rises slightly faster than
+    // the page, the credibility column slightly slower
+    const drift = gsap.context(() => {
+      gsap.to(q(".hero-v2-grid > div:first-child"), {
+        y: -64,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ref.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+      gsap.to(q(".hero-v2-grid > div:last-child"), {
+        y: -28,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ref.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+    }, ref);
+
+    return () => {
+      window.removeEventListener(PRELOADER_DONE_EVENT, begin);
+      tl?.kill();
+      drift.revert();
+    };
   }, []);
 
   return (
@@ -35,17 +88,6 @@ export default function HeroV2() {
           overflow: "hidden",
         }}
       >
-        {/* Subtle grain texture overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: `url("/noise.svg")`,
-            pointerEvents: "none",
-            opacity: 0.6,
-          }}
-        />
-
         <div
           className="hero-v2-grid"
           style={{
@@ -59,20 +101,26 @@ export default function HeroV2() {
         >
           {/* Left: Main copy */}
           <div>
-            <div className="v2-fade hero-v2-label" style={{ marginBottom: "32px" }}>
+            <div className="hero-el hero-el-label hero-v2-label" style={{ marginBottom: "32px" }}>
               Your Dedicated Design Partner
             </div>
 
-            <h1 className="v2-fade hero-v2-h1" style={{ marginBottom: "36px" }}>
-              Great design.
-              <br />
-              <em>On demand.</em>
-              <br />
-              No drama.
+            <h1 className="hero-v2-h1" style={{ marginBottom: "36px" }}>
+              <span className="line-mask">
+                <span className="line">Great design.</span>
+              </span>
+              <span className="line-mask">
+                <span className="line">
+                  <em>On demand.</em>
+                </span>
+              </span>
+              <span className="line-mask">
+                <span className="line">No drama.</span>
+              </span>
             </h1>
 
             <p
-              className="v2-fade"
+              className="hero-el hero-el-body"
               style={{
                 fontFamily: "'Sohne', sans-serif",
                 fontSize: "1.05rem",
@@ -88,9 +136,10 @@ export default function HeroV2() {
             </p>
 
             <div
-              className="v2-fade"
+              className="hero-el hero-el-cta"
               style={{ display: "flex", gap: "24px", alignItems: "center", flexWrap: "wrap" }}
             >
+              <Magnetic>
               <a
                 href="#pricing"
                 style={{
@@ -120,12 +169,13 @@ export default function HeroV2() {
               >
                 View Retainer Plans
               </a>
+              </Magnetic>
             </div>
           </div>
 
           {/* Right: Stats / credibility block */}
           <div
-            className="v2-fade"
+            className="hero-el hero-el-aside"
             style={{
               borderLeft: "1px solid rgba(201,169,110,0.2)",
               paddingLeft: "60px",
@@ -233,9 +283,11 @@ export default function HeroV2() {
           </div>
         </div>
 
+        <HeroDistortion heroRef={ref} />
+
         {/* Bottom scroll indicator */}
         <div
-          className="v2-fade hero-v2-scroll-indicator"
+          className="hero-el hero-el-scroll hero-v2-scroll-indicator"
           style={{
             position: "absolute",
             bottom: "40px",

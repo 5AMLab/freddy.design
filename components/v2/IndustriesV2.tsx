@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 const industries = [
   {
@@ -131,30 +131,6 @@ function IndustryCard({ industry, index }: { industry: (typeof industries)[0]; i
 
 export default function IndustriesV2() {
   const ref = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const cards = ref.current
-      ? Array.from(ref.current.querySelectorAll<Element>(".v2-fade"))
-      : [];
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const i = cards.indexOf(entry.target);
-            setTimeout(
-              () => entry.target.classList.add("v2-visible"),
-              Math.max(i, 0) * 100
-            );
-          }
-        });
-      },
-      { threshold: 0.05 }
-    );
-
-    cards.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <section

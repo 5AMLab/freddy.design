@@ -1,5 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import gsap from "gsap";
+import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 
 const services = [
   {
@@ -7,28 +10,38 @@ const services = [
     title: "Presentation Decks",
     desc: "Board reports, pitch decks, marketing reviews — polished and on-brand in 48 hours from your brief, rough notes, or even a voice message.",
     tag: "Most Requested",
+    img: "/portfolio/deck-generic-01.jpg",
   },
   {
     num: "02",
     title: "Brand & Campaign",
     desc: "Visual identity, social content, campaign assets, digital banners and posters. Luxury brand standards applied to every touchpoint.",
     tag: "High Impact",
+    img: "/portfolio/brand-guideline-01.jpg",
   },
   {
     num: "03",
     title: "Marketplace & E-commerce",
     desc: "Hero campaign images, product banners and storefront assets for Shopee, Lazada, Amazon and beyond. Built to stop the scroll and drive conversions.",
     tag: "Conversion-Focused",
+    img: "/portfolio/ooh-generic-01.jpg",
   },
   {
     num: "04",
     title: "Print & Collateral",
     desc: "Menus, brochures, event materials, packaging mockups and more. Print-ready files delivered clean and accurate every single time.",
     tag: "F&B Favourite",
+    img: "/portfolio/coffee-mockup-01.jpg",
   },
 ];
 
-function ServiceRow({ service }: { service: (typeof services)[0] }) {
+function ServiceRow({
+  service,
+  onHoverChange,
+}: {
+  service: (typeof services)[0];
+  onHoverChange: (hovered: boolean) => void;
+}) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -46,8 +59,14 @@ function ServiceRow({ service }: { service: (typeof services)[0] }) {
         transition: "background 0.4s",
         background: hovered ? "rgba(201,169,110,0.04)" : "transparent",
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => {
+        setHovered(true);
+        onHoverChange(true);
+      }}
+      onMouseLeave={() => {
+        setHovered(false);
+        onHoverChange(false);
+      }}
     >
       {/* Gold left sweep line */}
       <div
@@ -141,34 +160,79 @@ function ServiceRow({ service }: { service: (typeof services)[0] }) {
 
 export default function ServicesV2() {
   const ref = useRef<HTMLElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<number | null>(null);
+
+  // Floating work preview trails the cursor across the service rows,
+  // crossfading per row. Fine pointers only.
+  useEffect(() => {
+    const section = ref.current;
+    const el = previewRef.current;
+    if (!section || !el || prefersReducedMotion()) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const xTo = gsap.quickTo(el, "x", { duration: 0.55, ease: "power3.out" });
+    const yTo = gsap.quickTo(el, "y", { duration: 0.55, ease: "power3.out" });
+    const onMove = (e: MouseEvent) => {
+      const r = section.getBoundingClientRect();
+      xTo(e.clientX - r.left + 32);
+      yTo(e.clientY - r.top - 100);
+    };
+    section.addEventListener("mousemove", onMove, { passive: true });
+    return () => section.removeEventListener("mousemove", onMove);
+  }, []);
 
   useEffect(() => {
-    const cards = ref.current
-      ? Array.from(ref.current.querySelectorAll<Element>(".v2-fade"))
-      : [];
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const i = cards.indexOf(entry.target);
-            setTimeout(() => entry.target.classList.add("v2-visible"), Math.max(i, 0) * 100);
-          }
-        });
-      },
-      { threshold: 0.05 }
-    );
-    cards.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    const el = previewRef.current;
+    if (!el || prefersReducedMotion()) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    gsap.to(el, {
+      opacity: active !== null ? 1 : 0,
+      scale: active !== null ? 1 : 0.92,
+      duration: 0.35,
+      ease: "power3.out",
+    });
+  }, [active]);
 
   return (
     <section
       id="services"
       ref={ref}
       className="services-v2-section"
-      style={{ padding: "120px 72px", background: "#0D0D0D" }}
+      style={{ padding: "120px 72px", background: "#0D0D0D", position: "relative" }}
     >
+      {/* Cursor-trailing work preview */}
+      <div
+        ref={previewRef}
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "300px",
+          aspectRatio: "3/2",
+          overflow: "hidden",
+          borderRadius: "2px",
+          pointerEvents: "none",
+          zIndex: 5,
+          opacity: 0,
+        }}
+      >
+        {services.map((s, i) => (
+          <Image
+            key={s.num}
+            src={s.img}
+            alt=""
+            fill
+            sizes="300px"
+            style={{
+              objectFit: "cover",
+              opacity: active === i ? 1 : 0,
+              transition: "opacity 0.3s ease",
+            }}
+          />
+        ))}
+      </div>
       <div className="v2-fade" style={{ marginBottom: "72px" }}>
         <div
           style={{
@@ -199,8 +263,12 @@ export default function ServicesV2() {
       </div>
 
       <div style={{ borderTop: "1px solid rgba(245,240,232,0.12)" }}>
-        {services.map((service) => (
-          <ServiceRow key={service.num} service={service} />
+        {services.map((service, i) => (
+          <ServiceRow
+            key={service.num}
+            service={service}
+            onHoverChange={(h) => setActive(h ? i : null)}
+          />
         ))}
       </div>
 

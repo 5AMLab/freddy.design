@@ -360,6 +360,7 @@ function ProjectCard({
       onClick={hasImage ? onOpen : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      data-cursor={hasImage ? "view" : undefined}
       style={{ cursor: hasImage ? "pointer" : "default" }}
     >
       {/* Image */}
@@ -377,43 +378,28 @@ function ProjectCard({
         }}
       >
         {hasImage && (
-          <>
-            <Image
-              src={project.images[0]}
-              alt={`${project.title} — ${project.client}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              style={{ objectFit: "cover", objectPosition: "center" }}
-              loading="lazy"
-            />
+          // mask-scale (MOTION.md): outer layer is GSAP-scaled on scroll
+          // entry, inner layer carries the CSS hover zoom — separate
+          // elements so the two transforms never fight
+          <div className="mask-scale-media" style={{ position: "absolute", inset: 0 }}>
             <div
               style={{
                 position: "absolute",
                 inset: 0,
-                background: "rgba(13,13,13,0.35)",
-                opacity: hovered ? 1 : 0,
-                transition: "opacity 0.35s",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                transform: hovered ? "scale(1.05)" : "scale(1)",
+                transition: "transform 0.9s cubic-bezier(0.16,1,0.3,1)",
               }}
             >
-              <span
-                style={{
-                  fontFamily: "'Sohne', sans-serif",
-                  fontSize: "0.6rem",
-                  fontWeight: 500,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "rgba(245,240,232,0.8)",
-                  opacity: hovered ? 1 : 0,
-                  transition: "opacity 0.25s 0.05s",
-                }}
-              >
-                View project
-              </span>
+              <Image
+                src={project.images[0]}
+                alt={`${project.title} — ${project.client}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                style={{ objectFit: "cover", objectPosition: "center" }}
+                loading="lazy"
+              />
             </div>
-          </>
+          </div>
         )}
 
         {!hasImage && (
@@ -510,21 +496,6 @@ function ProjectCard({
 export default function PortfolioV2() {
   const ref = useRef<HTMLElement>(null);
   const [open, setOpen] = useState<Project | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add("v2-visible"), i * 100);
-          }
-        });
-      },
-      { threshold: 0.05 }
-    );
-    ref.current?.querySelectorAll(".v2-fade").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <>

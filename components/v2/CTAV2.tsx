@@ -1,11 +1,46 @@
 "use client";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { prefersReducedMotion } from "@/components/motion/MotionProvider";
+import Magnetic from "@/components/motion/Magnetic";
+import { openBrief } from "@/components/v2/BriefFlow";
+import { RETAINER_SLOTS } from "@/lib/site";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function CTAV2() {
+  const ref = useRef<HTMLElement>(null);
+
+  // drift (MOTION.md): the watermark slides gently right-to-left as the
+  // section moves through the viewport
+  useEffect(() => {
+    if (prefersReducedMotion() || !ref.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".cta-watermark",
+        { x: 120 },
+        {
+          x: -60,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        }
+      );
+    }, ref);
+    return () => ctx.revert();
+  }, []);
+
   return (
     <>
 
       <section
         id="cta"
+        ref={ref}
         className="cta-v2-section"
         style={{
           background: "#0D0D0D",
@@ -16,6 +51,7 @@ export default function CTAV2() {
       >
         {/* Background large type */}
         <div
+          className="cta-watermark"
           style={{
             position: "absolute",
             bottom: "-20px",
@@ -88,10 +124,13 @@ export default function CTAV2() {
           </div>
 
           <div style={{ flexShrink: 0 }}>
-            <a
-              href="#"
+            <Magnetic>
+            <button
+              onClick={openBrief}
               style={{
                 display: "inline-block",
+                border: "none",
+                cursor: "pointer",
                 fontFamily: "'Sohne', sans-serif",
                 fontWeight: 500,
                 fontSize: "0.8rem",
@@ -106,18 +145,17 @@ export default function CTAV2() {
                 whiteSpace: "nowrap",
               }}
               onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement;
+                const el = e.currentTarget as HTMLButtonElement;
                 el.style.opacity = "0.85";
-                el.style.transform = "translateY(-2px)";
               }}
               onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLAnchorElement;
+                const el = e.currentTarget as HTMLButtonElement;
                 el.style.opacity = "1";
-                el.style.transform = "translateY(0)";
               }}
             >
-              Start a Conversation
-            </a>
+              Brief Me in 20 Seconds
+            </button>
+            </Magnetic>
             <div
               style={{
                 marginTop: "16px",
@@ -126,11 +164,12 @@ export default function CTAV2() {
                 fontSize: "0.7rem",
                 fontWeight: 300,
                 letterSpacing: "0.1em",
-                color: "rgba(245,240,232,0.2)",
+                color: "rgba(201,169,110,0.6)",
                 textTransform: "uppercase",
               }}
             >
-              via WhatsApp or email
+              {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots
+              open for {RETAINER_SLOTS.month}
             </div>
           </div>
         </div>

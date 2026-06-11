@@ -10,6 +10,7 @@ import PricingV2 from "@/components/v2/PricingV2";
 import IndustriesV2 from "@/components/v2/IndustriesV2";
 import CTAV2 from "@/components/v2/CTAV2";
 import FooterV2 from "@/components/v2/FooterV2";
+import BriefFlow from "@/components/v2/BriefFlow";
 
 export default function Home() {
   return (
@@ -27,6 +28,7 @@ export default function Home() {
         <CTAV2 />
       </main>
       <FooterV2 />
+      <BriefFlow />
       <CookieBanner />
     </div>
   );

@@ -131,32 +131,163 @@ html {
   overflow-x: hidden;
 }
 
+/* ── LENIS SMOOTH SCROLL ── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 body {
   background: #0D0D0D;
   color: #F5F0E8;
   overflow-x: hidden;
 }
 
-/* ── MARQUEE ── */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-.animate-marquee {
-  animation: marquee 22s linear infinite;
-  width: max-content;
-}
-
-/* ── V2 FADE-IN ON SCROLL ── */
+/* ── MOTION VOCABULARY (see MOTION.md; driven by GSAP in MotionProvider) ──
+   .v2-fade      fade-up: opacity + 24px rise, batched stagger
+   .reveal-line  masked line reveal: wrap each line in .line-mask > .line */
 .v2-fade {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  transform: translateY(24px);
 }
-.v2-fade.v2-visible {
-  opacity: 1;
-  transform: translateY(0);
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
+.line-mask .line {
+  display: block;
+  will-change: transform;
+}
+
+/* Hero entrance elements start hidden; the load timeline brings them in */
+.hero-el {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.hero-v2-h1 .line {
+  transform: translateY(110%);
+}
+
+/* Reduced motion: everything simply visible, native scroll */
+.reduced-motion .v2-fade,
+.reduced-motion .hero-el,
+.reduced-motion .line-mask .line {
+  opacity: 1 !important;
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── CUSTOM CURSOR ── */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+.cursor-dot {
+  position: fixed;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #C9A96E;
+  pointer-events: none;
+  z-index: 1600;
+}
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.45);
+  background: rgba(201,169,110,0);
+  pointer-events: none;
+  z-index: 1599;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+}
+.cursor-ring-label {
+  font-family: 'Sohne', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #0D0D0D;
+  transition: opacity 0.2s;
+}
+
+/* ── GRAIN OVERLAY ── */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: url("/noise.svg");
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 1500;
+}
+
+/* ── BRIEF FLOW ── */
+.brief-option {
+  color: rgba(245,240,232,0.75);
+  transition: color 0.3s, padding-left 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.brief-option:hover {
+  color: #F5F0E8;
+  padding-left: 12px;
+}
+.brief-option-arrow {
+  color: rgba(201,169,110,0.0);
+  transition: color 0.3s;
+}
+.brief-option:hover .brief-option-arrow {
+  color: #C9A96E;
+}
+.brief-option:focus-visible {
+  outline: 1px solid rgba(201,169,110,0.6);
+  outline-offset: 4px;
+}
+
+/* ── NAV LINK UNDERLINE ── */
+.nav-link {
+  position: relative;
+  color: rgba(245,240,232,0.75);
+  transition: color 0.3s;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: #C9A96E;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.nav-link:hover {
+  color: #C9A96E;
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
 }
 
 /* Hero */
@@ -195,21 +326,106 @@ body {
 
 @media (max-width: 768px) {
   .nav-v2-wrapper { padding: 20px 24px; }
-  .nav-v2-links {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: rgba(13,13,13,0.98);
-    padding: 28px 24px;
-    gap: 24px !important;
-    border-bottom: 1px solid rgba(201,169,110,0.2);
-    backdrop-filter: blur(12px);
-  }
-  .nav-v2-links.open { display: flex !important; }
+  .nav-v2-links { display: none; }
   .nav-v2-hamburger { display: flex !important; }
+}
+
+/* ── FULL-PAGE MOBILE MENU ── */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99; /* under the navbar bar so logo + hamburger stay live */
+  visibility: hidden;
+  pointer-events: none;
+}
+@media (max-width: 768px) {
+  .mobile-menu { display: block; }
+}
+.mobile-menu-accent,
+.mobile-menu-bg {
+  position: absolute;
+  inset: 0;
+  transform: translateY(-100%);
+}
+.mobile-menu-accent { background: #C9A96E; }
+.mobile-menu-bg { background: #0D0D0D; }
+.mobile-menu-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 110px 24px 40px;
+}
+.mobile-menu-link {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 0;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(245,240,232,0.08);
+  font-family: 'Canela', serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 8.5vw, 2.8rem);
+  line-height: 1.1;
+  color: #F5F0E8;
+}
+.mobile-menu-link:active .line {
+  color: #C9A96E;
+  font-style: italic;
+}
+.mobile-menu-num {
+  font-family: 'Sohne', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: rgba(201,169,110,0.6);
+}
+.mobile-menu-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.mobile-menu-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Sohne', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.45);
+}
+.mobile-menu-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px rgba(74,222,128,0.6);
+}
+.mobile-menu-cta {
+  font-family: 'Sohne', sans-serif;
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0D0D0D;
+  background: #C9A96E;
+  border: none;
+  border-radius: 2px;
+  padding: 18px 0;
+  width: 100%;
+  cursor: pointer;
+}
+.mobile-menu-mail {
+  font-family: 'Canela', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1rem;
+  color: rgba(245,240,232,0.5);
+  text-decoration: none;
 }
 
 /* Hero responsive */
@@ -232,12 +448,12 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  opacity: 0.25;
+  opacity: 0.5;
   transition: opacity 0.4s ease;
   cursor: default;
 }
 .logo-item:hover {
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 @media (max-width: 768px) {

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import MotionProvider from "@/components/motion/MotionProvider";
+import Preloader from "@/components/motion/Preloader";
+import Cursor from "@/components/motion/Cursor";
 import "../styles/globals.css";
 
 export const metadata: Metadata = {
@@ -25,7 +28,12 @@ export default function RootLayout({
         <link rel="preconnect" href="https://va.vercel-scripts.com" />
       </head>
       <body>
-        {children}
+        <MotionProvider>
+          {children}
+          <Preloader />
+          <Cursor />
+          <div className="grain-overlay" aria-hidden />
+        </MotionProvider>
         <Analytics />
       </body>
     </html>

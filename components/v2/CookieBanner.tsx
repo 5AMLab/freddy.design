@@ -4,21 +4,26 @@ import Link from "next/link";
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
+  const [shown, setShown] = useState(false); // drives the enter/exit transition
 
   useEffect(() => {
     const consent = localStorage.getItem("cookie_consent");
-    if (!consent) setVisible(true);
+    if (!consent) {
+      setVisible(true);
+      // let the hero entrance breathe before the banner slides in
+      const t = setTimeout(() => setShown(true), 2200);
+      return () => clearTimeout(t);
+    }
   }, []);
 
-  const accept = () => {
-    localStorage.setItem("cookie_consent", "accepted");
-    setVisible(false);
+  const dismiss = (choice: "accepted" | "declined") => {
+    localStorage.setItem("cookie_consent", choice);
+    setShown(false);
+    setTimeout(() => setVisible(false), 500);
   };
 
-  const decline = () => {
-    localStorage.setItem("cookie_consent", "declined");
-    setVisible(false);
-  };
+  const accept = () => dismiss("accepted");
+  const decline = () => dismiss("declined");
 
   if (!visible) return null;
 
@@ -27,7 +32,11 @@ export default function CookieBanner() {
       position: "fixed",
       bottom: "32px",
       left: "50%",
-      transform: "translateX(-50%)",
+      transform: shown
+        ? "translateX(-50%) translateY(0)"
+        : "translateX(-50%) translateY(24px)",
+      opacity: shown ? 1 : 0,
+      transition: "transform 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.5s cubic-bezier(0.16,1,0.3,1)",
       zIndex: 999,
       width: "min(680px, calc(100vw - 48px))",
       background: "#161616",
