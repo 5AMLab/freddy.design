@@ -346,7 +346,12 @@ html.has-custom-cursor * {
 .mobile-menu-bg {
   position: absolute;
   inset: 0;
-  transform: translateY(-100%);
+  /* Off-screen start is owned entirely by GSAP (yPercent: -100) so its
+     transform can't compose on top of a stale CSS translateY(-100%).
+     That double-translation pushed the panel ~2 viewports up and hid the
+     background on taller phones (iPhone 13 etc). JS sets the initial
+     yPercent on mount; this transform: none is just the resting base. */
+  transform: none;
 }
 .mobile-menu-accent { background: #C9A96E; }
 .mobile-menu-bg { background: #0D0D0D; }

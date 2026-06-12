@@ -22,13 +22,16 @@ export default function NavbarV2() {
   useEffect(() => {
     const el = menuRef.current;
     if (!el) return;
+    const q = gsap.utils.selector(el);
     if (!mounted.current) {
       mounted.current = true;
+      // Park the panels off-screen via GSAP so it owns the transform outright
+      // (CSS leaves them at transform: none). Without this the first open would
+      // animate from the on-screen resting state.
+      gsap.set([q(".mobile-menu-accent"), q(".mobile-menu-bg")], { yPercent: -100 });
       if (!open) return; // don't play the close animation on first render
     }
     document.body.style.overflow = open ? "hidden" : "";
-
-    const q = gsap.utils.selector(el);
     if (prefersReducedMotion()) {
       gsap.set(el, { visibility: open ? "visible" : "hidden", pointerEvents: open ? "auto" : "none" });
       gsap.set([q(".mobile-menu-accent"), q(".mobile-menu-bg")], { yPercent: open ? 0 : -100 });
@@ -40,10 +43,8 @@ export default function NavbarV2() {
     const tl = gsap.timeline();
     if (open) {
       tl.set(el, { visibility: "visible", pointerEvents: "auto" })
-        // y: 0 clears the CSS translateY(-100%) fallback, which GSAP would
-        // otherwise keep as a resolved px base offset under yPercent
-        .fromTo(q(".mobile-menu-accent"), { yPercent: -100, y: 0 }, { yPercent: 0, duration: 0.5, ease: "expo.inOut" }, 0)
-        .fromTo(q(".mobile-menu-bg"), { yPercent: -100, y: 0 }, { yPercent: 0, duration: 0.55, ease: "expo.inOut" }, 0.08)
+        .fromTo(q(".mobile-menu-accent"), { yPercent: -100 }, { yPercent: 0, duration: 0.5, ease: "expo.inOut" }, 0)
+        .fromTo(q(".mobile-menu-bg"), { yPercent: -100 }, { yPercent: 0, duration: 0.55, ease: "expo.inOut" }, 0.08)
         .fromTo(
           q(".mobile-menu-link .line"),
           { yPercent: 110 },
