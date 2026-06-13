@@ -34,3 +34,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local agent / editor config
+/.claude/
+
+# local working assets — source files, references, raw exports (not shipped)
+/Reference/
+/Canela_Collection/
+/public/portfolio/hero video/
+*.psd
+
+# scratch
+/preview.html

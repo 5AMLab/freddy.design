@@ -20,8 +20,8 @@ export default function Home() {
         <HeroV2 />
         <MarqueeV2 />
         <LogosV2 />
-        <ServicesV2 />
         <PortfolioV2 />
+        <ServicesV2 />
         <HowItWorksV2 />
         <PricingV2 />
         <IndustriesV2 />

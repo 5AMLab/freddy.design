@@ -6,6 +6,9 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { PRELOADER_DONE_EVENT } from "@/components/motion/Preloader";
 import Magnetic from "@/components/motion/Magnetic";
 import HeroDistortion from "@/components/motion/HeroDistortion";
+import { openBrief } from "@/components/v2/BriefFlow";
+import { RETAINER_SLOTS } from "@/lib/site";
+import HeroReel from "@/components/v2/HeroReel";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -140,8 +143,8 @@ export default function HeroV2() {
               style={{ display: "flex", gap: "24px", alignItems: "center", flexWrap: "wrap" }}
             >
               <Magnetic>
-              <a
-                href="#pricing"
+              <button
+                onClick={openBrief}
                 style={{
                   fontFamily: "'Sohne', sans-serif",
                   fontWeight: 500,
@@ -149,27 +152,55 @@ export default function HeroV2() {
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                   color: "#0D0D0D",
-                  textDecoration: "none",
                   background: "#C9A96E",
+                  border: "none",
+                  cursor: "pointer",
                   padding: "16px 36px",
                   borderRadius: "2px",
                   transition: "opacity 0.2s, transform 0.2s",
                   display: "inline-block",
                 }}
                 onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
+                  const el = e.currentTarget as HTMLButtonElement;
                   el.style.opacity = "0.85";
                   el.style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
+                  const el = e.currentTarget as HTMLButtonElement;
                   el.style.opacity = "1";
                   el.style.transform = "translateY(0)";
                 }}
               >
-                View Retainer Plans
-              </a>
+                Brief Me in 20 Seconds
+              </button>
               </Magnetic>
+              <a
+                href="#pricing"
+                style={{
+                  fontFamily: "'Sohne', sans-serif",
+                  fontWeight: 400,
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "rgba(245,240,232,0.6)",
+                  textDecoration: "none",
+                  borderBottom: "1px solid rgba(201,169,110,0.3)",
+                  paddingBottom: "3px",
+                  transition: "color 0.2s, border-color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLAnchorElement;
+                  el.style.color = "#C9A96E";
+                  el.style.borderColor = "#C9A96E";
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLAnchorElement;
+                  el.style.color = "rgba(245,240,232,0.6)";
+                  el.style.borderColor = "rgba(201,169,110,0.3)";
+                }}
+              >
+                See Retainer Plans
+              </a>
             </div>
           </div>
 
@@ -184,6 +215,9 @@ export default function HeroV2() {
               gap: "40px",
             }}
           >
+            {/* Showreel */}
+            <HeroReel />
+
             {/* Status */}
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span
@@ -206,7 +240,10 @@ export default function HeroV2() {
                   color: "rgba(245,240,232,0.4)",
                 }}
               >
-                Available for new clients
+                <span style={{ color: "#C9A96E" }}>
+                  {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots
+                </span>{" "}
+                left for {RETAINER_SLOTS.month}
               </span>
             </div>
 

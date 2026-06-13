@@ -476,6 +476,13 @@ html.has-custom-cursor * {
 /* Portfolio */
 .portfolio-v2-section { padding: 120px 72px; }
 .portfolio-v2-grid { grid-template-columns: repeat(3, 1fr); }
+.portfolio-card { display: flex; flex-direction: column; }
+.portfolio-card-media { aspect-ratio: 3/2; }
+@media (min-width: 769px) {
+  .portfolio-card-featured { grid-column: span 2; }
+  /* standard card stretches its image to match the featured row height */
+  .portfolio-card:not(.portfolio-card-featured) .portfolio-card-media { flex: 1; }
+}
 @media (max-width: 768px) {
   .portfolio-v2-section { padding: 80px 24px !important; }
   .portfolio-v2-grid { grid-template-columns: 1fr !important; }

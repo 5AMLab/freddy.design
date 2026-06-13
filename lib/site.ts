@@ -5,9 +5,11 @@
 
 export const CONTACT_EMAIL = "hello@freddi.design"; // TODO: replace with the real inbox
 
-// Edit these by hand as slots fill — shown in the CTA and the brief flow.
+// Edit the counts by hand as slots fill — shown in the hero, the CTA and the
+// brief flow. The month is always the current one so the scarcity line can
+// never go stale; reset `open` when a new month starts.
 export const RETAINER_SLOTS = {
   open: 2,
   total: 3,
-  month: "June",
+  month: new Date().toLocaleString("en-SG", { month: "long" }),
 };

@@ -46,6 +46,9 @@ const plans = [
   },
 ];
 
+// Bronze: the gold accent darkened to hold contrast on the cream ground
+const BRONZE = "#8C6F42";
+
 export default function PricingV2() {
   const ref = useRef<HTMLElement>(null);
 
@@ -56,7 +59,7 @@ export default function PricingV2() {
         id="pricing"
         ref={ref}
         className="pricing-v2-section"
-        style={{ padding: "120px 72px", background: "#0D0D0D" }}
+        style={{ padding: "120px 72px", background: "#F5F0E8" }}
       >
         <div className="v2-fade" style={{ marginBottom: "72px" }}>
           <div
@@ -66,7 +69,7 @@ export default function PricingV2() {
               fontWeight: 400,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#C9A96E",
+              color: BRONZE,
               marginBottom: "20px",
             }}
           >
@@ -78,7 +81,7 @@ export default function PricingV2() {
               fontSize: "clamp(2.4rem, 4vw, 3.8rem)",
               fontWeight: 300,
               lineHeight: 1.1,
-              color: "#F5F0E8",
+              color: "#0D0D0D",
             }}
           >
             Predictable costs.
@@ -93,8 +96,8 @@ export default function PricingV2() {
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
             gap: "1px",
-            background: "rgba(245,240,232,0.06)",
-            border: "1px solid rgba(245,240,232,0.12)",
+            background: "rgba(13,13,13,0.08)",
+            border: "1px solid rgba(13,13,13,0.15)",
             borderRadius: "2px",
             overflow: "hidden",
           }}
@@ -104,7 +107,7 @@ export default function PricingV2() {
               key={plan.name}
               className="v2-fade"
               style={{
-                background: plan.featured ? "rgba(201,169,110,0.06)" : "#0D0D0D",
+                background: plan.featured ? "rgba(201,169,110,0.16)" : "#F5F0E8",
                 padding: "52px 40px",
                 position: "relative",
               }}
@@ -129,7 +132,7 @@ export default function PricingV2() {
                   fontWeight: 500,
                   letterSpacing: "0.2em",
                   textTransform: "uppercase",
-                  color: "rgba(245,240,232,0.55)",
+                  color: "rgba(13,13,13,0.55)",
                   marginBottom: "8px",
                 }}
               >
@@ -141,7 +144,7 @@ export default function PricingV2() {
                   fontFamily: "'Canela', serif",
                   fontSize: "1.8rem",
                   fontWeight: 400,
-                  color: plan.featured ? "#C9A96E" : "#F5F0E8",
+                  color: plan.featured ? BRONZE : "#0D0D0D",
                   marginBottom: "28px",
                 }}
               >
@@ -155,8 +158,8 @@ export default function PricingV2() {
                       fontWeight: 500,
                       letterSpacing: "0.14em",
                       textTransform: "uppercase",
-                      color: "#C9A96E",
-                      border: "1px solid rgba(201,169,110,0.4)",
+                      color: BRONZE,
+                      border: "1px solid rgba(140,111,66,0.45)",
                       padding: "3px 10px",
                       borderRadius: "2px",
                       verticalAlign: "middle",
@@ -172,7 +175,7 @@ export default function PricingV2() {
                   fontFamily: "'Canela Deck', serif",
                   fontSize: "3.6rem",
                   fontWeight: 300,
-                  color: "#F5F0E8",
+                  color: "#0D0D0D",
                   lineHeight: 1,
                   marginBottom: "4px",
                 }}
@@ -184,7 +187,7 @@ export default function PricingV2() {
                   fontFamily: "'Sohne', sans-serif",
                   fontSize: "0.75rem",
                   fontWeight: 300,
-                  color: "rgba(245,240,232,0.45)",
+                  color: "rgba(13,13,13,0.5)",
                   marginBottom: "36px",
                   letterSpacing: "0.04em",
                 }}
@@ -200,9 +203,9 @@ export default function PricingV2() {
                       fontFamily: "'Sohne', sans-serif",
                       fontSize: "0.88rem",
                       fontWeight: 400,
-                      color: "rgba(245,240,232,0.70)",
+                      color: "rgba(13,13,13,0.75)",
                       padding: "10px 0",
-                      borderBottom: "1px solid rgba(245,240,232,0.05)",
+                      borderBottom: "1px solid rgba(13,13,13,0.08)",
                       display: "flex",
                       alignItems: "center",
                       gap: "12px",
@@ -213,7 +216,7 @@ export default function PricingV2() {
                         width: "4px",
                         height: "4px",
                         borderRadius: "50%",
-                        background: plan.featured ? "#C9A96E" : "rgba(245,240,232,0.2)",
+                        background: plan.featured ? BRONZE : "rgba(13,13,13,0.25)",
                         flexShrink: 0,
                       }}
                     />
@@ -232,9 +235,9 @@ export default function PricingV2() {
                   fontSize: "0.75rem",
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
-                  color: plan.featured ? "#0D0D0D" : "#C9A96E",
-                  background: plan.featured ? "#C9A96E" : "transparent",
-                  border: `1px solid ${plan.featured ? "#C9A96E" : "rgba(201,169,110,0.3)"}`,
+                  color: plan.featured ? "#F5F0E8" : BRONZE,
+                  background: plan.featured ? "#0D0D0D" : "transparent",
+                  border: `1px solid ${plan.featured ? "#0D0D0D" : "rgba(140,111,66,0.4)"}`,
                   padding: "16px",
                   borderRadius: "2px",
                   textDecoration: "none",
@@ -245,9 +248,8 @@ export default function PricingV2() {
                   if (plan.featured) {
                     el.style.opacity = "0.85";
                   } else {
-                    el.style.background = "rgba(201,169,110,0.08)";
-                    el.style.borderColor = "#C9A96E";
-                    el.style.color = "#C9A96E";
+                    el.style.background = "rgba(201,169,110,0.15)";
+                    el.style.borderColor = BRONZE;
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -256,7 +258,7 @@ export default function PricingV2() {
                     el.style.opacity = "1";
                   } else {
                     el.style.background = "transparent";
-                    el.style.borderColor = "rgba(201,169,110,0.3)";
+                    el.style.borderColor = "rgba(140,111,66,0.4)";
                   }
                 }}
               >
@@ -273,7 +275,7 @@ export default function PricingV2() {
             fontFamily: "'Sohne', sans-serif",
             fontSize: "0.75rem",
             fontWeight: 400,
-            color: "rgba(245,240,232,0.40)",
+            color: "rgba(13,13,13,0.55)",
             letterSpacing: "0.04em",
             lineHeight: 1.6,
           }}

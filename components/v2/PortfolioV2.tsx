@@ -16,6 +16,8 @@ const projects = [
       "/portfolio/anz-05.jpg",
     ],
   },
+  // Slots 02–05 below are generated placeholders — overwrite the file in
+  // public/portfolio with the real project photo, keeping the filename.
   {
     id: "02",
     title: "Aurello Investor Deck",
@@ -23,6 +25,10 @@ const projects = [
     category: "Pitch Deck",
     images: [
       "/portfolio/deck-generic-01.jpg",
+      "/portfolio/akuos-02.jpg",
+      "/portfolio/akuos-03.jpg",
+      "/portfolio/akuos-04.jpg",
+      "/portfolio/akuos-05.jpg",
     ],
   },
   {
@@ -32,6 +38,10 @@ const projects = [
     category: "Brandbook",
     images: [
       "/portfolio/brand-guideline-01.jpg",
+      "/portfolio/cognitiv-02.jpg",
+      "/portfolio/cognitiv-03.jpg",
+      "/portfolio/cognitiv-04.jpg",
+      "/portfolio/cognitiv-05.jpg",
     ],
   },
   {
@@ -41,6 +51,10 @@ const projects = [
     category: "OOH & Campaign",
     images: [
       "/portfolio/ooh-generic-02.jpg",
+      "/portfolio/hermes-02.jpg",
+      "/portfolio/hermes-03.jpg",
+      "/portfolio/hermes-04.jpg",
+      "/portfolio/hermes-05.jpg",
     ],
   },
   {
@@ -50,6 +64,10 @@ const projects = [
     category: "Packaging",
     images: [
       "/portfolio/coffee-mockup-01.jpg",
+      "/portfolio/maison-02.jpg",
+      "/portfolio/maison-03.jpg",
+      "/portfolio/maison-04.jpg",
+      "/portfolio/maison-05.jpg",
     ],
   },
   {
@@ -59,6 +77,10 @@ const projects = [
     category: "Editorial Design",
     images: [
       "/portfolio/newspaper-generic-01.jpg",
+      "/portfolio/intern-02.jpg",
+      "/portfolio/intern-03.jpg",
+      "/portfolio/intern-04.jpg",
+      "/portfolio/intern-05.jpg",
     ],
   },
 ];
@@ -346,9 +368,11 @@ function Lightbox({
 
 function ProjectCard({
   project,
+  featured,
   onOpen,
 }: {
   project: Project;
+  featured: boolean;
   onOpen: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -356,7 +380,7 @@ function ProjectCard({
 
   return (
     <div
-      className="v2-fade"
+      className={`v2-fade portfolio-card${featured ? " portfolio-card-featured" : ""}`}
       onClick={hasImage ? onOpen : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -365,9 +389,9 @@ function ProjectCard({
     >
       {/* Image */}
       <div
+        className="portfolio-card-media"
         style={{
           width: "100%",
-          aspectRatio: "3/2",
           backgroundColor: "#141414",
           borderRadius: "2px",
           border: "1px solid",
@@ -394,7 +418,7 @@ function ProjectCard({
                 src={project.images[0]}
                 alt={`${project.title} — ${project.client}`}
                 fill
-                sizes="(max-width: 768px) 100vw, 33vw"
+                sizes={featured ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
                 style={{ objectFit: "cover", objectPosition: "center" }}
                 loading="lazy"
               />
@@ -444,7 +468,7 @@ function ProjectCard({
           <div
             style={{
               fontFamily: "'Canela', serif",
-              fontSize: "1.4rem",
+              fontSize: featured ? "1.75rem" : "1.4rem",
               fontWeight: 400,
               color: hovered ? "#F5F0E8" : "rgba(245,240,232,0.7)",
               marginBottom: "4px",
@@ -550,7 +574,11 @@ export default function PortfolioV2() {
           </div>
         </div>
 
-        {/* Staggered two-column grid */}
+        {/* Editorial grid: each desktop row pairs a featured card (2 cols,
+            fixed 3/2 crop) with a standard card stretched to match its
+            height. The featured slot alternates sides row by row —
+            positions 0, 3, 4, 7, … — so the rhythm holds as projects
+            are added. */}
         <div
           className="portfolio-v2-grid"
           style={{
@@ -558,13 +586,18 @@ export default function PortfolioV2() {
             gap: "32px",
           }}
         >
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onOpen={() => setOpen(project)}
-            />
-          ))}
+          {projects.map((project, i) => {
+            const pair = Math.floor(i / 2);
+            const featured = i === pair * 2 + (pair % 2);
+            return (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                featured={featured}
+                onOpen={() => setOpen(project)}
+              />
+            );
+          })}
         </div>
 
         {/* Bottom row: CTA + confidentiality note */}

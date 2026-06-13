@@ -6,7 +6,7 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { openBrief } from "@/components/v2/BriefFlow";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-const MENU_ITEMS = ["Services", "Portfolio", "How It Works", "Pricing", "Industries"];
+const MENU_ITEMS = ["Portfolio", "Services", "How It Works", "Pricing", "Industries"];
 
 export default function NavbarV2() {
   const [open, setOpen] = useState(false);
@@ -166,7 +166,7 @@ export default function NavbarV2() {
           alignItems: "center",
         }}
       >
-        {["Services", "Portfolio", "How It Works", "Pricing", "Industries"].map((item) => (
+        {MENU_ITEMS.map((item) => (
           <li key={item}>
             <a
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
