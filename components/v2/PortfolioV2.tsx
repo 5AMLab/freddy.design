@@ -24,11 +24,11 @@ const projects = [
     client: "Akuos",
     category: "Pitch Deck",
     images: [
-      "/portfolio/deck-generic-01.jpg",
+      "/portfolio/akuos-00.jpg",
+      "/portfolio/akuos-01.jpg",
       "/portfolio/akuos-02.jpg",
       "/portfolio/akuos-03.jpg",
       "/portfolio/akuos-04.jpg",
-      "/portfolio/akuos-05.jpg",
     ],
   },
   {
