@@ -24,7 +24,7 @@ const projects = [
     client: "Akuos",
     category: "Pitch Deck",
     images: [
-      "/portfolio/akuos-00.jpg",
+      "/portfolio/akuos-00b.avif",
       "/portfolio/akuos-01.jpg",
       "/portfolio/akuos-02.jpg",
       "/portfolio/akuos-03.jpg",
@@ -37,11 +37,14 @@ const projects = [
     client: "Cognitiv AI",
     category: "Brandbook",
     images: [
-      "/portfolio/brand-guideline-01.jpg",
-      "/portfolio/cognitiv-02.jpg",
-      "/portfolio/cognitiv-03.jpg",
-      "/portfolio/cognitiv-04.jpg",
-      "/portfolio/cognitiv-05.jpg",
+      "/portfolio/cognitiv-07.webp",
+      "/portfolio/cognitiv-01.webp",
+      "/portfolio/cognitiv-02.webp",
+      "/portfolio/cognitiv-03.webp",
+      "/portfolio/cognitiv-04.webp",
+      "/portfolio/cognitiv-05.webp",
+      "/portfolio/cognitiv-06.webp",
+      "/portfolio/cognitiv-08.webp",
     ],
   },
   {
