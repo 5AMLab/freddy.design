@@ -53,7 +53,7 @@ const projects = [
     client: "Hermès",
     category: "OOH & Campaign",
     images: [
-      "/portfolio/ooh-generic-02.jpg",
+      "/portfolio/hermes-01.jpg",
       "/portfolio/hermes-02.jpg",
       "/portfolio/hermes-03.jpg",
       "/portfolio/hermes-04.jpg",
