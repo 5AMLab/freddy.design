@@ -201,6 +201,34 @@
   height: 100%;
   object-fit: cover;
 }
+/* Close button — touch-only. .kloaq-thumb has pointer-events: none (so the
+   preview never blocks taps on the cases underneath), so this needs its own
+   pointer-events: auto to be tappable. Hidden on fine pointers: desktop
+   still dismisses via mouseleave, so a visible × there would be redundant
+   chrome floating over the image. */
+.kloaq-thumb-close {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  .kloaq-thumb-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.55);
+    color: var(--cream);
+    font-size: 1.3rem;
+    line-height: 1;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+}
 /* Column-2 content of the hero: an 8-col grid with the word cloud restrained
    to the left 6 columns and the showreel sitting in the right 2, side by
    side, rather than the reel falling below the cloud in normal flow. */
@@ -229,6 +257,11 @@
   align-items: flex-end; /* bottom-align name + project type */
   gap: 6px;
   line-height: 1;
+  /* Without this, some Android browsers add a ~300ms delay to disambiguate
+     a tap from the start of a double-tap-to-zoom gesture, which reads as
+     a "double tap needed" lag and can let a second, fast tap land as a
+     fresh click on whatever the layout shifted to underneath. */
+  touch-action: manipulation;
 }
 .kloaq-case-name {
   font-family: var(--display);
@@ -589,12 +622,6 @@
   /* No cursor to trail — the touch preview above replaces it */
   .kloaq-whatido-preview {
     display: none;
-  }
-  /* Corner marks brighten permanently on the active row instead of via
-     hover, and the row gets a light active-state background so tapped
-     rows visibly differ from idle ones in the accordion. */
-  .kloaq-service-row.is-active {
-    background: color-mix(in srgb, var(--cream) 4%, transparent);
   }
 }
 
