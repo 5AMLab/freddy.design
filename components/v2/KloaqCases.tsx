@@ -43,14 +43,19 @@ export default function KloaqCases() {
   // ever landed.
   const activeRef = useRef<string | null>(null);
 
+  const isCoarse = () => !window.matchMedia("(pointer: fine)").matches;
+
+  // Fine-pointer only — on touch, some browsers fire synthetic mousemove
+  // events during a tap/drag (e.g. a finger sliding slightly while pressed),
+  // which was re-pinning the thumb mid-touch and made it feel like the
+  // preview was "running away" when reaching for the close button.
   const move = (e: React.MouseEvent) => {
+    if (isCoarse()) return;
     const el = thumbRef.current;
     if (!el) return;
     el.style.left = `${e.clientX}px`;
     el.style.top = `${e.clientY}px`;
   };
-
-  const isCoarse = () => !window.matchMedia("(pointer: fine)").matches;
 
   const setActiveCase = (id: string | null) => {
     activeRef.current = id;
@@ -143,8 +148,13 @@ export default function KloaqCases() {
       >
         {activeProject && (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={activeProject.images[0]} alt="" />
+            {/* Clips/rounds the image only — kept separate from .kloaq-thumb
+                itself so the close button below can sit outside the frame
+                without being clipped by the image's overflow: hidden. */}
+            <span className="kloaq-thumb-frame">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={activeProject.images[0]} alt="" />
+            </span>
             <button
               type="button"
               className="kloaq-thumb-close"

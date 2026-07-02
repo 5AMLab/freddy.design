@@ -176,36 +176,45 @@
   margin-bottom: 24px;
 }
 
-/* Floating portfolio image that fades in + follows the cursor on case hover */
+/* Floating portfolio image that fades in + follows the cursor on case hover.
+   Unclipped (no overflow: hidden here) so the touch close button can sit
+   outside the image frame — .kloaq-thumb-frame below carries the rounding
+   and clipping instead. */
 .kloaq-thumb {
   position: fixed;
   top: 0;
   left: 0;
   width: 340px;
   height: 240px;
-  border-radius: 14px;
-  overflow: hidden;
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.92);
   transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 50;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
 }
 .kloaq-thumb.is-visible {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+.kloaq-thumb-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
 }
 .kloaq-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-/* Close button — touch-only. .kloaq-thumb has pointer-events: none (so the
-   preview never blocks taps on the cases underneath), so this needs its own
-   pointer-events: auto to be tappable. Hidden on fine pointers: desktop
-   still dismisses via mouseleave, so a visible × there would be redundant
-   chrome floating over the image. */
+/* Close button — touch-only, sits outside the image frame (bottom-right
+   corner, half overlapping the edge) rather than floating on top of the
+   photo. Keeping it off the image means a finger reaching for the button
+   doesn't also cover/appear to "chase" the photo underneath. .kloaq-thumb
+   has pointer-events: none (so the preview never blocks taps on the cases
+   underneath), so this needs its own pointer-events: auto to be tappable.
+   Hidden on fine pointers: desktop still dismisses via mouseleave. */
 .kloaq-thumb-close {
   display: none;
 }
@@ -215,18 +224,19 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 32px;
-    height: 32px;
+    bottom: -18px;
+    right: -18px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    border: none;
-    background: rgba(0, 0, 0, 0.55);
+    border: 1.5px solid var(--hairline);
+    background: var(--ink);
     color: var(--cream);
     font-size: 1.3rem;
     line-height: 1;
     pointer-events: auto;
     cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   }
 }
 /* Column-2 content of the hero: an 8-col grid with the word cloud restrained
