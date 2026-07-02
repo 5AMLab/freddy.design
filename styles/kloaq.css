@@ -1,0 +1,1028 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   KLOAQ-INSPIRED REVIEW LAYOUT  —  "Kloaq energy, freddy palette"
+   A design study that takes kloaq.com's loud, brash structure — the packed
+   typographic case "cloud", heavy condensed caps, rotated sidebar labels,
+   pill-shaped service tags — and reskins it in freddi.design's dark + gold
+   brand instead of Kloaq's orange.
+
+   Kloaq → freddy translation:
+   - orange field            →  #050505 ink canvas
+   - near-black type          →  #f9f9f9 cream type
+   - hover word flips black   →  hover word flips to gold #C9A96E
+   - heavy condensed grotesk  →  Boldonse (loaded below) for display
+   - UI / labels / body       →  Inter Tight (loaded below), layered over Söhne
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Two typefaces only, kept consistent with the rest of the page: Boldonse
+   for display/headline moments, Inter Tight for everything else (labels,
+   body copy, UI). No third serif — the former Canela "editorial voice" role
+   is now just Inter Tight at a larger size / lighter weight, or Boldonse
+   where a headline-level statement is called for. Scoped here so neither
+   face touches the live site. */
+@import url('https://fonts.googleapis.com/css2?family=Boldonse&family=Inter+Tight:wght@300;400;500;600;700;800&display=swap');
+
+.kloaq-root {
+  --ink: #050505;
+  --cream: #f9f9f9;
+  --gold: #C9A96E;
+  --orange: #FC5000; /* Flameburst Orange — Kloaq accent */
+  --muted: rgba(245, 240, 232, 0.55);
+  --hairline: rgba(245, 240, 232, 0.18);
+  --display: 'Boldonse', 'Anton', 'Sohne Breit', sans-serif;
+  --body: 'Inter Tight', 'Sohne', sans-serif;
+  font-family: var(--body);
+  position: relative;
+  /* Faint grid, not Kloaq's flat field — structure instead of a color glow.
+     Painted once on the root (not `fixed`) so scrolling stays on the
+     compositor fast-path instead of repainting the gradient every frame. */
+  background:
+    repeating-linear-gradient(to right, rgba(245, 240, 232, 0.02) 0 1px, transparent 1px 200px),
+    repeating-linear-gradient(to bottom, rgba(245, 240, 232, 0.02) 0 1px, transparent 1px 200px),
+    var(--ink);
+  color: var(--cream);
+}
+/* Film grain for tactile depth (live-site noise asset). Plain low-opacity
+   layer rather than mix-blend-mode, which forces a full-page blend
+   recompute on every scroll frame. */
+.kloaq-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/noise.svg");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 1;
+}
+/* Keep real content above the grain layer */
+.kloaq-root > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Page-wide widescreen cap: every top-level section keeps its own
+   full-bleed background, but its content stops growing past 1600px and
+   centers with equal breathing room on both sides — otherwise every
+   section's grid/columns (number, title, marks, description, etc.) just
+   kept stretching wider forever on ultra-wide viewports. Box-sizing keeps
+   each section's own horizontal padding inside the 1600px cap rather than
+   adding to it. */
+.kloaq-root main > section {
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* ── LIGHT SECTION (field swap) ──
+   The page is otherwise one unbroken ink canvas top to bottom — heavy in a
+   way Kloaq's own site never is, because Kloaq swaps its whole section field
+   (orange/white/black) instead of just varying text color. This modifier
+   flips a section's field to cream and re-points the shared cream/muted/
+   hairline tokens to their ink-on-cream equivalents, so every rule already
+   written against var(--cream)/var(--muted)/var(--hairline) inside the
+   section repaints correctly with no per-rule overrides. Orange stays
+   orange — it's the one accent that reads on both fields.
+   The section element itself is capped at 1600px (see the rule above), so a
+   plain `background` only paints that centered box — on ultra-wide viewports
+   the root's ink shows through as black bars on both sides. Standard
+   full-bleed breakout: a ::before sized to 100vw, centered under the section
+   via the classic left:50%/-50vw margin trick, painted behind the content
+   (z-index: -1) so it reads as the section's true edge-to-edge field. */
+.kloaq-light-section {
+  position: relative;
+  /* z-index: 0 (rather than the default auto) makes this section establish
+     its own stacking context, so the ::before's z-index: -1 below stacks
+     behind the section's own content but stays contained inside the
+     section — without this, "relative + z-index: auto" doesn't create a
+     containing stacking context, and -1 escapes to behind <main>'s own
+     opaque ink background instead (main.background: var(--ink), see the
+     FOOTER REVEAL rule below), which is what was blanking out the breakout. */
+  z-index: 0;
+  background: #f9f9f9;
+  --cream: #050505;
+  --muted: rgba(5, 5, 5, 0.55);
+  --hairline: rgba(5, 5, 5, 0.14);
+}
+.kloaq-light-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* The section itself is a centered, width-capped box (see the 1600px cap
+     above), so `left` here resolves against the section's own 1600px box,
+     not the viewport — the textbook "left: 50%; margin-left: -50vw" breakout
+     only reaches the true viewport edge when the containing block is already
+     full-width. calc(-50vw + 50%) cancels the section's own centering
+     offset: 50% (of the section's width) returns to the section's left edge,
+     then -50vw walks left by half the viewport, landing this pseudo's left
+     edge exactly at the viewport's left edge regardless of the section's own
+     width/centering. */
+  left: calc(-50vw + 50%);
+  width: 100vw;
+  background: #f9f9f9;
+  z-index: -1;
+}
+
+/* Nav links: full-opacity cream at rest (live site's .nav-link default is
+   75% opacity), hover flips to Flameburst orange with no underline — scoped
+   to the review page only. */
+.kloaq-root .nav-link {
+  color: var(--cream);
+}
+.kloaq-root .nav-link::after {
+  display: none;
+}
+.kloaq-root .nav-link:hover {
+  color: var(--orange);
+}
+
+/* Section label — horizontal, sitting above the section's heading/content
+   rather than as a rotated side rail. These sections are now single-column
+   grids (padding provides the 160px inset on every side — see
+   .kloaq-about-section etc.), so the label and its content stack normally
+   with no rail column to misalign against. */
+.kloaq-vlabel {
+  font-family: var(--body);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+  color: var(--orange);
+  writing-mode: horizontal-tb;
+  white-space: nowrap;
+  margin-bottom: 32px;
+}
+
+/* ── CASE CLOUD (the Kloaq signature) ──
+   Project names set huge in condensed caps and packed irregularly across the
+   canvas, with service tags inline. Flowed as wrapping inline blocks rather
+   than a rigid grid so it reads as a dense typographic field. */
+.kloaq-cases-section {
+  /* 80px matches .kloaq-about-section etc. on both sides — the old
+     "72px padding + 48px rail column + 40px gap" only added the rail's
+     width on the left, leaving the right edge at 72px instead of 160px. */
+  padding: 0 80px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+/* Clears the fixed navbar, then sits as a normal heading row above the cloud.
+   184px matches .kloaq-cloud's 48px bottom padding plus this label's own
+   32px (24px margin + 8px cloud padding-top) gap to the first row of the
+   cloud below it — so the hero reads as symmetric top/bottom whitespace
+   around the "Projects" label + cloud block as a whole. */
+.kloaq-cases-section > .kloaq-vlabel {
+  margin-top: 184px;
+  margin-bottom: 24px;
+}
+
+/* Floating portfolio image that fades in + follows the cursor on case hover */
+.kloaq-thumb {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 340px;
+  height: 240px;
+  border-radius: 14px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.92);
+  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+}
+.kloaq-thumb.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.kloaq-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Column-2 content of the hero: an 8-col grid with the word cloud restrained
+   to the left 6 columns and the showreel sitting in the right 2, side by
+   side, rather than the reel falling below the cloud in normal flow. */
+.kloaq-cases-content {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 40px;
+  align-items: end; /* bottom-align the reel with the cloud's last row */
+}
+/* Sits directly under the "Projects" label now that the label is a normal
+   top-aligned heading rather than a side rail — no artificial min-height/
+   centering box, which was pushing the first row ~210px below the label.
+   Restrained to 6 of 8 columns so names wrap earlier, leaving the right 2
+   columns clear for the showreel. */
+.kloaq-cloud {
+  grid-column: 1 / 7;
+  padding: 8px 0 48px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px 28px;
+}
+.kloaq-case {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: flex-end; /* bottom-align name + project type */
+  gap: 6px;
+  line-height: 1;
+}
+.kloaq-case-name {
+  font-family: var(--display);
+  font-weight: 400; /* Boldonse is single-weight; its native weight is heavy */
+  font-size: clamp(2rem, 4.6vw, 4.4rem);
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--cream);
+  transition: color 0.25s ease;
+}
+.kloaq-case:hover .kloaq-case-name {
+  color: var(--orange);
+}
+/* "All work" rendered as an outline word, like Kloaq's ghost "ALL WORK" */
+.kloaq-case-name.is-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--cream);
+}
+.kloaq-case:hover .kloaq-case-name.is-outline {
+  -webkit-text-stroke-color: var(--orange);
+}
+.kloaq-case-tag {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: clamp(0.62rem, 0.9vw, 0.92rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange);
+  white-space: nowrap;
+  padding-bottom: 0.18em; /* nudge baseline up so it sits on the cap line */
+  margin-right: 10px; /* breathing room so tags don't collide with next name */
+}
+/* Mobile-only inline thumbnail (see .kloaq-case-thumb in the 820px block) —
+   hidden on desktop, which uses the cursor-following .kloaq-thumb instead */
+.kloaq-case-thumb {
+  display: none;
+}
+/* Wraps name+tag so the mobile thumbnail can stretch to match their combined
+   height (see .kloaq-case-text in the 820px block). On desktop this stays
+   invisible to layout — name and tag keep sitting directly in the
+   .kloaq-case inline-flex row as before. */
+.kloaq-case-text {
+  display: contents;
+}
+
+/* ── SHOWREEL (sits beside the word cloud, right 2 of 8 columns) ──
+   Sized as a small accent rather than a second focal point, so it doesn't
+   compete with the cloud. Fills its grid column (rather than a fixed width)
+   so it scales with viewport, and bottom-aligns with the cloud's last row via
+   .kloaq-cases-content's align-items: end. */
+.kloaq-reel-frame {
+  grid-column: 7 / 9;
+  width: 100%;
+  /* .kloaq-cloud's own 48px bottom padding sits below its last row of text,
+     so aligning to the grid cell's bottom edge (align-items: end above)
+     leaves the reel 48px lower than the actual last line. Pull it back up
+     by that same amount so its bottom lines up with the text, not the
+     padding. */
+  margin-bottom: 48px;
+}
+.kloaq-reel-frame .hero-reel-card {
+  border-color: transparent !important;
+  /* Match .kloaq-thumb's 14px radius — the cursor-following image preview
+     shown on case hover — so the reel reads as the same shape language. */
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+/* ── LOGO WALL (reference: LogosV2 on the live site) ──
+   Same brands, sized up 1.5x (28px → 42px). Unlike the live site's static
+   centered row, this scrolls edge-to-edge as a continuous marquee — full
+   bleed, no section padding. Marks render flat white at rest and flip to
+   the page's orange accent on hover. brightness(0) + invert(1) flattens any
+   source SVG to solid white regardless of its native colors; the hover state
+   layers a sepia/hue-rotate chain tuned to land on #FC5000 from that white
+   base, so every logo recolors identically. */
+.kloaq-logos-section {
+  padding: 56px 0 120px;
+  overflow: hidden;
+}
+.kloaq-logos-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  will-change: transform;
+}
+.kloaq-logos-set {
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  padding-right: 64px;
+}
+.kloaq-logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: default;
+}
+.kloaq-logo-item img {
+  filter: brightness(0) invert(1);
+  opacity: 0.75;
+  transition: filter 0.35s ease, opacity 0.35s ease;
+}
+.kloaq-logo-item:hover img {
+  filter: brightness(0) saturate(100%) invert(48%) sepia(97%) saturate(3000%) hue-rotate(3deg) brightness(101%) contrast(105%);
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kloaq-logos-set:last-child { display: none; }
+}
+
+/* ── LOGOS INTRO — mirrors .kloaq-about-section's padding exactly (160px
+   top/bottom, 80px left/right) so content aligns identically down the page. ── */
+.kloaq-logos-intro-section {
+  padding: 160px 80px;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.kloaq-logos-intro {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 64px;
+  align-items: start;
+}
+.kloaq-logos-intro h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  line-height: 1.45; /* Boldonse's tall glyphs need generous leading once it wraps to 2 lines */
+  text-transform: uppercase;
+  color: var(--cream);
+  margin: 0;
+}
+.kloaq-logos-intro p {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 1.35rem; /* matches .kloaq-about-grid p */
+  line-height: 1.6;
+  color: var(--cream);
+  margin: 0;
+}
+
+/* ── ABOUT (flat two-column black-on-field text, like Kloaq) ──
+   160px top/bottom, 80px left/right — matches the navbar's 72px + the rail's
+   old 48px + 40px gap on the left, now applied symmetrically on the right too. */
+.kloaq-about-section {
+  padding: 160px 80px;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.kloaq-about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+}
+.kloaq-about-grid p {
+  font-family: var(--body);
+  font-size: 1.35rem;
+  line-height: 1.6;
+  color: var(--cream);
+  margin: 0 0 36px;
+}
+.kloaq-about-grid p.lead {
+  font-family: var(--body);
+  font-weight: 300;
+  font-size: clamp(1.7rem, 2.4vw, 2.3rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.kloaq-about-statement {
+  font-family: var(--display); /* Boldonse — same headline voice as the cloud */
+  font-weight: 400;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  text-transform: uppercase;
+  line-height: 1.35;
+  color: var(--cream);
+  border-left: 2px solid var(--orange);
+  padding-left: 28px;
+  margin: 8px 0 0;
+}
+
+/* ── WHAT I DO (reference: ServicesV2 on the live site) ──
+   Same numbered-row layout and hover interactions (orange sweep, cursor-
+   trailing image preview, tag pill), recolored to this page's system:
+   Boldonse for the headline, Inter Tight for body/tags, orange not gold. */
+.kloaq-whatido-section {
+  padding: 160px 80px;
+  display: grid;
+  grid-template-columns: 1fr;
+  position: relative;
+}
+.kloaq-whatido-heading {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 3.6vw, 3.2rem);
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--cream);
+  margin: 0 0 72px;
+}
+.kloaq-whatido-list {
+  border-top: 1px solid var(--hairline);
+}
+/* Nine-column row: a dedicated number column, then the requested 8-col
+   split — title 2/8, corner marks 1/8, description 5/8 — so the row's
+   content edges still line up with the page's underlying 8-col grid. */
+.kloaq-service-row {
+  display: grid;
+  grid-template-columns: minmax(48px, auto) repeat(8, 1fr);
+  align-items: baseline;
+  gap: 24px;
+  padding: 44px 0;
+  border-bottom: 1px solid var(--hairline);
+  cursor: default;
+}
+.kloaq-service-num {
+  grid-column: span 1;
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+.kloaq-service-num.is-active {
+  color: var(--orange);
+}
+.kloaq-service-title {
+  grid-column: span 2;
+  font-family: var(--body); /* Inter Tight Medium — was Boldonse, which has no 500 weight */
+  font-weight: 500;
+  font-size: clamp(1.2rem, 1.9vw, 1.6rem);
+  text-transform: none;
+  color: color-mix(in srgb, var(--cream) 85%, transparent);
+  line-height: 1.25;
+}
+/* Decorative +/× corner marks only — the image itself lives in the single
+   cursor-trailing .kloaq-whatido-preview below, not fixed per row. Sized to
+   the marks' own content (not a fixed 220px) so they never dictate the
+   row's height or squeeze the description column on narrower viewports. */
+.kloaq-service-imgslot {
+  /* Spans its own track plus the empty one before copy, then centers its
+     content within that combined width — so the marks sit centered in the
+     whitespace between title and description, not hugging the title side. */
+  grid-column: span 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 8px; /* lines the marks up with the title/description baseline */
+}
+/* Fixed-size SVG, identical viewBox for every mark — guarantees the "+"
+   and "x" share the same width/height, unlike text glyphs (differing
+   per-character metrics). */
+.kloaq-service-mark {
+  display: block;
+  width: 14px;
+  height: 14px;
+  overflow: visible;
+  color: var(--hairline);
+  transition: color 0.3s ease;
+}
+.kloaq-service-mark.is-active {
+  color: var(--orange);
+}
+/* Cursor-trailing preview — same behavior as the live site's ServicesV2:
+   follows the mouse via GSAP quickTo (x/y set in JS), crossfades per row.
+   Sized large enough to deliberately overlap the row dividers above/below
+   rather than sit neatly inside a single row's height. */
+.kloaq-whatido-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 270px;
+  height: 354px;
+  border-radius: 16px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.kloaq-service-copy {
+  grid-column: 6 / span 4;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.kloaq-service-desc {
+  font-family: var(--body);
+  font-size: 1.35rem; /* matches .kloaq-about-grid p */
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--cream) 70%, transparent);
+  font-weight: 400;
+  margin: 0;
+}
+/* Hidden at rest, only revealed on hover — matches the title/image, which
+   also only pick up their active color/visibility when the row is hovered. */
+.kloaq-service-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.kloaq-service-tags.is-active {
+  opacity: 1;
+}
+.kloaq-service-tag {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+  white-space: nowrap;
+}
+.kloaq-whatido-link {
+  font-family: var(--body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 48px;
+  border-bottom: 1px solid rgba(252, 80, 0, 0.35);
+  padding-bottom: 2px;
+  transition: border-color 0.2s, gap 0.2s;
+}
+.kloaq-whatido-link:hover {
+  border-color: var(--orange);
+  gap: 14px;
+}
+.kloaq-about-statement em {
+  font-style: normal;
+  color: var(--orange);
+}
+
+/* ── INDUSTRIES (KloaqIndustries) ──
+   Rhymes with What I Do (same heading treatment, same [01]-numbered/muted-
+   to-cream hover, same orange accent + closing link) but staged as a
+   horizontal auto-scrolling marquee with a floating preview image instead
+   of vertical rows with a cursor-trailing one — keeps the two sections from
+   reading as the same component twice. */
+.kloaq-industries-section {
+  padding: 160px 80px;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+/* Flex row (not a positioning-only wrapper) so the preview vertically
+   centers against the heading's actual content box via align-items —
+   centering with position:absolute + top:50% against this wrapper instead
+   would include the heading's own bottom margin in the box being centered
+   against, pulling the image below the optical middle of the text. */
+.kloaq-industries-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 72px; /* replaces .kloaq-whatido-heading's own bottom margin, which is zeroed below */
+}
+.kloaq-industries-heading {
+  margin-bottom: 0;
+}
+.kloaq-industries-marquee-wrap {
+  position: relative;
+  border-top: 1px solid var(--hairline);
+  overflow: hidden;
+}
+.kloaq-industries-track {
+  display: flex;
+  align-items: baseline;
+  width: max-content;
+  animation: kloaq-industries-scroll 34s linear infinite;
+}
+@keyframes kloaq-industries-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.kloaq-industry-seq {
+  display: flex;
+  align-items: baseline;
+}
+.kloaq-industry-item {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+  gap: 14px;
+  padding: 32px 40px;
+  cursor: default;
+}
+.kloaq-industry-num {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  transition: color 0.3s ease;
+}
+.kloaq-industry-num.is-active {
+  color: var(--orange);
+}
+.kloaq-industry-name {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  line-height: 1.25;
+  white-space: nowrap;
+  color: rgba(245, 240, 232, 0.85);
+  transition: color 0.3s ease;
+}
+.kloaq-industry-name.is-active {
+  color: var(--cream);
+}
+.kloaq-industry-tag {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--orange);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.kloaq-industry-tag.is-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+/* Preview image — a normal flex child of .kloaq-industries-head, vertically
+   centered against the heading via that flex row's align-items rather than
+   position:absolute + top:50% (which centered against the heading's
+   margin-inclusive box, not its actual text). Fills the empty space beside
+   the heading instead of only appearing once you're hovering the ticker
+   below. Still hover-driven, not cursor-trailing like What I Do's preview. */
+.kloaq-industries-preview {
+  position: relative;
+  flex-shrink: 0;
+  width: 270px;
+  height: 180px;
+  border-radius: 16px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.3s ease;
+}
+.kloaq-industries-section .kloaq-whatido-link {
+  margin-top: 40px;
+  /* Grid items stretch to fill their column by default regardless of the
+     item's own display (inline-flex doesn't opt out of this the way it
+     would in normal flow) — without this the link's border-bottom draws
+     under the full section width instead of hugging the link text. */
+  justify-self: start;
+}
+
+/* ── START A CONVERSATION (KloaqCTA) ──
+   Overrides the shared .cta-v2-section's 72px L/R padding (the old site-wide
+   default) with the 80px used by every other kloaq section, so this is the
+   only section on the page that doesn't fall out of the grid. */
+.kloaq-cta-section.cta-v2-section {
+  padding: 160px 80px;
+  /* globals.css's shared ".cta-v2-section" rule sets overflow-x: hidden
+     site-wide (to clip other v2 sections' own overflow) — that also clips
+     .kloaq-light-section's full-bleed ::before breakout below, undoing the
+     ultra-wide fix for this section specifically. Safe to reopen here since
+     this section's own content (watermark, copy) is already bounded by its
+     own positioning, not dependent on the section clipping it. */
+  overflow-x: visible;
+}
+
+/* ── FOOTER REVEAL ──
+   Curtain effect: <main> (everything through the CTA) is pinned with
+   position: sticky at top:0 while the footer, which follows it in normal
+   flow, keeps scrolling up underneath. Because <main> is sticky it stops
+   moving once its top hits the viewport top and just sits there — so the
+   footer sliding up from below reads as it rising up *over* the page,
+   uncovering itself, rather than the page simply scrolling away to reveal
+   the next section. The footer needs its own stacking context above <main>
+   (z-index + relative) so it visibly overlaps rather than tucking behind. */
+.kloaq-root main {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ink);
+}
+.kloaq-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: -1px; /* seam guard against sub-pixel gaps */
+}
+
+/* ── FOOTER ──
+   Same two-typeface system as the rest of the page (Boldonse wordmark,
+   Inter Tight everything else) with the Flameburst orange accent. Link
+   columns + newsletter sit in one row, with copyright/legal stacked under
+   the newsletter input, and a huge ghost wordmark bleeds off the
+   bottom-left corner as the page's closing statement — no separate brand
+   column, the watermark does that job. */
+.kloaq-footer {
+  background: var(--ink);
+  border-top: 1px solid var(--hairline);
+  overflow: hidden;
+}
+.kloaq-footer-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 96px 80px 56px;
+  position: relative;
+  z-index: 2;
+}
+
+.kloaq-footer-newsletter p {
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 340px;
+  margin-bottom: 24px;
+}
+.kloaq-footer-newsletter-form {
+  display: flex;
+  align-items: center;
+  background: var(--cream);
+  border-radius: 8px;
+  max-width: 340px;
+  padding: 4px 4px 4px 16px;
+}
+.kloaq-footer-newsletter-form input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 12px 0;
+  font-family: var(--body);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.kloaq-footer-newsletter-form input::placeholder {
+  color: rgba(5, 5, 5, 0.4);
+}
+.kloaq-footer-newsletter-form button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--ink);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--orange);
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.kloaq-footer-newsletter-form button:hover {
+  background: var(--orange);
+  color: var(--ink);
+}
+.kloaq-footer-newsletter-success {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.kloaq-footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 0.6fr)) 1.4fr;
+  gap: 40px;
+}
+.kloaq-footer-col-title {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.4);
+  margin-bottom: 24px;
+}
+.kloaq-footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.kloaq-footer-col a {
+  font-family: var(--body);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--cream);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.kloaq-footer-col a:hover {
+  color: var(--orange);
+}
+
+.kloaq-footer-bottom {
+  margin-top: 24px;
+}
+.kloaq-footer-legal {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+.kloaq-footer-legal a {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: rgba(245, 240, 232, 0.3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.kloaq-footer-legal a:hover {
+  color: var(--orange);
+}
+
+/* Huge ghost wordmark — same outline-only device as KloaqCTA's watermark,
+   anchoring the footer as the page's true final statement. Sized/positioned
+   to sit fully inside the footer (no clipping top/bottom/sides) rather than
+   bleeding off the edge, and left-aligned to the same 72px inset as the
+   navbar wordmark (.kloaq-navbar-wrapper's padding: 48px 72px) so both
+   logos share one visual edge down the page. */
+.kloaq-footer-watermark {
+  position: relative;
+  z-index: 1;
+  max-width: 1600px;
+  margin: 48px auto 0;
+  padding: 0 72px 56px;
+  text-align: left;
+  font-family: var(--display);
+  font-size: clamp(3.5rem, 13vw, 11rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(245, 240, 232, 0.14);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 900px) {
+  .kloaq-footer-inner { padding: 72px 24px 40px; }
+  /* Single column: Pages, Recent Works, Socials and Newsletter stack in DOM
+     order rather than the desktop 4-across row. */
+  .kloaq-footer-links {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .kloaq-footer-watermark { font-size: 20vw; margin-top: 32px; padding: 0 24px 32px; }
+}
+
+/* ── RESPONSIVE ── */
+/* Tablet + small-laptop range (821px–1360px): the desktop 8-col split
+   (cloud 1-6, reel 7-8) squeezes the reel's column below a usable video
+   width here, which also forces the cloud's own column narrower and breaks
+   its names into cramped early wraps (verified this persists well past
+   tablet widths, up to ~1360px, before the 8-col split has enough room to
+   breathe). Rather than restyle the cloud itself (that's the 820px
+   breakpoint's job, stacking one name per row), just drop the reel below
+   it in normal flow at a capped, left-aligned width — the cloud keeps
+   wrapping exactly as it does on desktop, just with the full row to do
+   it in. */
+@media (min-width: 821px) and (max-width: 1360px) {
+  .kloaq-cases-content {
+    grid-template-columns: 1fr;
+  }
+  .kloaq-cloud {
+    grid-column: 1;
+  }
+  .kloaq-reel-frame {
+    grid-column: 1;
+    width: 100%;
+    max-width: 420px;
+    margin: 8px 0 0;
+  }
+}
+
+@media (max-width: 820px) {
+  /* Sections collapse to a single column here, so both the label and the
+     content wrapper after it must fall back to column 1 — the desktop-only
+     column-2 placement would otherwise push them into a nonexistent second
+     track and break the mobile layout. */
+  .kloaq-vlabel,
+  .kloaq-vlabel + * {
+    grid-column: 1;
+  }
+  .kloaq-cases-section { padding: 0 24px; min-height: auto; grid-template-columns: 1fr; gap: 24px; }
+  /* Desktop's 8-col grid (cloud in cols 1-6, reel in cols 7-8) collapses to a
+     single stacked column — reel falls below the cloud again on mobile. */
+  .kloaq-cases-content {
+    grid-template-columns: 1fr;
+  }
+  /* Wrapping inline cloud reads as broken on narrow screens (names split
+     mid-word, tags float disconnected from their name) — stack as full-width
+     rows instead. Still the same display type, just one project per line. */
+  .kloaq-cloud {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0 40px;
+    gap: 0;
+  }
+  .kloaq-case {
+    align-items: stretch; /* thumb stretches to match .kloaq-case-text's height */
+    gap: 16px;
+    padding: 16px 0;
+  }
+  /* Leading thumbnail replaces desktop's cursor-following preview, which has
+     no touch equivalent — gives every row visual context inline. Width fixed,
+     height stretches (via the row's align-items: stretch) to match the
+     name+tag text column exactly rather than a fixed square. */
+  .kloaq-case-thumb {
+    display: block;
+    flex-shrink: 0;
+    width: 56px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .kloaq-case-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Name is the only line now (tag hidden below), centered against the
+     thumbnail's stretched height. */
+  .kloaq-case-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  /* Sized off available row width (100vw − 24px×2 padding − 56px thumb −
+     16px gap) rather than viewport width alone, so the longest name
+     ("Cognitiv AI") still fits one line instead of wrapping. white-space:
+     nowrap enforces the single line; the calc'd clamp keeps it from
+     overflowing the row on any phone width. */
+  .kloaq-case-name {
+    font-size: clamp(1.15rem, calc((100vw - 128px) / 7.4), 2.1rem);
+    white-space: nowrap;
+  }
+  /* Dropped for a cleaner mobile list — category is still visible on the
+     project's detail page after tapping through. */
+  .kloaq-case-tag {
+    display: none;
+  }
+  /* Full-width on mobile instead of sitting in the desktop-only 2-col track */
+  .kloaq-reel-frame {
+    grid-column: 1;
+    width: 100%;
+    margin: 0 0 56px;
+  }
+  .kloaq-about-section { padding: 96px 24px; grid-template-columns: 1fr; gap: 24px; }
+  .kloaq-about-grid { grid-template-columns: 1fr; gap: 48px; }
+  .kloaq-industries-section { padding: 96px 24px; }
+  .kloaq-industry-item { padding: 24px 24px; gap: 10px; }
+  .kloaq-industries-preview { display: none; } /* no hover on touch — nothing to anchor the preview to */
+  .kloaq-industry-tag { opacity: 1; transform: none; } /* always show tags on touch */
+  .kloaq-cta-section.cta-v2-section { padding: 96px 24px; }
+  .kloaq-logos-intro-section { padding: 96px 24px; grid-template-columns: 1fr; gap: 24px; }
+  .kloaq-logos-intro { grid-template-columns: 1fr; gap: 24px; }
+  .kloaq-logos-section { padding: 40px 0 72px; }
+  .kloaq-logos-set { gap: 40px; padding-right: 40px; }
+  .kloaq-whatido-section { padding: 96px 24px; grid-template-columns: 1fr; gap: 24px; }
+  /* Desktop's 9-col row (num/title/marks/gap/desc) uses line-based
+     grid-column placement (e.g. "6 / span 4") on its children — those line
+     numbers don't exist in a single-column grid, so the browser was adding
+     implicit columns to satisfy them instead of actually collapsing to one
+     column. Resetting every child back to grid-column: auto is what makes
+     `grid-template-columns: 1fr` above actually take effect. */
+  .kloaq-service-row { grid-template-columns: 1fr; gap: 4px; padding: 32px 0; }
+  .kloaq-service-num,
+  .kloaq-service-title,
+  .kloaq-service-imgslot,
+  .kloaq-service-copy {
+    grid-column: auto;
+  }
+  .kloaq-service-num { margin-bottom: 4px; }
+  .kloaq-service-title { margin-bottom: 12px; }
+  .kloaq-service-imgslot { display: none; } /* no cursor on touch — nothing to anchor marks to */
+  .kloaq-whatido-preview { display: none; } /* cursor-trailing preview needs a fine pointer */
+  .kloaq-service-tags { opacity: 1; } /* no hover on touch — always show tags */
+  .kloaq-cases-section > .kloaq-vlabel {
+    margin-top: 100px;
+  }
+  .kloaq-thumb { display: none; }
+}

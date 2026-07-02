@@ -1,0 +1,164 @@
+"use client";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { prefersReducedMotion } from "@/components/motion/MotionProvider";
+import Magnetic from "@/components/motion/Magnetic";
+import { openBrief } from "@/components/v2/BriefFlow";
+import { RETAINER_SLOTS } from "@/lib/site";
+
+gsap.registerPlugin(ScrollTrigger);
+
+// CTA for the /kloaq review page. A copy of CTAV2 recoloured gold → Flameburst
+// orange so the whole page commits to one accent. Headline and watermark use
+// Boldonse (the same display face as the word cloud) instead of Canela, so
+// the whole page stays on its two-typeface system (Boldonse + Inter Tight).
+const ORANGE = "#FC5000";
+
+export default function KloaqCTA() {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (prefersReducedMotion() || !ref.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".kloaq-cta-watermark",
+        { x: 120 },
+        {
+          x: -60,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ref.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        }
+      );
+    }, ref);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section
+      id="cta"
+      ref={ref}
+      className="cta-v2-section kloaq-cta-section kloaq-light-section"
+      style={{ background: "#f9f9f9", position: "relative" }}
+    >
+      {/* Background large type */}
+      <div
+        className="kloaq-cta-watermark"
+        style={{
+          position: "absolute",
+          bottom: "-20px",
+          right: "-20px",
+          fontFamily: "'Boldonse', 'Anton', sans-serif",
+          fontSize: "clamp(6rem, 15vw, 16rem)",
+          fontWeight: 400,
+          textTransform: "uppercase",
+          color: "rgba(5,5,5,0.06)",
+          lineHeight: 1,
+          pointerEvents: "none",
+          userSelect: "none",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Let&apos;s talk
+      </div>
+
+      <div
+        className="cta-v2-inner"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "80px",
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
+        <div>
+          <div className="kloaq-vlabel" style={{ marginBottom: "24px" }}>
+            Start a Conversation
+          </div>
+          <h2
+            style={{
+              fontFamily: "'Boldonse', 'Anton', sans-serif",
+              fontSize: "clamp(1.8rem, 3.2vw, 3rem)",
+              fontWeight: 400,
+              textTransform: "uppercase",
+              lineHeight: 1.4,
+              color: "#050505",
+              marginBottom: "20px",
+            }}
+          >
+            Ready to have a designer
+            <br />
+            <em style={{ color: ORANGE, fontStyle: "normal" }}>on speed dial?</em>
+          </h2>
+          <p
+            style={{
+              fontFamily: "'Inter Tight', 'Sohne', sans-serif",
+              fontSize: "1.35rem",
+              fontWeight: 300,
+              lineHeight: 1.6,
+              color: "rgba(5,5,5,0.6)",
+              maxWidth: "440px",
+            }}
+          >
+            No contracts. No overhead. Just great design, whenever you need it.
+          </p>
+        </div>
+
+        <div style={{ flexShrink: 0 }}>
+          <Magnetic>
+          <button
+            onClick={openBrief}
+            style={{
+              display: "inline-block",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "'Inter Tight', 'Sohne', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#050505",
+              background: ORANGE,
+              padding: "20px 52px",
+              borderRadius: "10px",
+              textDecoration: "none",
+              transition: "background 0.2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "#D94600";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = ORANGE;
+            }}
+          >
+            Brief Me in 20 Seconds
+          </button>
+          </Magnetic>
+          <div
+            style={{
+              marginTop: "16px",
+              textAlign: "center",
+              fontFamily: "'Inter Tight', 'Sohne', sans-serif",
+              fontSize: "0.7rem",
+              fontWeight: 300,
+              letterSpacing: "0.1em",
+              color: "rgba(252,80,0,0.7)",
+              textTransform: "uppercase",
+            }}
+          >
+            {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots open
+            for {RETAINER_SLOTS.month}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
