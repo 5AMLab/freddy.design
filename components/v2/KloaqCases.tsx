@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 import { projects } from "@/lib/work";
 import HeroReel from "@/components/v2/HeroReel";
+import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 
 /**
  * Kloaq's signature, freddy-skinned: the portfolio as a packed typographic
@@ -11,8 +13,14 @@ import HeroReel from "@/components/v2/HeroReel";
  * inline tag, so they tessellate into a dense field.
  *
  * Hovering a name reveals that project's portfolio image, which fades in and
- * follows the cursor — Kloaq's real interaction. The hovered name also flips
- * to orange. A ghost outlined "All work" closes the set.
+ * trails the cursor with GSAP easing (quickTo, reference: hover-reveal
+ * project list) rather than snapping straight to it. The page-wide cursor
+ * dot itself lives in KloaqCursor.tsx (mounted once at the page level, not
+ * per-section) and pulses larger over `.kloaq-case` on its own via a
+ * `mouseover` listener there — this component only owns the thumb trail.
+ * The image sits behind the case names (z-index) so the hovered name's
+ * outline/ghost treatment stays legible on top of it, the same treatment
+ * "All work" already had at rest.
  *
  * Touch/tablet (pointer: coarse) has no hover or cursor to follow, so cases
  * get a tap-to-reveal fallback there: first tap on an inactive case pins the
@@ -43,7 +51,36 @@ export default function KloaqCases() {
   // ever landed.
   const activeRef = useRef<string | null>(null);
 
+  // GSAP quickTo setters for the thumb trail, built once on mount (fine
+  // pointer + motion allowed only — see the effect below) and read from the
+  // mousemove/tap handlers via this ref so those handlers don't need to
+  // recreate them on every render.
+  const thumbToRef = useRef<{ x: gsap.QuickToFunc; y: gsap.QuickToFunc } | null>(null);
+
   const isCoarse = () => !window.matchMedia("(pointer: fine)").matches;
+
+  // One-time setup: builds the quickTo setters used by move()/tap() below.
+  // .kloaq-thumb has no centering transform (see kloaq.css) — it anchors its
+  // top-left corner to the raw x/y point, reference-image style. Skipped
+  // entirely for touch or reduced-motion, so those visitors never pay for
+  // GSAP's per-frame ticker.
+  useEffect(() => {
+    if (isCoarse() || prefersReducedMotion()) return;
+    const thumb = thumbRef.current;
+    if (!thumb) return;
+
+    // Starting scale now lives here instead of CSS (see .kloaq-thumb in
+    // kloaq.css) — quickTo(x)/quickTo(y) below claims the transform
+    // property, so scale has to be set through GSAP from the start too or
+    // the first hover-in would jump from GSAP's default scale(1) instead of
+    // growing from 0.92.
+    gsap.set(thumb, { scale: 0.92 });
+
+    thumbToRef.current = {
+      x: gsap.quickTo(thumb, "x", { duration: 0.5, ease: "power3.out" }),
+      y: gsap.quickTo(thumb, "y", { duration: 0.5, ease: "power3.out" }),
+    };
+  }, []);
 
   // Fine-pointer only — on touch, some browsers fire synthetic mousemove
   // events during a tap/drag (e.g. a finger sliding slightly while pressed),
@@ -51,10 +88,8 @@ export default function KloaqCases() {
   // preview was "running away" when reaching for the close button.
   const move = (e: React.MouseEvent) => {
     if (isCoarse()) return;
-    const el = thumbRef.current;
-    if (!el) return;
-    el.style.left = `${e.clientX}px`;
-    el.style.top = `${e.clientY}px`;
+    thumbToRef.current?.x(e.clientX);
+    thumbToRef.current?.y(e.clientY);
   };
 
   const setActiveCase = (id: string | null) => {
@@ -75,24 +110,56 @@ export default function KloaqCases() {
     if (!isCoarse()) return;
     if (activeRef.current !== id) {
       e.preventDefault();
+      // No quickTo setters on touch (the setup effect above bails out for
+      // coarse pointers), so the pinned position is set directly via
+      // left/top instead. .kloaq-thumb has no centering transform (its
+      // frame's top-left corner anchors to the x/y point, matching the
+      // cursor dot on desktop) — offset by half the frame's own size here
+      // so the touch-pinned preview centers under the tap point instead of
+      // opening mostly off-screen near an edge.
       const el = thumbRef.current;
       if (el) {
-        el.style.left = `${e.clientX}px`;
-        el.style.top = `${e.clientY}px`;
+        const { width, height } = el.getBoundingClientRect();
+        el.style.left = `${e.clientX - width / 2}px`;
+        el.style.top = `${e.clientY - height / 2}px`;
       }
       setActiveCase(id);
     }
   };
 
+  // Grows the thumb from its resting 0.92 to full size while a case is
+  // hovered. Plain gsap.to() — NOT quickTo. quickTo's resetTo() (what each
+  // call after the first uses internally) requires the target property to
+  // already belong to an existing PropTween on some tween for that element;
+  // scale was only ever set via gsap.set() (not a real tween), so the first
+  // .scale() call failed with GSAP's own "scale not eligible for reset"
+  // warning and silently no-opped instead of animating — same end result as
+  // the original bug (stuck at 0.92), just from a different cause. A normal
+  // gsap.to() has no such prerequisite, and GSAP correctly merges it with
+  // the x/y quickTo tween into one combined transform on the same element
+  // without either overwriting the other — the two systems share the
+  // underlying CSSPlugin transform cache regardless of which API created
+  // each tween.
+  useEffect(() => {
+    if (isCoarse() || prefersReducedMotion()) return;
+    const thumb = thumbRef.current;
+    if (!thumb) return;
+    gsap.to(thumb, { scale: active ? 1 : 0.92, duration: 0.45, ease: "power3.out" });
+  }, [active]);
+
   const activeProject = projects.find((p) => p.id === active);
 
   return (
-    <section className="kloaq-cases-section" id="cases" onMouseMove={move}>
+    <section
+      className="kloaq-cases-section"
+      id="cases"
+      onMouseMove={move}
+    >
       <div className="kloaq-vlabel">Projects</div>
 
       <div className="kloaq-cases-content">
         <div className="kloaq-cloud">
-          {projects.map((p) => (
+          {projects.map((p, i) => (
             <a
               key={p.id}
               href={`/work/${p.slug}`}
@@ -115,16 +182,28 @@ export default function KloaqCases() {
               </span>
               <span className="kloaq-case-text">
                 <span className="kloaq-case-name">{DISPLAY_NAME[p.slug] ?? p.client}</span>
-                <span className="kloaq-case-tag">{p.category}</span>
+                {/* Meta line under the name (mobile-only — .kloaq-case-meta is
+                    display:contents on desktop so index/tag flow inline in the
+                    packed cloud as before). Index is zero-padded (01, 02, …). */}
+                <span className="kloaq-case-meta">
+                  <span className="kloaq-case-index" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="kloaq-case-tag">{p.category}</span>
+                </span>
               </span>
             </a>
           ))}
 
-          {/* "All work" flows inline, right after the last project */}
+          {/* "All work" flows inline, right after the last project. No index
+              (it's the overview link, not a numbered project) — just the tag
+              in the meta line, matching the rows above. */}
           <a href="/work" className="kloaq-case">
             <span className="kloaq-case-text">
               <span className="kloaq-case-name is-outline">All Work</span>
-              <span className="kloaq-case-tag">Overview →</span>
+              <span className="kloaq-case-meta">
+                <span className="kloaq-case-tag">Overview →</span>
+              </span>
             </span>
           </a>
         </div>

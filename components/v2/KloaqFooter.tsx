@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import KloaqFooterWordmark from "@/components/v2/KloaqFooterWordmark";
 
 // Footer for the /kloaq review page. Speaks the same language as the rest
 // of the study — Boldonse wordmark, Inter Tight UI, Flameburst orange — and
@@ -132,9 +133,7 @@ export default function KloaqFooter() {
         </div>
       </div>
 
-      <div className="kloaq-footer-watermark" aria-hidden="true">
-        freddy
-      </div>
+      <KloaqFooterWordmark />
     </footer>
   );
 }

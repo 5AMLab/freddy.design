@@ -8,6 +8,7 @@ import KloaqIndustries from "@/components/v2/KloaqIndustries";
 import KloaqCTA from "@/components/v2/KloaqCTA";
 import KloaqFooter from "@/components/v2/KloaqFooter";
 import BriefFlow from "@/components/v2/BriefFlow";
+import KloaqCursor from "@/components/v2/KloaqCursor";
 
 export const metadata: Metadata = {
   title: "Design review — Kloaq-inspired direction",
@@ -90,6 +91,7 @@ export default function KloaqReview() {
       </main>
       <KloaqFooter />
       <BriefFlow />
+      <KloaqCursor />
     </div>
   );
 }

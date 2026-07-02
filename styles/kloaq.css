@@ -176,10 +176,14 @@
   margin-bottom: 24px;
 }
 
-/* Floating portfolio image that fades in + follows the cursor on case hover.
-   Unclipped (no overflow: hidden here) so the touch close button can sit
-   outside the image frame — .kloaq-thumb-frame below carries the rounding
-   and clipping instead. */
+/* Floating portfolio image that fades in + trails the cursor (GSAP quickTo,
+   see KloaqCases.tsx) on case hover. Unclipped (no overflow: hidden here) so
+   the touch close button can sit outside the image frame —
+   .kloaq-thumb-frame below carries the rounding and clipping instead.
+   No centering transform (reference: `.hover-reveal` has no translate) —
+   the frame's top-left corner sits at the x/y point itself, same as the
+   custom cursor dot's un-offset corner in the reference screenshot, so the
+   two visually anchor together instead of the image centering on the dot. */
 .kloaq-thumb {
   position: fixed;
   top: 0;
@@ -188,22 +192,64 @@
   height: 240px;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, -50%) scale(0.92);
-  transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 50;
+  transition: opacity 0.3s ease;
+  /* Sits above the whole cloud (every .kloaq-case-name is z-index: auto) so
+     it reads as a clean floating card rather than getting shredded by
+     unrelated names elsewhere in the cloud that happen to overlap its
+     340×240 footprint. Only the currently-hovered case's own name punches
+     back above it (.kloaq-case.is-active .kloaq-case-name, z-index: 11)
+     so that one name stays legible over its own preview image.
+     No `scale` here: GSAP's quickTo(x)/quickTo(y) on this element claims
+     the `transform` property for position and bakes in whatever `scale`
+     was present the first time it touches the element, permanently zeroing
+     the standalone CSS `scale` property afterward — a CSS-only scale here
+     would get silently frozen at its rest value and never reach 1. Scale is
+     animated via GSAP instead (see the `active` effect in KloaqCases.tsx),
+     starting from 0.92 in JS so it's on the same transform pipeline as x/y. */
+  z-index: 10;
 }
 .kloaq-thumb.is-visible {
   opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
 }
 .kloaq-thumb-frame {
+  /* This is a <span> (inline by default in HTML) — border-radius clipping
+     on a genuinely inline box is unreliable across browsers even with
+     width/height/overflow set, because its box comes from the replaced
+     <img> inside rather than normal block layout. `display: block` gives
+     it an unambiguous box so the rounding actually clips. */
+  display: block;
   width: 100%;
   height: 100%;
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
 }
-.kloaq-thumb img {
+/* Custom round cursor (see KloaqCursor.tsx) — page-wide, not scoped to a
+   single section. Solid --orange, no mix-blend-mode: this page alternates
+   dark and near-white (.kloaq-light-section) fills, and a blend-mode dot
+   risks washing out against near-white backgrounds; a flat fill stays
+   visible regardless of what's underneath. Fine pointers + motion-allowed
+   only (component bails out entirely otherwise, so touch/reduced-motion
+   visitors keep the system cursor — see body:has(.kloaq-root) in
+   globals.css, which restores `cursor: auto` on this page). Position is
+   GSAP-owned (quickTo on x/y), same reasoning as .kloaq-thumb above. */
+.kloaq-page-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  background: var(--orange);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1600;
+  opacity: 1;
+  /* Same reasoning as .kloaq-thumb: standalone `translate` centers the dot
+     on its x/y point without fighting GSAP's transform-based quickTo. */
+  translate: -50% -50%;
+  transition: opacity 0.2s ease;
+}
+.kloaq-thumb-frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -280,10 +326,26 @@
   letter-spacing: 0.005em;
   text-transform: uppercase;
   color: var(--cream);
-  transition: color 0.25s ease;
+  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease;
 }
+/* Only the hovered case's own name rises above .kloaq-thumb's image preview
+   (z-index: 10, see below) — giving every name in the cloud that z-index
+   put unrelated names (AKUOS, COGNITIV, etc.) on top of the image too,
+   since the 340×240 thumb overlaps several rows and every name shared the
+   same stacking level. Flex items respect z-index without needing their
+   own `position` (.kloaq-case, the flex container, establishes that). */
+.kloaq-case.is-active .kloaq-case-name {
+  position: relative;
+  z-index: 11;
+}
+/* Hover flips to an outline/ghost word (reference: reveal-on-hover project
+   list) instead of a solid color change — reads as "opening up" rather than
+   just recoloring, and doubles as the same treatment "All work" already had
+   at rest (see .is-outline below), so the whole cloud shares one hover
+   language. */
 .kloaq-case:hover .kloaq-case-name {
-  color: var(--orange);
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--orange);
 }
 /* "All work" rendered as an outline word, like Kloaq's ghost "ALL WORK" */
 .kloaq-case-name.is-outline {
@@ -309,11 +371,23 @@
 .kloaq-case-thumb {
   display: none;
 }
+/* Mobile-only running index (01, 02, …) — the desktop cloud stays a bare
+   packed field where numbering would just add noise. Shown in the 820px
+   block below. */
+.kloaq-case-index {
+  display: none;
+}
 /* Wraps name+tag so the mobile thumbnail can stretch to match their combined
    height (see .kloaq-case-text in the 820px block). On desktop this stays
    invisible to layout — name and tag keep sitting directly in the
    .kloaq-case inline-flex row as before. */
 .kloaq-case-text {
+  display: contents;
+}
+/* Groups index + tag into a meta line on mobile (see the 820px block). On
+   desktop it's display: contents so index/tag flow inline in the packed
+   cloud exactly as they did before this wrapper existed. */
+.kloaq-case-meta {
   display: contents;
 }
 
@@ -802,13 +876,15 @@
    Same two-typeface system as the rest of the page (Boldonse wordmark,
    Inter Tight everything else) with the Flameburst orange accent. Link
    columns + newsletter sit in one row, with copyright/legal stacked under
-   the newsletter input, and a huge ghost wordmark bleeds off the
-   bottom-left corner as the page's closing statement — no separate brand
-   column, the watermark does that job. */
+   the newsletter input, and a huge gradient-filled wordmark sits fully
+   inside the footer as the page's closing statement — no separate brand
+   column, the watermark does that job. No overflow: hidden here — it used
+   to clip the watermark when it bled off the edges by design; now that the
+   watermark is fully inset it only clipped ~7px off the "f" ascender/"y"
+   descender's own tips with nothing left to hide. */
 .kloaq-footer {
   background: var(--ink);
   border-top: 1px solid var(--hairline);
-  overflow: hidden;
 }
 .kloaq-footer-inner {
   max-width: 1600px;
@@ -930,27 +1006,42 @@
   color: var(--orange);
 }
 
-/* Huge ghost wordmark — same outline-only device as KloaqCTA's watermark,
-   anchoring the footer as the page's true final statement. Sized/positioned
-   to sit fully inside the footer (no clipping top/bottom/sides) rather than
-   bleeding off the edge, and left-aligned to the same 72px inset as the
-   navbar wordmark (.kloaq-navbar-wrapper's padding: 48px 72px) so both
-   logos share one visual edge down the page. */
+/* Huge ghost wordmark, anchoring the footer as the page's true final
+   statement. Sized/positioned to sit fully inside the footer (no clipping
+   top/bottom/sides) rather than bleeding off the edge, and left-aligned to
+   the same 72px inset as the navbar wordmark (.kloaq-navbar-wrapper's
+   padding: 48px 72px) so both logos share one visual edge down the page.
+   Fill is a full-opacity animated gradient (see KloaqFooterWordmark.tsx).
+   Boldonse's "y" descender draws past its own line box at line-height: 1
+   (confirmed by measuring the glyph's rendered rect vs. the container's —
+   the ink extends ~3px below the box, so container padding alone can't
+   help since flex items stretch to the box, not the leading). line-height:
+   1.4 gives the extra ~0.4 line worth of vertical room split around the
+   flex row so both the "f" ascender and "y" descender render fully inside. */
 .kloaq-footer-watermark {
   position: relative;
   z-index: 1;
   max-width: 1600px;
   margin: 48px auto 0;
-  padding: 0 72px 56px;
-  text-align: left;
+  padding: 8px 72px 40px;
+  display: flex;
+  align-items: center;
   font-family: var(--display);
   font-size: clamp(3.5rem, 13vw, 11rem);
-  line-height: 1;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(245, 240, 232, 0.14);
+  line-height: 1.4;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
+}
+.kloaq-footer-watermark-char {
+  display: inline-block;
+  white-space: pre;
+  background: linear-gradient(180deg, var(--orange) 0%, var(--gold) 42%, var(--cream) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  will-change: background-image;
 }
 
 @media (max-width: 900px) {
@@ -961,7 +1052,7 @@
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  .kloaq-footer-watermark { font-size: 20vw; margin-top: 32px; padding: 0 24px 32px; }
+  .kloaq-footer-watermark { font-size: 20vw; margin-top: 32px; padding: 8px 24px 40px; }
 }
 
 /* ── RESPONSIVE ── */
@@ -1034,50 +1125,68 @@
     grid-column: 1;
     display: flex;
     flex-direction: column;
+    align-items: stretch; /* desktop's align-items: center would otherwise center every stacked row */
     padding: 8px 0 40px;
     gap: 0;
   }
+  /* Direction A: the permanent 56px thumbnail is gone — it read as an app
+     menu and shrank the names to fit. Each project is now a full-width row
+     that leads with the display type at hero scale, with a small meta line
+     (running index · category) hung beneath it. The portfolio image returns
+     as the tap-reveal it is on desktop (.kloaq-thumb, re-enabled at the end
+     of this block) rather than a permanent decoration. */
   .kloaq-case {
-    align-items: stretch; /* thumb stretches to match .kloaq-case-text's height */
-    gap: 16px;
-    padding: 16px 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 18px 0;
   }
-  /* Leading thumbnail replaces desktop's cursor-following preview, which has
-     no touch equivalent — gives every row visual context inline. Width fixed,
-     height stretches (via the row's align-items: stretch) to match the
-     name+tag text column exactly rather than a fixed square. */
+  /* Permanent inline thumbnail removed on mobile — see the note above. */
   .kloaq-case-thumb {
-    display: block;
-    flex-shrink: 0;
-    width: 56px;
-    border-radius: 8px;
-    overflow: hidden;
+    display: none;
   }
-  .kloaq-case-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  /* Name is the only line now (tag hidden below), centered against the
-     thumbnail's stretched height. */
   .kloaq-case-text {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 10px;
   }
-  /* Sized off available row width (100vw − 24px×2 padding − 56px thumb −
-     16px gap) rather than viewport width alone, so the longest name
-     ("Cognitiv AI") still fits one line instead of wrapping. white-space:
-     nowrap enforces the single line; the calc'd clamp keeps it from
-     overflowing the row on any phone width. */
+  /* Type is the hero now: sized off the full row width (100vw − 24px×2
+     padding) so the longest name ("COGNITIV") fills the line without
+     wrapping. white-space: nowrap holds the single line; the clamp keeps it
+     from overflowing on the narrowest phones. */
   .kloaq-case-name {
-    font-size: clamp(1.15rem, calc((100vw - 128px) / 7.4), 2.1rem);
+    font-size: clamp(2rem, calc((100vw - 48px) / 6.4), 3.4rem);
     white-space: nowrap;
+    line-height: 0.92;
   }
-  /* Dropped for a cleaner mobile list — category is still visible on the
-     project's detail page after tapping through. */
+  /* Meta line under each name: "01 · Brand" — index and category on one row,
+     both in the accent, separated by a middot. Restored here (hidden on
+     desktop, dropped from the old mobile list). */
+  .kloaq-case-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .kloaq-case-index {
+    display: inline;
+    font-family: var(--body);
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    color: var(--orange);
+  }
+  /* Middot between index and tag — a pseudo on the tag rather than a text
+     node so the "All Work" row (which has a tag but no index) skips it. */
+  .kloaq-case-index + .kloaq-case-tag::before {
+    content: "·";
+    margin-right: 8px;
+    color: var(--orange);
+  }
   .kloaq-case-tag {
-    display: none;
+    display: inline;
+    font-size: 0.82rem;
+    padding-bottom: 0;
+    margin-right: 0;
   }
   /* Full-width on mobile instead of sitting in the desktop-only 2-col track */
   .kloaq-reel-frame {
@@ -1118,5 +1227,9 @@
   .kloaq-cases-section > .kloaq-vlabel {
     margin-top: 100px;
   }
-  .kloaq-thumb { display: none; }
+  /* .kloaq-thumb is intentionally NOT hidden here anymore: with the permanent
+     inline thumbnail gone, the tap-to-reveal preview (positioned at the tap
+     point by KloaqCases' `tap` handler on coarse pointers) is how the
+     portfolio image shows on touch — same behavior as desktop hover. It stays
+     opacity:0 until a case is tapped, so it costs nothing at rest. */
 }
