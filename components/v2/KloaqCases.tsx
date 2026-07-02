@@ -14,6 +14,12 @@ import HeroReel from "@/components/v2/HeroReel";
  * follows the cursor — Kloaq's real interaction. The hovered name also flips
  * to orange. A ghost outlined "All work" closes the set.
  *
+ * Touch/tablet (pointer: coarse) has no hover or cursor to follow, so cases
+ * get a tap-to-reveal fallback there: first tap on an inactive case previews
+ * it (pinned near the tap point, not cursor-following) instead of navigating;
+ * tapping the already-active case follows through to the project. See the
+ * `tap` handler below.
+ *
  * Review-page-only display overrides: this study renders shorter labels for
  * a couple of projects than lib/work.ts's `client` field (kept as-is there
  * so the live /work index and detail pages are untouched) — also keeps their
@@ -37,10 +43,40 @@ export default function KloaqCases() {
     el.style.top = `${e.clientY}px`;
   };
 
+  const isCoarse = () => !window.matchMedia("(pointer: fine)").matches;
+
+  // Coarse pointers (touch) get a tap-to-reveal instead of hover: first tap
+  // pins the preview at the tap point and stops there; tapping the same,
+  // already-active case again lets the click through to navigate. Some
+  // touch browsers (notably iPad Safari) synthesize a mouseenter right
+  // before the click on an <a>, so onMouseEnter below is also gated behind
+  // isCoarse() — otherwise that synthetic hover would set `active` before
+  // this handler runs, making the "first tap" check below a no-op and
+  // sending every tap straight through to navigation.
+  const tap = (e: React.MouseEvent, id: string) => {
+    if (!isCoarse()) return;
+    if (active !== id) {
+      e.preventDefault();
+      const el = thumbRef.current;
+      if (el) {
+        el.style.left = `${e.clientX}px`;
+        el.style.top = `${e.clientY}px`;
+      }
+      setActive(id);
+    }
+  };
+
   const activeProject = projects.find((p) => p.id === active);
 
   return (
-    <section className="kloaq-cases-section" id="cases" onMouseMove={move}>
+    <section
+      className="kloaq-cases-section"
+      id="cases"
+      onMouseMove={move}
+      onClick={(e) => {
+        if (isCoarse() && e.target === e.currentTarget) setActive(null);
+      }}
+    >
       <div className="kloaq-vlabel">Projects</div>
 
       <div className="kloaq-cases-content">
@@ -49,9 +85,14 @@ export default function KloaqCases() {
             <a
               key={p.id}
               href={`/work/${p.slug}`}
-              className="kloaq-case"
-              onMouseEnter={() => setActive(p.id)}
-              onMouseLeave={() => setActive((cur) => (cur === p.id ? null : cur))}
+              className={`kloaq-case${active === p.id ? " is-active" : ""}`}
+              onMouseEnter={() => {
+                if (!isCoarse()) setActive(p.id);
+              }}
+              onMouseLeave={() => {
+                if (!isCoarse()) setActive((cur) => (cur === p.id ? null : cur));
+              }}
+              onClick={(e) => tap(e, p.id)}
             >
               {/* Mobile-only inline thumbnail — desktop gets the cursor-
                   following preview instead, so this is hidden above 820px.

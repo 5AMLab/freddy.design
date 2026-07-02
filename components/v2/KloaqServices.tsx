@@ -8,6 +8,11 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 // marks (image lives in a single cursor-trailing preview, not per-row) |
 // description + tags. The preview follows the mouse exactly like the live
 // site's ServicesV2, crossfading between images as the active row changes.
+//
+// Coarse pointers (touch) get an accordion fallback: tapping a row toggles
+// it active (same `active` state hover already drives) and reveals a fixed
+// inline image beneath its description — the cursor-trailing preview is
+// hidden there since there's no cursor to trail.
 const services = [
   {
     num: "01",
@@ -48,11 +53,21 @@ function ServiceRow({
   hovered: boolean;
   onHoverChange: (hovered: boolean) => void;
 }) {
+  const isFine = () => window.matchMedia("(pointer: fine)").matches;
+
   return (
     <div
-      className="kloaq-service-row"
-      onMouseEnter={() => onHoverChange(true)}
-      onMouseLeave={() => onHoverChange(false)}
+      className={`kloaq-service-row${hovered ? " is-active" : ""}`}
+      onMouseEnter={() => {
+        if (isFine()) onHoverChange(true);
+      }}
+      onMouseLeave={() => {
+        if (isFine()) onHoverChange(false);
+      }}
+      onClick={() => {
+        if (isFine()) return;
+        onHoverChange(!hovered);
+      }}
     >
       <span className={`kloaq-service-num${hovered ? " is-active" : ""}`}>
         [{service.num}]
@@ -105,6 +120,15 @@ function ServiceRow({
               </span>
             ))}
           </div>
+        )}
+        {/* Touch-only accordion image — desktop's cursor-trailing preview
+            has no touch equivalent, so tapping a row reveals its image
+            inline here instead. Hidden on fine pointers via CSS. */}
+        {hovered && (
+          <span className="kloaq-service-touch-preview" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={service.img} alt="" loading="lazy" />
+          </span>
         )}
       </div>
     </div>

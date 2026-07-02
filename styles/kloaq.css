@@ -563,6 +563,41 @@
   padding-bottom: 2px;
   transition: border-color 0.2s, gap 0.2s;
 }
+/* Touch-only accordion image, rendered inline under a row's copy when that
+   row is tapped active (see KloaqServices' ServiceRow onClick) — desktop's
+   cursor-trailing .kloaq-whatido-preview has no touch equivalent, so this
+   is the coarse-pointer replacement. Hidden on fine pointers below; sized
+   as a normal block image rather than an absolutely-positioned follower. */
+.kloaq-service-touch-preview {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  .kloaq-service-touch-preview {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .kloaq-service-touch-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* No cursor to trail — the touch preview above replaces it */
+  .kloaq-whatido-preview {
+    display: none;
+  }
+  /* Corner marks brighten permanently on the active row instead of via
+     hover, and the row gets a light active-state background so tapped
+     rows visibly differ from idle ones in the accordion. */
+  .kloaq-service-row.is-active {
+    background: color-mix(in srgb, var(--cream) 4%, transparent);
+  }
+}
+
 .kloaq-whatido-link:hover {
   border-color: var(--orange);
   gap: 14px;
@@ -915,6 +950,28 @@
     width: 100%;
     max-width: 420px;
     margin: 8px 0 0;
+  }
+}
+
+/* Coarse pointers (touch) have no hover, so the desktop cursor-following
+   preview becomes tap-to-reveal instead (see KloaqCases' `tap` handler,
+   which positions .kloaq-thumb at the tap point on first tap and lets a
+   second tap on the same case navigate through). This block just adds the
+   affordance that a hover-only cue can't: the active name flips orange like
+   desktop's :hover, and a very small tap animation confirms the touch
+   registered even before the preview image finishes fading in. */
+@media (hover: none) and (pointer: coarse) {
+  .kloaq-case.is-active .kloaq-case-name {
+    color: var(--orange);
+  }
+  .kloaq-case.is-active .kloaq-case-name.is-outline {
+    -webkit-text-stroke-color: var(--orange);
+  }
+  .kloaq-case {
+    transition: transform 0.15s ease;
+  }
+  .kloaq-case.is-active {
+    transform: scale(0.97);
   }
 }
 
