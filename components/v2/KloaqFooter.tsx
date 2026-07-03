@@ -9,7 +9,7 @@ import KloaqFooterWordmark from "@/components/v2/KloaqFooterWordmark";
 // footer (fixed in normal flow, sitting on top in source order) slides up
 // over it like a curtain rising rather than just scrolling into view.
 const PAGE_LINKS = [
-  { label: "Home", href: "/kloaq" },
+  { label: "Home", href: "/" },
   { label: "Work", href: "/work" },
   { label: "Contact", href: "#cta" },
 ];

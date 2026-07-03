@@ -1,4 +1,5 @@
 "use client";
+import "@/styles/kloaq.css";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
@@ -7,13 +8,14 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { openBrief } from "@/components/v2/BriefFlow";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-// Trimmed navbar for the /kloaq review page. A copy of NavbarV2 with a shorter
-// link set (Portfolio / Services / Pricing) so the live homepage nav stays
-// untouched. "How It Works" and "Industries" are intentionally dropped here.
+// Homepage nav (also used on /kloaq). Links map to the sections the Kloaq
+// composition actually renders: #services (KloaqServices) and #industries
+// (KloaqIndustries), plus Portfolio → /work. There is no pricing section on
+// this page, so "Pricing" is intentionally not listed (it would dead-anchor).
 const MENU_ITEMS: { label: string; href?: string; anchor?: string }[] = [
   { label: "Portfolio", href: "/work" },
   { label: "Services", anchor: "#services" },
-  { label: "Pricing", anchor: "#pricing" },
+  { label: "Industries", anchor: "#industries" },
 ];
 
 export default function KloaqNavbar() {
@@ -154,7 +156,7 @@ export default function KloaqNavbar() {
         transition:
           "background 0.4s, border-color 0.4s, backdrop-filter 0.4s, transform 0.5s cubic-bezier(0.16,1,0.3,1)",
       }}
-      className="nav-v2-wrapper kloaq-navbar-wrapper"
+      className="kloaq-nav-wrapper"
     >
 
       <a
@@ -173,7 +175,7 @@ export default function KloaqNavbar() {
       </a>
 
       <ul
-        className={`nav-v2-links${open ? " open" : ""}`}
+        className="kloaq-nav-links"
         style={{
           gap: "40px",
           listStyle: "none",
@@ -236,7 +238,7 @@ export default function KloaqNavbar() {
       </ul>
 
       <div
-        className="nav-v2-hamburger"
+        className="kloaq-nav-hamburger"
         onClick={() => setOpen(!open)}
         aria-label={open ? "Close menu" : "Open menu"}
         style={{ display: "none", flexDirection: "column", gap: "6px", cursor: "pointer", position: "relative", width: "22px", height: "16px" }}

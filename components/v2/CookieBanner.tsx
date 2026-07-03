@@ -40,7 +40,7 @@ export default function CookieBanner() {
       zIndex: 999,
       width: "min(680px, calc(100vw - 48px))",
       background: "#161616",
-      border: "1px solid rgba(201,169,110,0.2)",
+      border: "1px solid rgba(252,80,0,0.2)",
       borderRadius: "4px",
       padding: "28px 32px",
       display: "flex",
@@ -49,27 +49,27 @@ export default function CookieBanner() {
       flexWrap: "wrap",
       boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
     }}>
-      {/* Gold accent line */}
+      {/* Orange accent line */}
       <div style={{
         position: "absolute",
         top: 0, left: 0, right: 0,
         height: "1px",
-        background: "linear-gradient(90deg, transparent, #C9A96E, transparent)",
+        background: "linear-gradient(90deg, transparent, #FC5000, transparent)",
       }} />
 
       <div style={{ flex: 1, minWidth: "200px" }}>
         <p style={{
-          fontFamily: "'Sohne', sans-serif",
+          fontFamily: "var(--font-body), sans-serif",
           fontSize: "0.82rem",
           fontWeight: 300,
           lineHeight: 1.7,
-          color: "rgba(245,240,232,0.6)",
+          color: "rgba(249,249,249,0.6)",
         }}>
           We use essential cookies to keep this site running. No tracking, no ads.{" "}
           <Link href="/cookies" style={{
-            color: "#C9A96E",
+            color: "#FC5000",
             textDecoration: "none",
-            borderBottom: "1px solid rgba(201,169,110,0.3)",
+            borderBottom: "1px solid rgba(252,80,0,0.3)",
           }}>
             Cookie Policy
           </Link>
@@ -80,35 +80,35 @@ export default function CookieBanner() {
         <button
           onClick={decline}
           style={{
-            fontFamily: "'Sohne', sans-serif",
+            fontFamily: "var(--font-body), sans-serif",
             fontSize: "0.72rem",
             fontWeight: 400,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            color: "rgba(245,240,232,0.3)",
+            color: "rgba(249,249,249,0.3)",
             background: "transparent",
             border: "none",
             cursor: "pointer",
             padding: "10px 4px",
             transition: "color 0.2s",
           }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "rgba(245,240,232,0.6)")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "rgba(245,240,232,0.3)")}
+          onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "rgba(249,249,249,0.6)")}
+          onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.color = "rgba(249,249,249,0.3)")}
         >
           Decline
         </button>
         <button
           onClick={accept}
           style={{
-            fontFamily: "'Sohne', sans-serif",
+            fontFamily: "var(--font-body), sans-serif",
             fontSize: "0.72rem",
             fontWeight: 500,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            color: "#0D0D0D",
-            background: "#C9A96E",
-            border: "1px solid #C9A96E",
-            borderRadius: "2px",
+            color: "#f9f9f9",
+            background: "#FC5000",
+            border: "1px solid #FC5000",
+            borderRadius: "8px",
             cursor: "pointer",
             padding: "10px 24px",
             transition: "opacity 0.2s",

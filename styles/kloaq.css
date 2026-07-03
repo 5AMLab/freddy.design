@@ -123,18 +123,8 @@
   z-index: -1;
 }
 
-/* Nav links: full-opacity cream at rest (live site's .nav-link default is
-   75% opacity), hover flips to Flameburst orange with no underline — scoped
-   to the review page only. */
-.kloaq-root .nav-link {
-  color: var(--cream);
-}
-.kloaq-root .nav-link::after {
-  display: none;
-}
-.kloaq-root .nav-link:hover {
-  color: var(--orange);
-}
+/* Nav-link styling lives in globals.css as the base .nav-link rule (the
+   site-wide default), so there's nothing to override here. */
 
 /* Section label — horizontal, sitting above the section's heading/content
    rather than as a rotated side rail. These sections are now single-column
@@ -157,6 +147,13 @@
    Project names set huge in condensed caps and packed irregularly across the
    canvas, with service tags inline. Flowed as wrapping inline blocks rather
    than a rigid grid so it reads as a dense typographic field. */
+/* Desktop shows the packed cloud (.kloaq-cases-section) and hides the mobile
+   scroll-carousel hero; the 820px block below flips both. Both trees are in
+   the SSR output — this is a pure CSS toggle, so no hydration flash. */
+.kloaq-mobile-hero {
+  display: none;
+}
+
 .kloaq-cases-section {
   /* 80px matches .kloaq-about-section etc. on both sides — the old
      "72px padding + 48px rail column + 40px gap" only added the rail's
@@ -759,6 +756,11 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+/* KloaqIndustries pauses the marquee via JS after hydration; guard it in CSS
+   too so reduced-motion users don't see it scroll on first paint. */
+@media (prefers-reduced-motion: reduce) {
+  .kloaq-industries-track { animation: none; }
+}
 .kloaq-industry-seq {
   display: flex;
   align-items: baseline;
@@ -883,6 +885,21 @@
    watermark is fully inset it only clipped ~7px off the "f" ascender/"y"
    descender's own tips with nothing left to hide. */
 .kloaq-footer {
+  /* Self-contained tokens: this footer is now shared site-wide (home, work,
+     legal), but the kloaq design tokens are scoped to .kloaq-root — which
+     only wraps the homepage. On every other page the footer would inherit
+     none of them, collapsing its background to transparent and its fonts to
+     the browser default. Re-declaring the tokens it actually uses here makes
+     the footer render identically regardless of any ancestor wrapper. */
+  --ink: #050505;
+  --cream: #f9f9f9;
+  --gold: #c9a96e;
+  --orange: #fc5000;
+  --muted: rgba(245, 240, 232, 0.55);
+  --hairline: rgba(245, 240, 232, 0.18);
+  --display: 'Boldonse', 'Anton', 'Sohne Breit', sans-serif;
+  --body: 'Inter Tight', 'Sohne', sans-serif;
+
   background: var(--ink);
   border-top: 1px solid var(--hairline);
 }
@@ -1009,7 +1026,7 @@
 /* Huge ghost wordmark, anchoring the footer as the page's true final
    statement. Sized/positioned to sit fully inside the footer (no clipping
    top/bottom/sides) rather than bleeding off the edge, and left-aligned to
-   the same 72px inset as the navbar wordmark (.kloaq-navbar-wrapper's
+   the same 72px inset as the navbar wordmark (.kloaq-nav-wrapper's
    padding: 48px 72px) so both logos share one visual edge down the page.
    Fill is a full-opacity animated gradient (see KloaqFooterWordmark.tsx).
    Boldonse's "y" descender draws past its own line box at line-height: 1
@@ -1017,13 +1034,20 @@
    the ink extends ~3px below the box, so container padding alone can't
    help since flex items stretch to the box, not the leading). line-height:
    1.4 gives the extra ~0.4 line worth of vertical room split around the
-   flex row so both the "f" ascender and "y" descender render fully inside. */
+   flex row so both the "f" ascender and "y" descender render fully inside.
+   padding-bottom: 96px (not a smaller value) is deliberate — the page's
+   own scrollable height ends exactly at the footer's bottom edge (there's
+   nothing after the footer to scroll to), so at max scroll the footer's
+   bottom edge lands flush with the viewport bottom. A small gap below the
+   "y" descender reads as "cut off" against that edge even though nothing
+   is technically clipped — this padding is what actually reads as clear
+   air below the glyph once you're scrolled all the way down. */
 .kloaq-footer-watermark {
   position: relative;
   z-index: 1;
   max-width: 1600px;
   margin: 48px auto 0;
-  padding: 8px 72px 40px;
+  padding: 8px 72px 96px;
   display: flex;
   align-items: center;
   font-family: var(--display);
@@ -1037,6 +1061,18 @@
   display: inline-block;
   white-space: pre;
   background: linear-gradient(180deg, var(--orange) 0%, var(--gold) 42%, var(--cream) 100%);
+  /* background-size/position: with the default `auto` size, the gradient
+     paints exactly across the element's own line-box — but Boldonse's
+     glyph ink (especially "f"'s ascender and "y"'s descender) extends well
+     outside that line-box in both directions (confirmed by comparing
+     getBoundingClientRect() of a Range around the text vs. the element
+     itself: the ink was ~46px taller than the box, offset both above and
+     below it). Any ink outside the gradient's own box has nothing painted
+     under it. Oversizing to 300% height and centering it on the box gives
+     enough overshoot on both edges to always fully cover the glyph, no
+     matter which char/ascender-descender combination is in play. */
+  background-size: 100% 300%;
+  background-position: 0% 50%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1052,7 +1088,7 @@
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  .kloaq-footer-watermark { font-size: 20vw; margin-top: 32px; padding: 8px 24px 40px; }
+  .kloaq-footer-watermark { font-size: 20vw; margin-top: 32px; padding: 8px 24px 72px; }
 }
 
 /* ── RESPONSIVE ── */
@@ -1112,6 +1148,9 @@
   .kloaq-vlabel + * {
     grid-column: 1;
   }
+  /* Swap the desktop cloud for the mobile scroll-carousel hero. */
+  .kloaq-cases-section { display: none; }
+  .kloaq-mobile-hero { display: block; }
   .kloaq-cases-section { padding: 0 24px; min-height: auto; grid-template-columns: 1fr; gap: 24px; }
   /* Desktop's 8-col grid (cloud in cols 1-6, reel in cols 7-8) collapses to a
      single stacked column — reel falls below the cloud again on mobile. */
@@ -1232,4 +1271,223 @@
      point by KloaqCases' `tap` handler on coarse pointers) is how the
      portfolio image shows on touch — same behavior as desktop hover. It stays
      opacity:0 until a case is tapped, so it costs nothing at rest. */
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   MOBILE HERO  —  KloaqCasesMobile.tsx
+   Touch counterpart to the desktop cloud: a full-screen, one-project-at-a-
+   time scroll carousel. The section is pinned by ScrollTrigger for `count`
+   viewport-steps; each step centers one project title over its full-bleed,
+   dimmed image. Cross-fade transitions (no layout movement), so all state
+   here is just opacity toggling on .is-active.
+   Shown only inside the max-width:820px block above (display:none by default).
+   ────────────────────────────────────────────────────────────────────────── */
+.kloaq-mobile-hero {
+  position: relative;
+  padding: 0;
+}
+/* The viewport is exactly one screen tall — this is what ScrollTrigger pins.
+   100svh (small viewport height) so mobile browser chrome doesn't clip the
+   centered title behind the URL bar. */
+.kloaq-mobile-hero-viewport {
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+.kloaq-mobile-hero-track {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+/* Image layer — a single contained rounded rectangle (matches the desktop
+   cloud's .kloaq-thumb-frame: 14px radius, soft shadow, object-fit: cover,
+   NOT dimmed). The stacked <img>s crossfade inside this fixed-size card; the
+   title overlays its centre (see .kloaq-mobile-hero-titles below). */
+.kloaq-mobile-hero-media {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  max-width: 380px;
+  /* 4:5 portrait card. */
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+}
+.kloaq-mobile-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* Undimmed — no scrim or shadow behind the title (per the design call);
+     the image shows crisp and the title sits on top as-is. */
+  transform: scale(1.04);
+  transition: opacity 0.7s ease, transform 1.2s ease;
+  will-change: opacity, transform;
+}
+.kloaq-mobile-hero-img.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Title layer — overlays the centre of the image card. Absolutely centred
+   over the same 380px-wide box as .kloaq-mobile-hero-media (both are centred
+   children of the track), so the title reads across the middle of the photo.
+   Only .is-active is shown/interactive. */
+.kloaq-mobile-hero-titles {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+.kloaq-mobile-hero-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--cream);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease;
+}
+.kloaq-mobile-hero-title.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.kloaq-mobile-hero-index {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  color: var(--orange);
+}
+.kloaq-mobile-hero-name {
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 0.95;
+  font-size: clamp(1.9rem, 9vw, 3rem);
+  text-transform: uppercase;
+  color: var(--cream);
+  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease;
+}
+/* Active title mirrors the desktop cloud's hover language: transparent fill
+   with a 1.5px orange text-stroke (the "ghost/outline word"). Since the
+   centred title is always the active project here, this is its resting look
+   — reads over any image and matches the cloud's on-hover treatment. */
+.kloaq-mobile-hero-title.is-active .kloaq-mobile-hero-name {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--orange);
+}
+.kloaq-mobile-hero-tag {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* Progress dots — bottom center. */
+.kloaq-mobile-hero-dots {
+  position: absolute;
+  z-index: 2;
+  bottom: 48px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.kloaq-mobile-hero-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(245, 240, 232, 0.28);
+  transition: background 0.4s ease, transform 0.4s ease;
+}
+.kloaq-mobile-hero-dot.is-active {
+  background: var(--orange);
+  transform: scale(1.4);
+}
+
+/* Scroll affordance — fades once past the first project. */
+.kloaq-mobile-hero-hint {
+  position: absolute;
+  z-index: 2;
+  bottom: 72px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--body);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  animation: kloaq-hero-hint-bob 1.8s ease-in-out infinite;
+}
+.kloaq-mobile-hero-hint.is-hidden {
+  opacity: 0;
+}
+@keyframes kloaq-hero-hint-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* The rotated "Projects" vlabel would overlap the centered title on a full-
+   screen frame — pin it top-left over the image instead. */
+.kloaq-mobile-hero > .kloaq-vlabel {
+  position: absolute;
+  z-index: 2;
+  top: 96px;
+  left: 24px;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No pin/hijack — the section becomes a normal vertical stack of card +
+     title blocks that scroll conventionally, so every project is reachable. */
+  .kloaq-mobile-hero-viewport { height: auto; overflow: visible; }
+  .kloaq-mobile-hero-track {
+    height: auto;
+    justify-content: flex-start;
+    padding-top: 120px;
+    padding-bottom: 120px;
+    gap: 80px;
+  }
+  /* Each project is its own card+title pair in flow. The React tree renders
+     one media card and one titles zone (crossfading), so in reduced motion we
+     just reveal all stacked images/titles at once, laid out relatively. */
+  .kloaq-mobile-hero-img {
+    position: relative;
+    opacity: 1;
+    transform: none;
+  }
+  .kloaq-mobile-hero-titles { height: auto; }
+  .kloaq-mobile-hero-title {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+    margin-bottom: 60px;
+  }
+  .kloaq-mobile-hero-hint,
+  .kloaq-mobile-hero-dots { display: none; }
 }

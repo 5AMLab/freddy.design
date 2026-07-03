@@ -2,11 +2,9 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
-// Logo wall for the /kloaq review page — same brands as the live site's
-// LogosV2, sized up 1.5x (28px → 42px). Unlike the live version (a static
-// centered row), this one scrolls edge-to-edge as a continuous marquee, and
-// the marks are recolored orange to match the word-cloud accent instead of
-// sitting at their native brand colors.
+// Logo wall for the homepage and /kloaq. Scrolls edge-to-edge as a
+// continuous marquee, with the marks recolored orange to match the
+// word-cloud accent instead of sitting at their native brand colors.
 const logos = [
   { name: "SK-II", src: "/logos/SK-II.svg" },
   { name: "Digital Realty", src: "/logos/digital realty.svg" },
@@ -26,6 +24,12 @@ function LogoSet({ setKey }: { setKey: string }) {
           <Image
             src={logo.src}
             alt={logo.name}
+            // Variable-width SVG marks pinned to a fixed 42px height, width by
+            // aspect ratio. height:"42px" (not "auto") must stay in the inline
+            // style — next/image injects its own inline width/height, which
+            // beats the .kloaq-logo-item img CSS rule, so the real size has to
+            // be set inline here too or the mark collapses to 0. width={0}
+            // keeps the intrinsic aspect ratio unconstrained.
             width={0}
             height={42}
             style={{ width: "auto", height: "42px" }}

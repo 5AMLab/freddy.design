@@ -9,10 +9,9 @@ import { RETAINER_SLOTS } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// CTA for the /kloaq review page. A copy of CTAV2 recoloured gold → Flameburst
-// orange so the whole page commits to one accent. Headline and watermark use
-// Boldonse (the same display face as the word cloud) instead of Canela, so
-// the whole page stays on its two-typeface system (Boldonse + Inter Tight).
+// CTA for the homepage and /kloaq. Flameburst orange accent throughout, and
+// headline/watermark use Boldonse (the same display face as the word cloud)
+// so the page stays on its two-typeface system (Boldonse + Inter Tight).
 const ORANGE = "#FC5000";
 
 export default function KloaqCTA() {

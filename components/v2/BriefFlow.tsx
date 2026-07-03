@@ -119,12 +119,13 @@ export default function BriefFlow() {
         textAlign: "left",
         background: "none",
         border: "none",
-        borderBottom: "1px solid rgba(245,240,232,0.12)",
+        borderBottom: "1px solid rgba(249,249,249,0.12)",
         padding: "22px 0",
         cursor: "pointer",
-        fontFamily: "'Canela', serif",
-        fontSize: "clamp(1.5rem, 2.6vw, 2.2rem)",
-        fontWeight: 300,
+        fontFamily: "var(--font-body), sans-serif",
+        fontSize: "clamp(1.3rem, 2.2vw, 1.8rem)",
+        fontWeight: 500,
+        color: "#f9f9f9",
       }}
     >
       {value}
@@ -146,7 +147,7 @@ export default function BriefFlow() {
         position: "fixed",
         inset: 0,
         zIndex: 1400,
-        background: "rgba(13,13,13,0.98)",
+        background: "rgba(5,5,5,0.98)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
         overflowY: "auto",
@@ -173,16 +174,16 @@ export default function BriefFlow() {
         >
           <div
             style={{
-              fontFamily: "'Sohne Breit', sans-serif",
+              fontFamily: "var(--font-body), sans-serif",
               fontSize: "0.65rem",
               fontWeight: 500,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#C9A96E",
+              color: "#FC5000",
             }}
           >
             Brief Me{" "}
-            <span style={{ color: "rgba(245,240,232,0.3)", marginLeft: "12px" }}>
+            <span style={{ color: "rgba(249,249,249,0.3)", marginLeft: "12px" }}>
               {String(Math.min(step + 1, 4)).padStart(2, "0")} / 04
             </span>
           </div>
@@ -191,10 +192,10 @@ export default function BriefFlow() {
             aria-label="Close"
             style={{
               background: "none",
-              border: "1px solid rgba(201,169,110,0.35)",
-              borderRadius: "2px",
-              color: "rgba(245,240,232,0.7)",
-              fontFamily: "'Sohne', sans-serif",
+              border: "1px solid rgba(252,80,0,0.35)",
+              borderRadius: "8px",
+              color: "rgba(249,249,249,0.7)",
+              fontFamily: "var(--font-body), sans-serif",
               fontSize: "0.65rem",
               letterSpacing: "0.16em",
               textTransform: "uppercase",
@@ -211,11 +212,12 @@ export default function BriefFlow() {
           {step <= 2 && (
             <h2
               style={{
-                fontFamily: "'Canela', serif",
-                fontSize: "clamp(2.2rem, 4.5vw, 3.6rem)",
-                fontWeight: 300,
-                lineHeight: 1.1,
-                color: "#F5F0E8",
+                fontFamily: "var(--font-display), sans-serif",
+                fontSize: "clamp(1.7rem, 3.4vw, 2.8rem)",
+                fontWeight: 400,
+                lineHeight: 1.2,
+                textTransform: "uppercase",
+                color: "#f9f9f9",
                 marginBottom: "clamp(28px, 5vh, 56px)",
               }}
             >
@@ -225,9 +227,10 @@ export default function BriefFlow() {
                   style={{
                     display: "block",
                     fontSize: "1.05rem",
-                    fontFamily: "'Sohne', sans-serif",
-                    fontWeight: 300,
-                    color: "rgba(245,240,232,0.5)",
+                    fontFamily: "var(--font-body), sans-serif",
+                    fontWeight: 400,
+                    textTransform: "none",
+                    color: "rgba(249,249,249,0.5)",
                     marginTop: "16px",
                     lineHeight: 1.7,
                   }}
@@ -239,13 +242,13 @@ export default function BriefFlow() {
           )}
 
           {step === 0 && (
-            <div style={{ borderTop: "1px solid rgba(245,240,232,0.12)" }}>
+            <div style={{ borderTop: "1px solid rgba(249,249,249,0.12)" }}>
               {DELIVERABLES.map((d) => optionRow(d, pick(setDeliverable)))}
             </div>
           )}
 
           {step === 1 && (
-            <div style={{ borderTop: "1px solid rgba(245,240,232,0.12)" }}>
+            <div style={{ borderTop: "1px solid rgba(249,249,249,0.12)" }}>
               {TIMELINES.map((t) => optionRow(t, pick(setTimeline)))}
             </div>
           )}
@@ -262,16 +265,15 @@ export default function BriefFlow() {
                   width: "100%",
                   background: "transparent",
                   border: "none",
-                  borderBottom: "1px solid rgba(201,169,110,0.35)",
+                  borderBottom: "1px solid rgba(252,80,0,0.35)",
                   outline: "none",
                   resize: "vertical",
                   padding: "8px 0 16px",
-                  fontFamily: "'Canela', serif",
-                  fontSize: "clamp(1.2rem, 2vw, 1.6rem)",
-                  fontWeight: 300,
-                  fontStyle: "italic",
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "clamp(1.15rem, 1.9vw, 1.5rem)",
+                  fontWeight: 400,
                   lineHeight: 1.5,
-                  color: "#F5F0E8",
+                  color: "#f9f9f9",
                 }}
               />
               <input
@@ -283,13 +285,13 @@ export default function BriefFlow() {
                   marginTop: "28px",
                   background: "transparent",
                   border: "none",
-                  borderBottom: "1px solid rgba(245,240,232,0.15)",
+                  borderBottom: "1px solid rgba(249,249,249,0.15)",
                   outline: "none",
                   padding: "8px 0 12px",
-                  fontFamily: "'Sohne', sans-serif",
+                  fontFamily: "var(--font-body), sans-serif",
                   fontSize: "0.95rem",
                   fontWeight: 300,
-                  color: "rgba(245,240,232,0.8)",
+                  color: "rgba(249,249,249,0.8)",
                 }}
               />
               <button
@@ -297,15 +299,15 @@ export default function BriefFlow() {
                 disabled={!note.trim()}
                 style={{
                   marginTop: "40px",
-                  fontFamily: "'Sohne', sans-serif",
+                  fontFamily: "var(--font-body), sans-serif",
                   fontWeight: 500,
                   fontSize: "0.8rem",
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
-                  color: "#0D0D0D",
-                  background: note.trim() ? "#C9A96E" : "rgba(201,169,110,0.25)",
+                  color: "#f9f9f9",
+                  background: note.trim() ? "#FC5000" : "rgba(252,80,0,0.25)",
                   border: "none",
-                  borderRadius: "2px",
+                  borderRadius: "8px",
                   padding: "16px 36px",
                   cursor: note.trim() ? "pointer" : "not-allowed",
                   transition: "background 0.3s",
@@ -320,12 +322,12 @@ export default function BriefFlow() {
             <div>
               <div
                 style={{
-                  fontFamily: "'Sohne Breit', sans-serif",
+                  fontFamily: "var(--font-body), sans-serif",
                   fontSize: "0.65rem",
                   fontWeight: 500,
                   letterSpacing: "0.22em",
                   textTransform: "uppercase",
-                  color: "#C9A96E",
+                  color: "#FC5000",
                   marginBottom: "24px",
                 }}
               >
@@ -333,13 +335,12 @@ export default function BriefFlow() {
               </div>
               <blockquote
                 style={{
-                  fontFamily: "'Canela', serif",
-                  fontSize: "clamp(1.3rem, 2.4vw, 1.9rem)",
-                  fontWeight: 300,
-                  fontStyle: "italic",
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "clamp(1.2rem, 2.2vw, 1.7rem)",
+                  fontWeight: 400,
                   lineHeight: 1.6,
-                  color: "rgba(245,240,232,0.85)",
-                  borderLeft: "1px solid rgba(201,169,110,0.4)",
+                  color: "rgba(249,249,249,0.85)",
+                  borderLeft: "1px solid rgba(252,80,0,0.4)",
                   paddingLeft: "28px",
                   marginBottom: "40px",
                   whiteSpace: "pre-line",
@@ -352,15 +353,15 @@ export default function BriefFlow() {
                 href={mailto}
                 style={{
                   display: "inline-block",
-                  fontFamily: "'Sohne', sans-serif",
+                  fontFamily: "var(--font-body), sans-serif",
                   fontWeight: 500,
                   fontSize: "0.8rem",
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
-                  color: "#0D0D0D",
-                  background: "#C9A96E",
+                  color: "#f9f9f9",
+                  background: "#FC5000",
                   padding: "18px 44px",
-                  borderRadius: "2px",
+                  borderRadius: "8px",
                   textDecoration: "none",
                 }}
               >
@@ -370,17 +371,17 @@ export default function BriefFlow() {
               <p
                 style={{
                   marginTop: "28px",
-                  fontFamily: "'Sohne', sans-serif",
+                  fontFamily: "var(--font-body), sans-serif",
                   fontSize: "0.85rem",
                   fontWeight: 300,
                   lineHeight: 1.8,
-                  color: "rgba(245,240,232,0.5)",
+                  color: "rgba(249,249,249,0.5)",
                   maxWidth: "460px",
                 }}
               >
                 Prefer WhatsApp? Every retainer includes a direct line — speed
                 dial starts when we do.{" "}
-                <span style={{ color: "#C9A96E" }}>
+                <span style={{ color: "#FC5000" }}>
                   {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots
                   open for {RETAINER_SLOTS.month}.
                 </span>
@@ -399,11 +400,11 @@ export default function BriefFlow() {
               background: "none",
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Sohne', sans-serif",
+              fontFamily: "var(--font-body), sans-serif",
               fontSize: "0.75rem",
               letterSpacing: "0.14em",
               textTransform: "uppercase",
-              color: "rgba(245,240,232,0.4)",
+              color: "rgba(249,249,249,0.4)",
               padding: "8px 0",
             }}
           >

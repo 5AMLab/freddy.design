@@ -9,15 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        black: "#0f0f0f",
-        red: "#E8222E",
-        cream: "#FFF8EE",
-        yellow: "#FFD93D",
-        ink: "#1a1a1a",
+        // Kloaq design system — single source of truth.
+        ink: "#050505",
+        cream: "#f9f9f9",
+        orange: "#FC5000", // Flameburst Orange — the one accent
       },
       fontFamily: {
-        fredoka: ["'Fredoka One'", "cursive"],
-        nunito: ["'Nunito'", "sans-serif"],
+        // Boldonse for display/headline, Inter Tight for body/UI.
+        display: ["var(--font-display)", "sans-serif"],
+        body: ["var(--font-body)", "sans-serif"],
+        sans: ["var(--font-body)", "sans-serif"],
+      },
+      borderRadius: {
+        // Canonical image-rectangle radius from the Kloaq study.
+        image: "14px",
+        "image-sm": "12px",
       },
     },
   },

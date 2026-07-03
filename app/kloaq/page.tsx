@@ -16,12 +16,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * Standalone design study: kloaq.com's loud, brash structure (case cloud,
+ * Original design study: kloaq.com's loud, brash structure (case cloud,
  * heavy condensed type, rotated labels, pill tags, slash-separated client run)
- * reskinned in freddi.design's dark + gold brand. Reuses the real Navbar /
- * Brief flow, with a Kloaq-specific CTA and Footer so those two sections can
- * commit fully to the new design language. Live site at "/" is untouched.
- * Noindexed — internal review only.
+ * reskinned in freddi.design's dark + Flameburst-orange brand. This design
+ * language is now also the homepage (app/page.tsx uses the same components);
+ * this route stays as the original reference/staging version, noindexed.
  */
 export default function KloaqReview() {
   return (
@@ -45,7 +44,7 @@ export default function KloaqReview() {
           </div>
         </section>
 
-        {/* Logo wall — same brands as the live site's LogosV2, sized up 1.5x */}
+        {/* Logo wall */}
         <KloaqLogos />
 
         {/* About — flat two-column text + accented closing statement */}
@@ -79,7 +78,7 @@ export default function KloaqReview() {
           </div>
         </section>
 
-        {/* What I Do — numbered service rows, reference: live site ServicesV2 */}
+        {/* What I Do — numbered service rows */}
         <KloaqServices />
 
         {/* Industries — replaces the old "What we do" + Clients section.

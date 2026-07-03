@@ -4,10 +4,10 @@ import Image from "next/image";
 import gsap from "gsap";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 
-// "What I Do" for the /kloaq review page. Row layout: num+title | corner
-// marks (image lives in a single cursor-trailing preview, not per-row) |
-// description + tags. The preview follows the mouse exactly like the live
-// site's ServicesV2, crossfading between images as the active row changes.
+// "What I Do" — the homepage's and /kloaq's services section. Row layout:
+// num+title | corner marks (image lives in a single cursor-trailing preview,
+// not per-row) | description + tags. The preview follows the mouse across
+// the section, crossfading between images as the active row changes.
 //
 // Coarse pointers (touch) get an accordion fallback: tapping a row toggles
 // it active (same `active` state hover already drives) and reveals a fixed
@@ -140,8 +140,8 @@ export default function KloaqServices() {
   const previewRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
 
-  // Cursor-trailing preview, same behavior as the live site's ServicesV2:
-  // the image follows the mouse across the whole section (fine pointers only).
+  // Cursor-trailing preview: the image follows the mouse across the whole
+  // section (fine pointers only).
   useEffect(() => {
     const section = ref.current;
     const el = previewRef.current;
@@ -211,7 +211,10 @@ export default function KloaqServices() {
           ))}
         </div>
 
-        <a href="#pricing" className="kloaq-whatido-link">
+        {/* No pricing section on /kloaq — link to the live homepage's
+            #pricing (matches KloaqNavbar's "Pricing" item, which also
+            resolves to /#pricing off-homepage). */}
+        <a href="/#pricing" className="kloaq-whatido-link">
           See pricing &amp; plans →
         </a>
       </div>

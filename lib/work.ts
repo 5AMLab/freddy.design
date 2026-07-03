@@ -1,7 +1,6 @@
 // Single source of truth for portfolio work.
-// Consumed by the homepage section (components/v2/PortfolioV2.tsx),
-// the index page (app/work/page.tsx) and the detail pages
-// (app/work/[slug]/page.tsx).
+// Consumed by the index page (app/work/page.tsx via WorkIndex) and the
+// detail pages (app/work/[slug]/page.tsx via WorkDetail).
 //
 // Slots flagged with `placeholder: true` still use generated/stock
 // imagery — overwrite the files in public/portfolio with the real

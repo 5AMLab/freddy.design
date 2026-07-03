@@ -10,6 +10,20 @@ function finish() {
   window.dispatchEvent(new Event(PRELOADER_DONE_EVENT));
 }
 
+// Has the intro already played this browser session? Read synchronously so an
+// already-preloaded session (any client navigation after the first paint) never
+// even renders the overlay — it can't get stuck waiting on an effect to clear.
+// Guarded for SSR (no window/sessionStorage on the server → render it, the
+// effect resolves it on the client).
+function alreadyPreloaded() {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem("fd-preloaded") === "1";
+  } catch {
+    return false;
+  }
+}
+
 // Brief opening sequence (≤1.5s): wordmark reveals, overlay wipes up, then
 // hands off to the hero entrance via PRELOADER_DONE_EVENT. Plays once per
 // browser session; skipped entirely under reduced motion.
@@ -20,21 +34,21 @@ export default function Preloader() {
   useEffect(() => {
     const el = ref.current;
     const skip =
-      !el || prefersReducedMotion() || sessionStorage.getItem("fd-preloaded");
+      !el || prefersReducedMotion() || alreadyPreloaded();
     if (skip) {
+      sessionStorage.setItem("fd-preloaded", "1");
       setDone(true);
       finish();
       return;
     }
 
     const word = el.querySelector(".preloader-word");
-    const tl = gsap.timeline({
-      onComplete: () => {
-        sessionStorage.setItem("fd-preloaded", "1");
-        setDone(true);
-        finish();
-      },
-    });
+    const complete = () => {
+      sessionStorage.setItem("fd-preloaded", "1");
+      setDone(true);
+      finish();
+    };
+    const tl = gsap.timeline({ onComplete: complete });
     tl.fromTo(
       word,
       { yPercent: 110 },
@@ -44,7 +58,13 @@ export default function Preloader() {
       .to(word, { yPercent: -110, duration: 0.5, ease: "expo.in" }, 0.9)
       .to(el, { yPercent: -100, duration: 0.7, ease: "expo.inOut" }, 1.1);
 
+    // Failsafe: if the timeline ever stalls (interrupted tween, tab throttling,
+    // a torn-down remount that kills it mid-flight), never trap the user behind
+    // a full-screen overlay — force the handoff after the sequence's own budget.
+    const failsafe = window.setTimeout(complete, 2600);
+
     return () => {
+      window.clearTimeout(failsafe);
       tl.kill();
     };
   }, []);
@@ -59,7 +79,7 @@ export default function Preloader() {
         position: "fixed",
         inset: 0,
         zIndex: 2000,
-        background: "#0D0D0D",
+        background: "#050505",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -69,14 +89,14 @@ export default function Preloader() {
         <span
           className="preloader-word line"
           style={{
-            fontFamily: "'Canela', serif",
-            fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
-            fontWeight: 300,
-            color: "#F5F0E8",
-            letterSpacing: "0.04em",
+            fontFamily: "var(--font-display), sans-serif",
+            fontSize: "clamp(1.4rem, 2.6vw, 2.1rem)",
+            fontWeight: 400,
+            color: "#f9f9f9",
+            letterSpacing: "0.02em",
           }}
         >
-          freddy<span style={{ color: "#C9A96E" }}>.</span>design
+          freddy<span style={{ color: "#FC5000" }}>.</span>
         </span>
       </span>
     </div>

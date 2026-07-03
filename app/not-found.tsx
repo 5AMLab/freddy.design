@@ -1,6 +1,7 @@
 "use client";
-import NavbarV2 from "@/components/v2/NavbarV2";
-import FooterV2 from "@/components/v2/FooterV2";
+import "@/styles/kloaq.css";
+import KloaqNavbar from "@/components/v2/KloaqNavbar";
+import KloaqFooter from "@/components/v2/KloaqFooter";
 import { useEffect, useState } from "react";
 
 export default function NotFound() {
@@ -12,8 +13,8 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div style={{ background: "#0D0D0D", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <NavbarV2 />
+    <div style={{ background: "#050505", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <KloaqNavbar />
 
       <main
         style={{
@@ -34,11 +35,10 @@ export default function NotFound() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -54%)",
-            fontFamily: "'Canela', serif",
-            fontSize: "clamp(14rem, 30vw, 34rem)",
-            fontWeight: 300,
-            fontStyle: "italic",
-            color: "rgba(201,169,110,0.05)",
+            fontFamily: "var(--font-display), sans-serif",
+            fontSize: "clamp(12rem, 26vw, 30rem)",
+            fontWeight: 400,
+            color: "rgba(252,80,0,0.06)",
             lineHeight: 1,
             pointerEvents: "none",
             userSelect: "none",
@@ -63,12 +63,12 @@ export default function NotFound() {
         >
           <div
             style={{
-              fontFamily: "'Sohne Breit', sans-serif",
+              fontFamily: "var(--font-body), sans-serif",
               fontSize: "0.65rem",
               fontWeight: 500,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#C9A96E",
+              color: "#FC5000",
               marginBottom: "28px",
             }}
           >
@@ -77,27 +77,28 @@ export default function NotFound() {
 
           <h1
             style={{
-              fontFamily: "'Canela', serif",
-              fontSize: "clamp(2.8rem, 5.5vw, 5.5rem)",
-              fontWeight: 300,
-              lineHeight: 1.05,
-              color: "#F5F0E8",
-              letterSpacing: "-0.01em",
+              fontFamily: "var(--font-display), sans-serif",
+              fontSize: "clamp(2rem, 4.2vw, 4rem)",
+              fontWeight: 400,
+              lineHeight: 1.2,
+              textTransform: "uppercase",
+              color: "#f9f9f9",
+              letterSpacing: "0.005em",
               marginBottom: "24px",
             }}
           >
             Looks like this page
             <br />
-            <em style={{ color: "#C9A96E" }}>got lost in the brief.</em>
+            <span style={{ color: "#FC5000" }}>got lost in the brief.</span>
           </h1>
 
           <p
             style={{
-              fontFamily: "'Sohne', sans-serif",
+              fontFamily: "var(--font-body), sans-serif",
               fontSize: "1rem",
               fontWeight: 300,
               lineHeight: 1.75,
-              color: "rgba(245,240,232,0.55)",
+              color: "rgba(249,249,249,0.55)",
               marginBottom: "48px",
             }}
           >
@@ -111,15 +112,15 @@ export default function NotFound() {
               href="/"
               style={{
                 display: "inline-block",
-                fontFamily: "'Sohne', sans-serif",
+                fontFamily: "var(--font-body), sans-serif",
                 fontWeight: 500,
                 fontSize: "0.8rem",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "#0D0D0D",
-                background: "#C9A96E",
+                color: "#f9f9f9",
+                background: "#FC5000",
                 padding: "18px 44px",
-                borderRadius: "2px",
+                borderRadius: "8px",
                 textDecoration: "none",
                 transition: "opacity 0.2s, transform 0.2s",
               }}
@@ -142,27 +143,27 @@ export default function NotFound() {
               onClick={() => { window.location.href = "/#cta"; }}
               style={{
                 display: "inline-block",
-                fontFamily: "'Sohne', sans-serif",
+                fontFamily: "var(--font-body), sans-serif",
                 fontWeight: 400,
                 fontSize: "0.8rem",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "#C9A96E",
-                border: "1px solid rgba(201,169,110,0.45)",
+                color: "#FC5000",
+                border: "1px solid rgba(252,80,0,0.45)",
                 padding: "18px 44px",
-                borderRadius: "2px",
+                borderRadius: "8px",
                 textDecoration: "none",
                 transition: "background 0.2s, color 0.2s",
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement;
-                el.style.background = "#C9A96E";
-                el.style.color = "#0D0D0D";
+                el.style.background = "#FC5000";
+                el.style.color = "#050505";
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement;
                 el.style.background = "transparent";
-                el.style.color = "#C9A96E";
+                el.style.color = "#FC5000";
               }}
             >
               Get in Touch
@@ -178,13 +179,13 @@ export default function NotFound() {
             left: "72px",
             right: "72px",
             height: "1px",
-            background: "rgba(201,169,110,0.12)",
+            background: "rgba(252,80,0,0.12)",
           }}
           className="not-found-rule"
         />
       </main>
 
-      <FooterV2 />
+      <KloaqFooter />
 
       <style>{`
         @media (max-width: 768px) {

@@ -2,128 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── CANELA FONT FACES ── */
-@font-face {
-  font-family: 'Canela';
-  src: url('/fonts/canela-woff2/Canela-Light-Trial.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Canela';
-  src: url('/fonts/canela-woff2/Canela-LightItalic-Trial.woff2') format('woff2');
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Canela';
-  src: url('/fonts/canela-woff2/Canela-Regular-Trial.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Canela';
-  src: url('/fonts/canela-woff2/Canela-RegularItalic-Trial.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Canela Deck';
-  src: url('/fonts/canela-woff2/CanelaDeck-Light-Trial.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Canela Deck';
-  src: url('/fonts/canela-woff2/CanelaDeck-Regular-Trial.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Canela Deck';
-  src: url('/fonts/canela-woff2/CanelaDeck-RegularItalic-Trial.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* ── SÖHNE FONT FACES ── */
-@font-face {
-  font-family: 'Sohne';
-  src: url('/fonts/sohne-woff2/TestSohne-Leicht-BF663d89cd4952e.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Sohne';
-  src: url('/fonts/sohne-woff2/TestSohne-LeichtKursiv-BF663d89cd9a361.woff2') format('woff2');
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Sohne';
-  src: url('/fonts/sohne-woff2/TestSohne-Buch-BF663d89cd32e6a.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Sohne';
-  src: url('/fonts/sohne-woff2/TestSohne-BuchKursiv-BF663d89cd3e887.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Sohne';
-  src: url('/fonts/sohne-woff2/TestSohne-Kraftig-BF663d89cd37e26.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Sohne';
-  src: url('/fonts/sohne-woff2/TestSohne-Halbfett-BF663d89cd2d67b.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ── SÖHNE BREIT FONT FACES ── */
-@font-face {
-  font-family: 'Sohne Breit';
-  src: url('/fonts/sohne-woff2/TestSohneBreit-Leicht-BF663d89cae7333.woff2') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Sohne Breit';
-  src: url('/fonts/sohne-woff2/TestSohneBreit-Buch-BF663d89ca2ff42.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Sohne Breit';
-  src: url('/fonts/sohne-woff2/TestSohneBreit-Kraftig-BF663d89caa6b6c.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Display face (Boldonse) token. Declared statically here — not as an inline
+   style on <html> — so it never participates in hydration reconciliation.
+   Boldonse itself is loaded via the Google Fonts <link> in layout.tsx.
+   (--font-body is provided by next/font's generated class on <html>.)
+   --orange is the same Flameburst accent kloaq.css scopes to .kloaq-root —
+   redeclared here at :root so components that need it (e.g. KloaqCursor)
+   still resolve the color on pages without a .kloaq-root wrapper, like /work. */
+:root {
+  --font-display: 'Boldonse', sans-serif;
+  --orange: #FC5000;
 }
 
 html {
@@ -147,8 +41,11 @@ html.lenis body {
 }
 
 body {
-  background: #0D0D0D;
-  color: #F5F0E8;
+  background: #050505;
+  color: #f9f9f9;
+  /* Inter Tight is the site-wide body/UI face (Kloaq design system).
+     var(--font-body) is set by next/font on <html>. */
+  font-family: var(--font-body), sans-serif;
   overflow-x: hidden;
 }
 
@@ -168,18 +65,8 @@ body {
   will-change: transform;
 }
 
-/* Hero entrance elements start hidden; the load timeline brings them in */
-.hero-el {
-  opacity: 0;
-  transform: translateY(24px);
-}
-.hero-v2-h1 .line {
-  transform: translateY(110%);
-}
-
 /* Reduced motion: everything simply visible, native scroll */
 .reduced-motion .v2-fade,
-.reduced-motion .hero-el,
 .reduced-motion .line-mask .line {
   opacity: 1 !important;
   transform: none !important;
@@ -190,46 +77,45 @@ body {
   }
 }
 
-/* ── CUSTOM CURSOR ── */
+/* ── CUSTOM CURSOR ──
+   Single site-wide cursor (KloaqCursor.tsx, mounted once in the root layout)
+   — a solid orange dot that grows into a "View" badge over
+   [data-cursor="view"] targets. Styled here (not in kloaq.css) so it renders
+   on every route, including ones that never import kloaq.css (e.g. /privacy,
+   /terms). kloaq.css keeps its own copy of .kloaq-page-cursor for /kloaq's
+   isolated stylesheet, but this is the rule that actually applies now that
+   the component is mounted globally rather than per-page. */
 html.has-custom-cursor,
 html.has-custom-cursor * {
   cursor: none !important;
 }
-.cursor-dot {
-  position: fixed;
-  top: -3px;
-  left: -3px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #C9A96E;
-  pointer-events: none;
-  z-index: 1600;
-}
-.cursor-ring {
+.kloaq-page-cursor {
   position: fixed;
   top: 0;
   left: 0;
-  width: 32px;
-  height: 32px;
-  margin: -16px 0 0 -16px;
+  width: 14px;
+  height: 14px;
+  background: #FC5000;
   border-radius: 50%;
-  border: 1px solid rgba(201,169,110,0.45);
-  background: rgba(201,169,110,0);
   pointer-events: none;
-  z-index: 1599;
+  z-index: 1600;
+  opacity: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-origin: center;
+  /* Standalone `translate` centers the dot on its x/y point without fighting
+     GSAP's transform-based quickTo (which owns `scale`/`x`/`y`). */
+  translate: -50% -50%;
+  transition: opacity 0.2s ease, background 0.25s ease;
 }
-.cursor-ring-label {
-  font-family: 'Sohne', sans-serif;
+.kloaq-page-cursor-label {
+  font-family: var(--font-body), sans-serif;
   font-size: 0.6rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #0D0D0D;
+  color: #f9f9f9;
+  white-space: nowrap;
   transition: opacity 0.2s;
 }
 
@@ -245,89 +131,47 @@ html.has-custom-cursor * {
 
 /* ── BRIEF FLOW ── */
 .brief-option {
-  color: rgba(245,240,232,0.75);
+  color: rgba(249,249,249,0.75);
   transition: color 0.3s, padding-left 0.4s cubic-bezier(0.16,1,0.3,1);
 }
 .brief-option:hover {
-  color: #F5F0E8;
+  color: #f9f9f9;
   padding-left: 12px;
 }
 .brief-option-arrow {
-  color: rgba(201,169,110,0.0);
+  color: rgba(252,80,0,0.0);
   transition: color 0.3s;
 }
 .brief-option:hover .brief-option-arrow {
-  color: #C9A96E;
+  color: #FC5000;
 }
 .brief-option:focus-visible {
-  outline: 1px solid rgba(201,169,110,0.6);
+  outline: 1px solid rgba(252,80,0,0.6);
   outline-offset: 4px;
 }
 
-/* ── NAV LINK UNDERLINE ── */
+/* ── NAV LINK ──
+   The single source of truth for KloaqNavbar's desktop links. Full-opacity
+   cream at rest, flips to Flameburst orange on hover, no underline. This IS
+   the site-wide nav style — there is no per-page override, so it can't drift.
+   KloaqNavbar is the only navbar component; every page renders it. */
 .nav-link {
   position: relative;
-  color: rgba(245,240,232,0.75);
+  color: #F5F0E8;
   transition: color 0.3s;
 }
-.nav-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -6px;
-  height: 1px;
-  background: #C9A96E;
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
-}
 .nav-link:hover {
-  color: #C9A96E;
-}
-.nav-link:hover::after {
-  transform: scaleX(1);
-  transform-origin: left center;
+  color: #FC5000;
 }
 
-/* Hero */
-.hero-v2-label {
-  font-family: 'Sohne Breit', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #C9A96E;
-}
-.hero-v2-h1 {
-  font-family: 'Canela', serif;
-  font-size: clamp(4rem, 7vw, 7.5rem);
-  font-weight: 300;
-  line-height: 1.0;
-  color: #F5F0E8;
-  letter-spacing: -0.01em;
-}
-.hero-v2-h1 em {
-  font-style: italic;
-  color: #C9A96E;
-}
-
-/* Clip all section overflow */
-.hero-v2-section, .logos-v2-section, .services-v2-section,
-.portfolio-v2-section, .how-v2-section, .pricing-v2-section,
-.industries-v2-section, .cta-v2-section {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-/* Navbar */
-.nav-v2-links { display: flex; }
-.nav-v2-wrapper { padding: 24px 72px; }
+/* ── NAVBAR LAYOUT ── */
+.kloaq-nav-links { display: flex; }
+.kloaq-nav-wrapper { padding: 48px 72px; }
 
 @media (max-width: 768px) {
-  .nav-v2-wrapper { padding: 20px 24px; }
-  .nav-v2-links { display: none; }
-  .nav-v2-hamburger { display: flex !important; }
+  .kloaq-nav-wrapper { padding: 39px 24px; }
+  .kloaq-nav-links { display: none; }
+  .kloaq-nav-hamburger { display: flex !important; }
 }
 
 /* ── FULL-PAGE MOBILE MENU ── */
@@ -353,8 +197,8 @@ html.has-custom-cursor * {
      yPercent on mount; this transform: none is just the resting base. */
   transform: none;
 }
-.mobile-menu-accent { background: #C9A96E; }
-.mobile-menu-bg { background: #0D0D0D; }
+.mobile-menu-accent { background: #FC5000; }
+.mobile-menu-bg { background: #050505; }
 .mobile-menu-content {
   position: absolute;
   inset: 0;
@@ -369,23 +213,24 @@ html.has-custom-cursor * {
   gap: 16px;
   padding: 14px 0;
   text-decoration: none;
-  border-bottom: 1px solid rgba(245,240,232,0.08);
-  font-family: 'Canela', serif;
-  font-weight: 300;
-  font-size: clamp(2rem, 8.5vw, 2.8rem);
-  line-height: 1.1;
-  color: #F5F0E8;
+  border-bottom: 1px solid rgba(249,249,249,0.08);
+  /* Boldonse display face — uppercase, tighter leading for its tall glyphs */
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 6.5vw, 2.2rem);
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: #f9f9f9;
 }
 .mobile-menu-link:active .line {
-  color: #C9A96E;
-  font-style: italic;
+  color: #FC5000;
 }
 .mobile-menu-num {
-  font-family: 'Sohne', sans-serif;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.62rem;
   font-weight: 500;
   letter-spacing: 0.16em;
-  color: rgba(201,169,110,0.6);
+  color: rgba(252,80,0,0.7);
 }
 .mobile-menu-foot {
   display: flex;
@@ -396,12 +241,12 @@ html.has-custom-cursor * {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Sohne', sans-serif;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.68rem;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(245,240,232,0.45);
+  color: rgba(249,249,249,0.45);
 }
 .mobile-menu-dot {
   width: 7px;
@@ -411,43 +256,28 @@ html.has-custom-cursor * {
   box-shadow: 0 0 8px rgba(74,222,128,0.6);
 }
 .mobile-menu-cta {
-  font-family: 'Sohne', sans-serif;
-  font-weight: 500;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 600;
   font-size: 0.8rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #0D0D0D;
-  background: #C9A96E;
+  color: #f9f9f9;
+  background: #FC5000;
   border: none;
-  border-radius: 2px;
+  border-radius: 8px;
   padding: 18px 0;
   width: 100%;
   cursor: pointer;
 }
 .mobile-menu-mail {
-  font-family: 'Canela', serif;
-  font-style: italic;
-  font-weight: 300;
-  font-size: 1rem;
-  color: rgba(245,240,232,0.5);
+  font-family: var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: rgba(249,249,249,0.5);
   text-decoration: none;
 }
 
-/* Hero responsive */
-.hero-v2-grid { grid-template-columns: 1fr 1fr; }
-.hero-v2-scroll-indicator { left: 72px; }
-
-@media (max-width: 768px) {
-  .hero-v2-section { padding: 140px 24px 80px !important; }
-  .hero-v2-h1 { font-size: clamp(3.2rem, 10vw, 5rem) !important; }
-  .hero-v2-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
-  .hero-v2-grid p { max-width: 100% !important; }
-  .hero-v2-grid > div:last-child { padding-left: 0 !important; border-left: none !important; }
-  .hero-v2-stat-row { gap: 24px !important; }
-  .hero-v2-scroll-indicator { left: 24px !important; }
-}
-
-/* Logos */
+/* Logos (KloaqLogos wall) */
 .logo-item {
   display: flex;
   align-items: center;
@@ -461,74 +291,21 @@ html.has-custom-cursor * {
   opacity: 0.9;
 }
 
-@media (max-width: 768px) {
-  .logos-v2-section { padding: 48px 24px !important; }
-  .logos-v2-row { gap: 36px !important; flex-wrap: wrap !important; justify-content: center !important; }
-}
-
-/* Services */
-@media (max-width: 768px) {
-  .services-v2-section { padding: 80px 24px !important; }
-  .service-v2-row { grid-template-columns: 48px 1fr !important; padding: 28px 0 !important; }
-  .service-v2-tag { display: none !important; }
-}
-
-/* Portfolio */
-.portfolio-v2-section { padding: 120px 72px; }
-.portfolio-v2-grid { grid-template-columns: repeat(3, 1fr); }
-.portfolio-card { display: flex; flex-direction: column; }
-.portfolio-card-media { aspect-ratio: 3/2; }
-@media (min-width: 769px) {
-  .portfolio-card-featured { grid-column: span 2; }
-  /* standard card stretches its image to match the featured row height */
-  .portfolio-card:not(.portfolio-card-featured) .portfolio-card-media { flex: 1; }
-}
-@media (max-width: 768px) {
-  .portfolio-v2-section { padding: 80px 24px !important; }
-  .portfolio-v2-grid { grid-template-columns: 1fr !important; }
-  .portfolio-card { grid-column: span 1 !important; }
-}
-
-/* How It Works */
-@media (max-width: 768px) {
-  .how-v2-section { padding: 80px 24px !important; }
-  .how-v2-grid { grid-template-columns: 1fr 1fr !important; gap: 40px !important; }
-}
-@media (max-width: 480px) {
-  .how-v2-grid { grid-template-columns: 1fr !important; }
-}
-
-/* Pricing */
-@media (max-width: 768px) {
-  .pricing-v2-section { padding: 80px 24px !important; }
-  .pricing-v2-grid { grid-template-columns: 1fr !important; }
-}
-
-/* Industries */
-@media (max-width: 768px) {
-  .industries-v2-section { padding: 80px 24px !important; }
-  .industry-arrow-col { display: none !important; }
-  .industry-desc {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
-
-/* CTA */
-.cta-v2-section { padding: 120px 72px; }
-@media (max-width: 768px) {
-  .cta-v2-section { padding: 80px 24px !important; }
-  .cta-v2-inner { flex-direction: column !important; align-items: flex-start !important; gap: 40px !important; }
-}
-
-/* Footer */
-@media (max-width: 768px) {
-  .footer-v2-inner { flex-direction: column !important; gap: 28px !important; padding: 36px 24px !important; }
-}
-
 /* Legal pages */
 @media (max-width: 768px) {
   .legal-header { padding: 120px 24px 60px !important; }
   .legal-content { padding: 60px 24px 80px !important; }
   .legal-footer { padding: 32px 24px !important; flex-direction: column !important; align-items: flex-start !important; }
+}
+
+/* Work pages (/work index + /work/[slug] detail) */
+@media (max-width: 1024px) {
+  .work-index-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 768px) {
+  .work-index-grid-wrap { padding: 48px 24px !important; }
+  .work-index-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .work-detail-images { padding: 40px 24px !important; gap: 20px !important; }
+  .work-detail-meta { gap: 28px !important; }
+  .work-detail-next { padding: 48px 24px !important; }
 }
