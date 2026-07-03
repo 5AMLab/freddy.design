@@ -175,12 +175,14 @@ html.has-custom-cursor * {
 }
 
 /* ── FULL-PAGE MOBILE MENU ── */
-/* Scoped under .kloaq-root so these out-specific `.kloaq-root > *`
-   (position: relative; z-index: 2) in kloaq.css — the mobile menu is a direct
-   child of .kloaq-root, and at equal specificity that grain-layer rule was
-   winning on cascade order, collapsing this fixed full-screen overlay to
-   position:relative/height:0 (menu rendered but invisible behind the hero). */
-.kloaq-root .mobile-menu {
+/* Base display:none is unscoped so it applies on every page (work/case pages
+   aren't wrapped in .kloaq-root). Position/z-index are additionally pinned
+   under .kloaq-root because `.kloaq-root > *` (position: relative; z-index: 2)
+   in kloaq.css — the mobile menu is a direct child of .kloaq-root there, and
+   at equal specificity that grain-layer rule was winning on cascade order,
+   collapsing this fixed full-screen overlay to position:relative/height:0
+   (menu rendered but invisible behind the hero). */
+.mobile-menu {
   display: none;
   position: fixed;
   inset: 0;
@@ -188,8 +190,15 @@ html.has-custom-cursor * {
   visibility: hidden;
   pointer-events: none;
 }
+.kloaq-root .mobile-menu {
+  /* Re-assert fixed positioning at the same specificity as `.kloaq-root > *`
+     in kloaq.css, which otherwise wins on cascade order and collapses this
+     to position:relative (menu rendered but invisible behind the hero). */
+  position: fixed;
+  z-index: 99;
+}
 @media (max-width: 768px) {
-  .kloaq-root .mobile-menu { display: block; }
+  .mobile-menu { display: block; }
 }
 .mobile-menu-accent,
 .mobile-menu-bg {

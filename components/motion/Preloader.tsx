@@ -5,14 +5,8 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 
 export const PRELOADER_DONE_EVENT = "fd:preloader-done";
 
-// Manifesto phrases that each assemble word-by-word, hold, then clear before the
-// next one enters. Keep each line short (~3–5 words) — every word gets its own
-// masked reveal and the full rotation has to land inside the intro's budget.
-const MANIFESTO = [
-  ["We", "build", "brand", "worlds."],
-  ["Design", "with", "intent."],
-  ["Stories", "that", "move."],
-];
+// A single inspiring line that reveals, holds, then resolves into the wordmark.
+const MESSAGE = "We build brand worlds.";
 
 function finish() {
   document.documentElement.dataset.preloaderDone = "1";
@@ -33,10 +27,10 @@ function alreadyPreloaded() {
   }
 }
 
-// Opening sequence (~4s): a set of manifesto lines each assemble word-by-word,
-// hold, and clear in turn, then the freddy. wordmark drops in before the overlay
-// wipes up — handing off to the hero entrance via PRELOADER_DONE_EVENT. Plays
-// once per browser session; skipped entirely under reduced motion.
+// Opening sequence: one inspiring line reveals, holds, and clears, then the
+// freddy. wordmark resolves before the overlay wipes up — handing off to the
+// hero entrance via PRELOADER_DONE_EVENT. Plays once per browser session;
+// skipped entirely under reduced motion.
 export default function Preloader() {
   const ref = useRef<HTMLDivElement>(null);
   const [done, setDone] = useState(false);
@@ -51,7 +45,7 @@ export default function Preloader() {
       return;
     }
 
-    const phrases = el.querySelectorAll<HTMLElement>(".preloader-phrase");
+    const message = el.querySelector(".preloader-message .line");
     const wordmark = el.querySelector(".preloader-word");
     const complete = () => {
       sessionStorage.setItem("fd-preloaded", "1");
@@ -59,43 +53,26 @@ export default function Preloader() {
       finish();
     };
 
-    // Start every phrase hidden and its words below their masks. autoAlpha keeps
-    // inactive phrases fully out of sight (visibility:hidden) so the stacked
-    // phrases can never overlap or flash at rest before their turn.
-    gsap.set(phrases, { autoAlpha: 0 });
-    const allWords = el.querySelectorAll<HTMLElement>(".preloader-phrase .line");
-    gsap.set(allWords, { yPercent: 110 });
+    // Hide both lines below their masks up front (130% clears a tight
+    // line-height), then reveal the stack — so nothing flashes at rest in the
+    // gap between React's paint and GSAP's first frame.
+    gsap.set(message, { yPercent: 130 });
+    gsap.set(wordmark, { yPercent: 110 });
+    gsap.set(el.querySelector(".preloader-stack"), { autoAlpha: 1 });
 
     const tl = gsap.timeline({ onComplete: complete });
 
-    // Each phrase: reveal the phrase, its words snap up from their masks in
-    // sequence, hold, then clear out upward and the phrase is hidden again
-    // before the next one begins — so only one is ever visible at a time.
-    phrases.forEach((phrase, i) => {
-      const words = phrase.querySelectorAll<HTMLElement>(".line");
-
-      tl.set(phrase, { autoAlpha: 1 }, i === 0 ? 0.15 : ">")
-        .fromTo(
-          words,
-          { yPercent: 110 },
-          { yPercent: 0, duration: 0.55, ease: "expo.out", stagger: 0.07 },
-          "<"
-        )
-        .to(
-          words,
-          { yPercent: -110, duration: 0.4, ease: "expo.in", stagger: 0.03 },
-          ">+0.45"
-        )
-        .set(phrase, { autoAlpha: 0 });
-    });
-
-    // Wordmark drops in to resolve the sequence, holds, then the overlay wipes up.
-    tl.fromTo(
-      wordmark,
-      { yPercent: 110 },
-      { yPercent: 0, duration: 0.6, ease: "expo.out" },
-      "-=0.15"
-    )
+    // Message reveals, holds ~0.9s so it reads, then clears.
+    tl.to(message, { yPercent: 0, duration: 0.6, ease: "expo.out" }, 0.2)
+      .to(message, { yPercent: -130, duration: 0.45, ease: "expo.in" }, ">+0.9")
+      // Wordmark resolves the line only after the message has fully cleared, so
+      // the two never share the screen. Holds, then the overlay wipes up.
+      .fromTo(
+        wordmark,
+        { yPercent: 110 },
+        { yPercent: 0, duration: 0.6, ease: "expo.out" },
+        ">+0.25"
+      )
       .to(wordmark, { yPercent: -110, duration: 0.45, ease: "expo.in" }, "+=0.35")
       .to(el, { yPercent: -100, duration: 0.7, ease: "expo.inOut" }, "-=0.15");
 
@@ -128,67 +105,54 @@ export default function Preloader() {
         gap: "0.4em",
       }}
     >
-      {/* All phrases share the same centered slot (stacked absolutely) so each
-          rotation replaces the last in place rather than shifting layout. */}
+      {/* The whole content stack starts visibility:hidden and is only revealed
+          once GSAP has set the initial off-screen state — so no text ever
+          flashes at rest in the gap between React's paint and the first frame. */}
       <span
+        className="preloader-stack"
         style={{
-          position: "relative",
+          visibility: "hidden",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
-          minHeight: "1.2em",
+          gap: "0.4em",
         }}
       >
-        {MANIFESTO.map((phrase, pi) => (
+        <span
+          className="preloader-message line-mask"
+          style={{ padding: "0.12em 1.2rem" }}
+        >
           <span
-            className="preloader-phrase"
-            key={pi}
+            className="line"
             style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              display: "flex",
-              flexWrap: "nowrap",
-              justifyContent: "center",
-              gap: "0.3em",
               fontFamily: "var(--font-display), sans-serif",
               fontSize: "clamp(1.4rem, 4vw, 2.8rem)",
               fontWeight: 400,
               color: "#f9f9f9",
               letterSpacing: "0.01em",
-              lineHeight: 1.05,
-              padding: "0 1.2rem",
-              textAlign: "center",
+              lineHeight: 1.3,
               whiteSpace: "nowrap",
-              visibility: "hidden",
+              transform: "translateY(130%)",
             }}
           >
-            {phrase.map((word, wi) => (
-              <span className="line-mask" key={wi}>
-                {/* Start hidden below the mask so the stacked phrases never
-                    flash at rest before GSAP takes over. */}
-                <span className="line" style={{ transform: "translateY(110%)" }}>
-                  {word}
-                </span>
-              </span>
-            ))}
+            {MESSAGE}
           </span>
-        ))}
-      </span>
+        </span>
 
-      <span className="line-mask">
-        <span
-          className="preloader-word line"
-          style={{
-            fontFamily: "var(--font-display), sans-serif",
-            fontSize: "clamp(1.4rem, 2.6vw, 2.1rem)",
-            fontWeight: 400,
-            color: "#f9f9f9",
-            letterSpacing: "0.02em",
-          }}
-        >
-          freddy<span style={{ color: "#FC5000" }}>.</span>
+        <span className="line-mask" style={{ padding: "0.12em 0" }}>
+          <span
+            className="preloader-word line"
+            style={{
+              fontFamily: "var(--font-display), sans-serif",
+              fontSize: "clamp(1.4rem, 2.6vw, 2.1rem)",
+              fontWeight: 400,
+              color: "#f9f9f9",
+              letterSpacing: "0.02em",
+              lineHeight: 1.3,
+            }}
+          >
+            freddy<span style={{ color: "#FC5000" }}>.</span>
+          </span>
         </span>
       </span>
     </div>
