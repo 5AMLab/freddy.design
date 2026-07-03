@@ -48,10 +48,12 @@ function ServiceRow({
   service,
   hovered,
   onHoverChange,
+  onToggle,
 }: {
   service: (typeof services)[0];
   hovered: boolean;
   onHoverChange: (hovered: boolean) => void;
+  onToggle: () => void;
 }) {
   const isFine = () => window.matchMedia("(pointer: fine)").matches;
 
@@ -66,7 +68,10 @@ function ServiceRow({
       }}
       onClick={() => {
         if (isFine()) return;
-        onHoverChange(!hovered);
+        // Delegate to a functional state update in the parent keyed by this
+        // row's index — never reads a possibly-stale `hovered` snapshot, so a
+        // tap that lands mid-reflow can't toggle the wrong row.
+        onToggle();
       }}
     >
       <span className={`kloaq-service-num${hovered ? " is-active" : ""}`}>
@@ -160,6 +165,14 @@ export default function KloaqServices() {
   const ref = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
+  // Only fine pointers get the cursor-trailing preview. Gating the render (not
+  // just hiding via CSS) guarantees it can never flash at the section's
+  // top-left on touch — where gsap would otherwise leave it opacity:1 after a
+  // tap set `active`, appearing near row 1 no matter which row was tapped.
+  const [isFinePointer, setIsFinePointer] = useState(false);
+  useEffect(() => {
+    setIsFinePointer(window.matchMedia("(pointer: fine)").matches);
+  }, []);
 
   // Cursor-trailing preview: the image follows the mouse across the whole
   // section (fine pointers only).
@@ -194,7 +207,8 @@ export default function KloaqServices() {
 
   return (
     <section id="services" ref={ref} className="kloaq-whatido-section kloaq-light-section">
-      {/* Cursor-trailing work preview */}
+      {/* Cursor-trailing work preview — fine pointers only (see isFinePointer). */}
+      {isFinePointer && (
       <div ref={previewRef} aria-hidden className="kloaq-whatido-preview">
         {services.map((s, i) => (
           <Image
@@ -211,6 +225,7 @@ export default function KloaqServices() {
           />
         ))}
       </div>
+      )}
 
       <div className="kloaq-vlabel">What I Do</div>
 
@@ -228,6 +243,7 @@ export default function KloaqServices() {
               service={service}
               hovered={active === i}
               onHoverChange={(h) => setActive(h ? i : null)}
+              onToggle={() => setActive((prev) => (prev === i ? null : i))}
             />
           ))}
         </div>

@@ -713,28 +713,31 @@
   .kloaq-service-taphint.is-active .kloaq-service-taphint-arrow {
     transform: rotate(90deg);
   }
-  /* Kept mounted in both states so open AND close animate. The wrapper is a
-     grid whose single row collapses 1fr → 0fr; the img inside is what actually
-     drops/fades. Grid-row transitions give a smooth height collapse that a
-     conditionally-rendered element (which unmounts instantly) can't. */
+  /* Kept mounted in both states so open AND close animate. Height is reserved
+     with max-height (single-axis layout, far cheaper on iOS Safari than the
+     grid-template-rows fr interpolation we had before — fr forced a full-page
+     reflow every frame and janked on-device). The visible drop/fade is done
+     entirely on the img with transform + opacity, which the compositor handles
+     off the main thread. */
   .kloaq-service-touch-preview {
-    display: grid;
-    grid-template-rows: 0fr;
+    display: block;
     width: 100%;
     max-width: 320px;
+    max-height: 0;
     margin-top: 0;
-    /* Close easing (standard ease-in-out) — distributes the collapse evenly
-       across the full duration so it doesn't snap shut. Open overrides this
-       below with a snappier ease-out. */
+    overflow: hidden;
+    /* Close easing — even ease-in-out so the collapse doesn't snap shut. */
     transition:
-      grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
       margin-top 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .kloaq-service-touch-preview.is-open {
-    grid-template-rows: 1fr;
+    /* Generous cap ≥ the tallest rendered image; the transition eases toward
+       it but the img's own aspect-ratio caps the actual height. */
+    max-height: 400px;
     margin-top: 8px;
     transition:
-      grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
       margin-top 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .kloaq-service-touch-preview > img {
@@ -742,10 +745,11 @@
     aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: 12px;
-    min-height: 0; /* let the grid track shrink the img below its content size */
+    display: block;
     opacity: 0;
     transform: translateY(-14px) scale(0.97);
     transform-origin: top center;
+    will-change: transform, opacity;
     transition:
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1377,6 +1381,19 @@
   .kloaq-service-num { margin-bottom: 4px; }
   .kloaq-service-title { margin-bottom: 12px; }
   .kloaq-service-imgslot { display: none; } /* no cursor on touch — nothing to anchor marks to */
+  /* Whole row is one tap target on touch. Without this, iOS Safari applies
+     double-tap-zoom / text-selection heuristics to the large title & desc
+     blocks — delaying or misrouting the synthetic click so the tap resolves
+     to the wrong row — while the small tag spans (which don't trigger it)
+     worked. manipulation disables the double-tap delay; none-select stops the
+     text-selection gesture from eating the tap. */
+  .kloaq-service-row {
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
   .kloaq-whatido-preview { display: none; } /* cursor-trailing preview needs a fine pointer */
   .kloaq-service-tags { opacity: 1; } /* no hover on touch — always show tags */
   .kloaq-cases-section > .kloaq-vlabel {
