@@ -11,12 +11,12 @@ function MetaItem({ label, value }: { label: string; value: string }) {
     <div>
       <div
         style={{
-          fontFamily: "var(--font-body), sans-serif", fontSize: "0.6rem", fontWeight: 500,
-          letterSpacing: "0.14em", textTransform: "uppercase",
-          color: "rgba(252,80,0,0.6)", marginBottom: "8px",
+          fontFamily: "var(--font-body), sans-serif", fontSize: "0.72rem", fontWeight: 600,
+          letterSpacing: "0.04em", textTransform: "uppercase",
+          color: "var(--orange)", marginBottom: "8px",
         }}
       >
-        {label}
+        [{label.toUpperCase()}]
       </div>
       <div
         style={{
@@ -35,9 +35,10 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
     <div style={{ background: "#050505", minHeight: "100vh" }}>
       <KloaqNavbar />
 
-      {/* Header */}
+      {/* Header — same section language as the homepage/index: shared
+          .kloaq-vlabel label, Boldonse heading, cream lead paragraph, 80px rail. */}
       <div
-        style={{ padding: "160px 72px 64px", borderBottom: "1px solid rgba(249,249,249,0.06)" }}
+        style={{ padding: "160px 80px 64px", borderBottom: "1px solid rgba(249,249,249,0.06)" }}
         className="legal-header"
       >
         <Link
@@ -54,19 +55,12 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
         >
           ← All work
         </Link>
-        <div
-          style={{
-            fontFamily: "var(--font-body), sans-serif", fontSize: "0.65rem", fontWeight: 400,
-            letterSpacing: "0.22em", textTransform: "uppercase", color: "#FC5000", marginBottom: "20px",
-          }}
-        >
-          {project.client}
-        </div>
+        <div className="kloaq-vlabel">{project.client}</div>
         <h1
           style={{
             fontFamily: "var(--font-display), sans-serif", fontSize: "clamp(2rem, 3.8vw, 3.4rem)",
             fontWeight: 400, textTransform: "uppercase", letterSpacing: "0.005em",
-            lineHeight: 1.2, color: "#f9f9f9", marginBottom: "28px",
+            lineHeight: 1.45, color: "#f9f9f9", marginBottom: "28px",
             maxWidth: "900px",
           }}
         >
@@ -74,8 +68,8 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
         </h1>
         <p
           style={{
-            fontFamily: "var(--font-body), sans-serif", fontSize: "1.05rem", fontWeight: 400,
-            color: "rgba(249,249,249,0.5)", lineHeight: 1.75, maxWidth: "640px",
+            fontFamily: "var(--font-body), sans-serif", fontSize: "1.2rem", fontWeight: 400,
+            color: "rgba(249,249,249,0.7)", lineHeight: 1.75, maxWidth: "660px",
             marginBottom: "48px",
           }}
         >
@@ -99,7 +93,7 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
 
       {/* Image sequence — full-width, generous, in order */}
       <div
-        style={{ padding: "72px", display: "flex", flexDirection: "column", gap: "32px" }}
+        style={{ padding: "80px", display: "flex", flexDirection: "column", gap: "32px" }}
         className="work-detail-images"
       >
         {project.images.map((src, i) => (
@@ -135,19 +129,19 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
         style={{
           display: "block", textDecoration: "none",
           borderTop: "1px solid rgba(249,249,249,0.06)",
-          padding: "64px 72px",
+          padding: "64px 80px",
           background: "#0A0A0A",
         }}
         className="work-detail-next"
       >
         <div
           style={{
-            fontFamily: "var(--font-body), sans-serif", fontSize: "0.65rem", fontWeight: 500,
-            letterSpacing: "0.18em", textTransform: "uppercase",
-            color: "rgba(252,80,0,0.6)", marginBottom: "16px",
+            fontFamily: "var(--font-body), sans-serif", fontSize: "0.72rem", fontWeight: 600,
+            letterSpacing: "0.04em", textTransform: "uppercase",
+            color: "var(--orange)", marginBottom: "16px",
           }}
         >
-          Next project
+          [NEXT PROJECT]
         </div>
         <div
           style={{

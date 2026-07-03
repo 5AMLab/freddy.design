@@ -72,10 +72,9 @@ function IndexCard({ project }: { project: Project }) {
               fontWeight: 400,
               textTransform: "uppercase",
               letterSpacing: "0.005em",
-              color: hovered ? "#f9f9f9" : "rgba(249,249,249,0.7)",
+              color: "#f9f9f9", // full cream at rest — matches .kloaq-case-name
               marginBottom: "4px",
               lineHeight: 1.25,
-              transition: "color 0.3s",
             }}
           >
             {project.title}
@@ -92,25 +91,23 @@ function IndexCard({ project }: { project: Project }) {
             {project.client}
           </div>
         </div>
+        {/* Category tag — the homepage's bracketed-orange tag language
+            (matches .kloaq-service-tag: [TEXT], orange, uppercase, 600).
+            No pill/border — brightens on hover instead of flipping to a block. */}
         <div
           style={{
             fontFamily: "var(--font-body), sans-serif",
-            fontSize: "0.6rem",
-            fontWeight: 500,
-            letterSpacing: "0.14em",
+            fontSize: "0.72rem",
+            fontWeight: 600,
+            letterSpacing: "0.04em",
             textTransform: "uppercase",
-            color: hovered ? "#f9f9f9" : "rgba(252,80,0,0.4)",
-            background: hovered ? "#FC5000" : "transparent",
-            border: "1px solid",
-            borderColor: hovered ? "#FC5000" : "rgba(252,80,0,0.2)",
-            padding: "5px 10px",
-            borderRadius: "8px",
+            color: hovered ? "#FC5000" : "rgba(252,80,0,0.7)",
             whiteSpace: "nowrap",
             flexShrink: 0,
-            transition: "color 0.3s, background 0.3s, border-color 0.3s",
+            transition: "color 0.3s",
           }}
         >
-          {project.category}
+          [{project.category.toUpperCase()}]
         </div>
       </div>
     </Link>
@@ -122,32 +119,26 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
     <div style={{ background: "#050505", minHeight: "100vh" }}>
       <KloaqNavbar />
 
-      {/* Header */}
+      {/* Header — mirrors the homepage section language: shared .kloaq-vlabel
+          orange label, Boldonse display heading, cream lead paragraph, 80px rail. */}
       <div
-        style={{ padding: "160px 72px 72px", borderBottom: "1px solid rgba(249,249,249,0.06)" }}
+        style={{ padding: "160px 80px 80px", borderBottom: "1px solid rgba(249,249,249,0.06)" }}
         className="legal-header"
       >
-        <div
-          style={{
-            fontFamily: "var(--font-body), sans-serif", fontSize: "0.65rem", fontWeight: 400,
-            letterSpacing: "0.22em", textTransform: "uppercase", color: "#FC5000", marginBottom: "20px",
-          }}
-        >
-          The Work
-        </div>
+        <div className="kloaq-vlabel">Projects</div>
         <h1
           style={{
             fontFamily: "var(--font-display), sans-serif", fontSize: "clamp(2rem, 3.6vw, 3.2rem)",
             fontWeight: 400, textTransform: "uppercase", letterSpacing: "0.005em",
-            lineHeight: 1.2, color: "#f9f9f9", marginBottom: "20px",
+            lineHeight: 1.45, color: "#f9f9f9", marginBottom: "24px",
           }}
         >
           Selected work
         </h1>
         <p
           style={{
-            fontFamily: "var(--font-body), sans-serif", fontSize: "1rem", fontWeight: 400,
-            color: "rgba(249,249,249,0.4)", lineHeight: 1.7, maxWidth: "520px",
+            fontFamily: "var(--font-body), sans-serif", fontSize: "1.2rem", fontWeight: 400,
+            color: "rgba(249,249,249,0.7)", lineHeight: 1.7, maxWidth: "600px",
           }}
         >
           Annual reports, investor decks, brand systems, campaigns and packaging —
@@ -157,7 +148,7 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
       </div>
 
       {/* Grid */}
-      <div style={{ padding: "72px" }} className="work-index-grid-wrap">
+      <div style={{ padding: "80px" }} className="work-index-grid-wrap">
         <div
           className="work-index-grid"
           style={{

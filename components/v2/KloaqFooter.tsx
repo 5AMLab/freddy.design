@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import KloaqFooterWordmark from "@/components/v2/KloaqFooterWordmark";
+import BackToTop from "@/components/v2/BackToTop";
 
 // Footer for the /kloaq review page. Speaks the same language as the rest
 // of the study — Boldonse wordmark, Inter Tight UI, Flameburst orange — and
@@ -133,7 +134,10 @@ export default function KloaqFooter() {
         </div>
       </div>
 
-      <KloaqFooterWordmark />
+      <div className="kloaq-footer-mark-row">
+        <KloaqFooterWordmark />
+        <BackToTop />
+      </div>
     </footer>
   );
 }

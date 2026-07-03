@@ -191,7 +191,10 @@ export default function KloaqServices() {
     };
     section.addEventListener("mousemove", onMove, { passive: true });
     return () => section.removeEventListener("mousemove", onMove);
-  }, []);
+    // Re-run once the preview mounts: it's gated behind isFinePointer, so on
+    // the initial pass previewRef.current is still null and the listener would
+    // never attach — leaving the preview stuck at its top-left default.
+  }, [isFinePointer]);
 
   useEffect(() => {
     const el = previewRef.current;
