@@ -153,8 +153,13 @@ function ServiceRow({
           className={`kloaq-service-touch-preview${hovered ? " is-open" : ""}`}
           aria-hidden="true"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={service.img} alt="" loading="lazy" />
+          {/* Inner wrapper is the grid-row collapse target: the outer span
+              animates grid-template-rows 0fr→1fr, this child must be
+              min-height:0 + overflow:hidden so the row can shrink to zero. */}
+          <span className="kloaq-service-touch-preview-inner">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={service.img} alt="" loading="lazy" />
+          </span>
         </span>
       </div>
     </div>

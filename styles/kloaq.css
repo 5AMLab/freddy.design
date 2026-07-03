@@ -713,34 +713,37 @@
   .kloaq-service-taphint.is-active .kloaq-service-taphint-arrow {
     transform: rotate(90deg);
   }
-  /* Kept mounted in both states so open AND close animate. Height is reserved
-     with max-height (single-axis layout, far cheaper on iOS Safari than the
-     grid-template-rows fr interpolation we had before — fr forced a full-page
-     reflow every frame and janked on-device). The visible drop/fade is done
-     entirely on the img with transform + opacity, which the compositor handles
-     off the main thread. */
+  /* Kept mounted in both states so open AND close animate. Collapse is done
+     with grid-template-rows 0fr→1fr (not max-height): the row interpolates the
+     content's ACTUAL height, so there's no dead-zone delay from easing toward
+     a fixed cap that's taller than the real image, and the reflow is cheaper
+     than max-height's per-frame layout. The visible drop/fade is still done on
+     the img with transform + opacity, which the compositor handles off the
+     main thread. The inner wrapper (min-height:0 + overflow:hidden) is the
+     collapse target the grid row shrinks. */
   .kloaq-service-touch-preview {
-    display: block;
+    display: grid;
+    grid-template-rows: 0fr;
     width: 100%;
     max-width: 320px;
-    max-height: 0;
     margin-top: 0;
-    overflow: hidden;
     /* Close easing — even ease-in-out so the collapse doesn't snap shut. */
     transition:
-      max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
       margin-top 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .kloaq-service-touch-preview.is-open {
-    /* Generous cap ≥ the tallest rendered image; the transition eases toward
-       it but the img's own aspect-ratio caps the actual height. */
-    max-height: 400px;
+    grid-template-rows: 1fr;
     margin-top: 8px;
     transition:
-      max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1),
       margin-top 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .kloaq-service-touch-preview > img {
+  .kloaq-service-touch-preview-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .kloaq-service-touch-preview > .kloaq-service-touch-preview-inner > img {
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
@@ -754,7 +757,7 @@
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .kloaq-service-touch-preview.is-open > img {
+  .kloaq-service-touch-preview.is-open > .kloaq-service-touch-preview-inner > img {
     opacity: 1;
     transform: translateY(0) scale(1);
     transition:
@@ -763,7 +766,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .kloaq-service-touch-preview,
-    .kloaq-service-touch-preview > img {
+    .kloaq-service-touch-preview > .kloaq-service-touch-preview-inner > img {
       transition: none;
     }
   }
@@ -1199,7 +1202,6 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  will-change: background-image;
 }
 
 /* Tablet (600–900px): the desktop 4-across row doesn't fit, but collapsing
