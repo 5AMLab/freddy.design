@@ -67,17 +67,13 @@ export default function KloaqCTA() {
       </div>
 
       <div
-        className="cta-v2-inner"
+        className="cta-v2-inner kloaq-cta-inner"
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "80px",
           position: "relative",
           zIndex: 2,
         }}
       >
-        <div>
+        <div className="kloaq-cta-copy">
           <div className="kloaq-vlabel" style={{ marginBottom: "24px" }}>
             Start a Conversation
           </div>
@@ -100,9 +96,9 @@ export default function KloaqCTA() {
             style={{
               fontFamily: "'Inter Tight', 'Sohne', sans-serif",
               fontSize: "1.35rem",
-              fontWeight: 300,
+              fontWeight: 400,
               lineHeight: 1.6,
-              color: "rgba(5,5,5,0.6)",
+              color: "#050505",
               maxWidth: "440px",
             }}
           >
@@ -110,9 +106,10 @@ export default function KloaqCTA() {
           </p>
         </div>
 
-        <div style={{ flexShrink: 0 }}>
+        <div className="kloaq-cta-action">
           <Magnetic>
           <button
+            className="kloaq-cta-btn"
             onClick={openBrief}
             style={{
               display: "inline-block",
@@ -142,9 +139,9 @@ export default function KloaqCTA() {
           </button>
           </Magnetic>
           <div
+            className="kloaq-cta-slots"
             style={{
-              marginTop: "16px",
-              textAlign: "center",
+              marginTop: "18px",
               fontFamily: "'Inter Tight', 'Sohne', sans-serif",
               fontSize: "0.7rem",
               fontWeight: 300,

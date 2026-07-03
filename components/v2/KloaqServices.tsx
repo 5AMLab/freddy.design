@@ -73,7 +73,25 @@ function ServiceRow({
         [{service.num}]
       </span>
 
-      <span className="kloaq-service-title">{service.title}</span>
+      <span className="kloaq-service-title">
+        {service.title}
+        {/* Touch-only affordance: fine pointers reveal the image on hover, but
+            touch users have no cue that tapping does anything. This inline arrow
+            (hidden on fine pointers via CSS) signals the row is interactive —
+            a 45° down-right arrow to view, rotating to up-right once open. */}
+        <span className={`kloaq-service-taphint${hovered ? " is-active" : ""}`} aria-hidden="true">
+          <svg viewBox="0 0 16 16" className="kloaq-service-taphint-arrow">
+            <path
+              d="M4 4h8v8M12 4L4 12"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </span>
 
       {/* Corner marks only — the image itself lives in the cursor-trailing
           preview at the section level, not fixed in this slot. Marks idle
@@ -123,13 +141,16 @@ function ServiceRow({
         )}
         {/* Touch-only accordion image — desktop's cursor-trailing preview
             has no touch equivalent, so tapping a row reveals its image
-            inline here instead. Hidden on fine pointers via CSS. */}
-        {hovered && (
-          <span className="kloaq-service-touch-preview" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={service.img} alt="" loading="lazy" />
-          </span>
-        )}
+            inline here instead. Hidden on fine pointers via CSS. Kept mounted
+            (not conditionally rendered) so both the open drop and the close
+            collapse run as CSS transitions — unmounting would kill the exit. */}
+        <span
+          className={`kloaq-service-touch-preview${hovered ? " is-open" : ""}`}
+          aria-hidden="true"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={service.img} alt="" loading="lazy" />
+        </span>
       </div>
     </div>
   );

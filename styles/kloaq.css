@@ -685,20 +685,83 @@
 .kloaq-service-touch-preview {
   display: none;
 }
+/* Touch-only "Tap to view" affordance — hidden on fine pointers, which use
+   hover instead. */
+.kloaq-service-taphint {
+  display: none;
+}
 @media (hover: none) and (pointer: coarse) {
-  .kloaq-service-touch-preview {
+  .kloaq-service-taphint {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    color: var(--muted);
+    vertical-align: middle;
+    transition: color 0.3s ease;
+  }
+  .kloaq-service-taphint.is-active {
+    color: var(--orange);
+  }
+  .kloaq-service-taphint-arrow {
+    width: 16px;
+    height: 16px;
     display: block;
+    color: currentColor;
+    transition: transform 0.3s ease;
+  }
+  /* Default arrow points down-right (view); rotate to up-right when open (close). */
+  .kloaq-service-taphint.is-active .kloaq-service-taphint-arrow {
+    transform: rotate(90deg);
+  }
+  /* Kept mounted in both states so open AND close animate. The wrapper is a
+     grid whose single row collapses 1fr → 0fr; the img inside is what actually
+     drops/fades. Grid-row transitions give a smooth height collapse that a
+     conditionally-rendered element (which unmounts instantly) can't. */
+  .kloaq-service-touch-preview {
+    display: grid;
+    grid-template-rows: 0fr;
     width: 100%;
     max-width: 320px;
-    aspect-ratio: 4 / 3;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 8px;
+    margin-top: 0;
+    /* Close easing (standard ease-in-out) — distributes the collapse evenly
+       across the full duration so it doesn't snap shut. Open overrides this
+       below with a snappier ease-out. */
+    transition:
+      grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      margin-top 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .kloaq-service-touch-preview img {
+  .kloaq-service-touch-preview.is-open {
+    grid-template-rows: 1fr;
+    margin-top: 8px;
+    transition:
+      grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      margin-top 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .kloaq-service-touch-preview > img {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
+    border-radius: 12px;
+    min-height: 0; /* let the grid track shrink the img below its content size */
+    opacity: 0;
+    transform: translateY(-14px) scale(0.97);
+    transform-origin: top center;
+    transition:
+      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .kloaq-service-touch-preview.is-open > img {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition:
+      opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kloaq-service-touch-preview,
+    .kloaq-service-touch-preview > img {
+      transition: none;
+    }
   }
   /* No cursor to trail — the touch preview above replaces it */
   .kloaq-whatido-preview {
@@ -851,6 +914,31 @@
      this section's own content (watermark, copy) is already bounded by its
      own positioning, not dependent on the section clipping it. */
   overflow-x: visible;
+}
+
+/* Two-column layout: the copy on the left, the action stack on the right.
+   Bottom-aligned (not centre) so the button sits on the baseline of the
+   paragraph rather than floating against the tall headline. A subtle
+   accent bar over the vlabel gives the section a current, structured feel. */
+.kloaq-cta-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 64px 80px;
+  flex-wrap: wrap;
+}
+.kloaq-cta-copy {
+  flex: 1 1 460px;
+  min-width: 0;
+}
+.kloaq-cta-action {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.kloaq-cta-slots {
+  text-align: left;
 }
 
 /* ── FOOTER REVEAL ──
@@ -1080,7 +1168,27 @@
   will-change: background-image;
 }
 
-@media (max-width: 900px) {
+/* Tablet (600–900px): the desktop 4-across row doesn't fit, but collapsing
+   straight to a single column (the old ≤900px behaviour) wastes the width and
+   makes the footer feel like a phone screen. Instead keep the three link
+   columns — Pages, Recent Works, Socials — side by side in a 3-up row, and let
+   the Newsletter block span the full width on its own line beneath them. The
+   nav links stay scannable in columns, and the newsletter copy + email input
+   get the room they need rather than being crushed into a narrow 4th track. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .kloaq-footer-inner { padding: 80px 40px 48px; }
+  .kloaq-footer-links {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 32px;
+  }
+  .kloaq-footer-newsletter {
+    grid-column: 1 / -1;
+    max-width: 480px;
+  }
+  .kloaq-footer-watermark { font-size: 20vw; margin-top: 40px; padding: 8px 40px 80px; }
+}
+
+@media (max-width: 599px) {
   .kloaq-footer-inner { padding: 72px 24px 40px; }
   /* Single column: Pages, Recent Works, Socials and Newsletter stack in DOM
      order rather than the desktop 4-across row. */
@@ -1240,6 +1348,14 @@
   .kloaq-industries-preview { display: none; } /* no hover on touch — nothing to anchor the preview to */
   .kloaq-industry-tag { opacity: 1; transform: none; } /* always show tags on touch */
   .kloaq-cta-section.cta-v2-section { padding: 96px 24px; }
+  /* Stack the copy and the action below it — the flex row would otherwise
+     stay two columns and squeeze the button next to the headline. */
+  .kloaq-cta-inner { flex-direction: column; align-items: stretch; gap: 40px; }
+  .kloaq-cta-copy { flex: 1 1 auto; }
+  .kloaq-cta-action { align-items: stretch; }
+  .kloaq-cta-action > div { display: block; } /* Magnetic wrapper: fill width */
+  .kloaq-cta-action .kloaq-cta-btn { width: 100%; text-align: center; }
+  .kloaq-cta-slots { text-align: center; }
   .kloaq-logos-intro-section { padding: 96px 24px; grid-template-columns: 1fr; gap: 24px; }
   .kloaq-logos-intro { grid-template-columns: 1fr; gap: 24px; }
   .kloaq-logos-section { padding: 40px 0 72px; }
@@ -1277,9 +1393,10 @@
    MOBILE HERO  —  KloaqCasesMobile.tsx
    Touch counterpart to the desktop cloud: a full-screen, one-project-at-a-
    time scroll carousel. The section is pinned by ScrollTrigger for `count`
-   viewport-steps; each step centers one project title over its full-bleed,
-   dimmed image. Cross-fade transitions (no layout movement), so all state
-   here is just opacity toggling on .is-active.
+   viewport-steps; the image wipes are SCRUBBED from scroll progress (GSAP
+   owns each img's inline clip-path/scale — the rules here only set the
+   pre-hydration baseline), while titles, the giant ghost index and the dots
+   swap discretely at each step's midpoint via React state.
    Shown only inside the max-width:820px block above (display:none by default).
    ────────────────────────────────────────────────────────────────────────── */
 .kloaq-mobile-hero {
@@ -1311,7 +1428,7 @@
    title overlays its centre (see .kloaq-mobile-hero-titles below). */
 .kloaq-mobile-hero-media {
   position: relative;
-  z-index: 0;
+  z-index: 1; /* above the ghost numeral peeking out behind the card */
   width: 100%;
   max-width: 380px;
   /* 4:5 portrait card. */
@@ -1320,22 +1437,49 @@
   overflow: hidden;
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
 }
+
+/* Giant ghost index — a Boldonse outline numeral pinned behind the card's
+   top edge (same ghost-word language as the cloud's "All Work"), so each
+   step swaps a huge 01/02/… peeking out from behind the photo. The key
+   remount in JSX restarts the rise animation on every swap. */
+.kloaq-mobile-hero-ghost {
+  position: absolute;
+  z-index: 0;
+  top: 4svh;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 42vw;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(245, 240, 232, 0.3);
+  pointer-events: none;
+  user-select: none;
+  animation: kloaq-hero-ghost-in 0.9s var(--ease-ghost, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+@keyframes kloaq-hero-ghost-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .kloaq-mobile-hero-img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  /* Undimmed — no scrim or shadow behind the title (per the design call);
-     the image shows crisp and the title sits on top as-is. */
-  transform: scale(1.04);
-  transition: opacity 0.7s ease, transform 1.2s ease;
-  will-change: opacity, transform;
+  /* Undimmed — no scrim behind the title (per the design call). No CSS
+     transitions either: the wipe is scrubbed live from scroll progress, so
+     GSAP owns clip-path and transform inline. These stylesheet values are
+     only the pre-hydration baseline — every image except the first clipped
+     shut (inset from the top) so the SSR paint shows project 01, not the
+     last image in the stack. */
+  clip-path: inset(100% 0 0 0);
+  will-change: clip-path, transform;
 }
-.kloaq-mobile-hero-img.is-active {
-  opacity: 1;
-  transform: scale(1);
+.kloaq-mobile-hero-img:first-child {
+  clip-path: inset(0 0 0 0);
 }
 
 /* Title layer — overlays the centre of the image card. Absolutely centred
@@ -1344,7 +1488,7 @@
    Only .is-active is shown/interactive. */
 .kloaq-mobile-hero-titles {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   top: 50%;
   left: 0;
   right: 0;
@@ -1352,12 +1496,15 @@
   text-align: center;
   pointer-events: none;
 }
+/* Rise/sink choreography: the incoming title rises ~28px into center, the
+   outgoing one sinks back down as it fades — the type rides the same upward
+   pull as the image wipe instead of just blinking. */
 .kloaq-mobile-hero-title {
   position: absolute;
   left: 0;
   right: 0;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(calc(-50% + 28px));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1366,24 +1513,22 @@
   color: var(--cream);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.55s ease;
+  transition: opacity 0.45s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .kloaq-mobile-hero-title.is-active {
   opacity: 1;
+  transform: translateY(-50%);
   pointer-events: auto;
-}
-.kloaq-mobile-hero-index {
-  font-family: var(--body);
-  font-weight: 500;
-  font-size: 0.8rem;
-  letter-spacing: 0.14em;
-  color: var(--orange);
 }
 .kloaq-mobile-hero-name {
   font-family: var(--display);
   font-weight: 400;
   line-height: 0.95;
-  font-size: clamp(1.9rem, 9vw, 3rem);
+  /* Cloud scale — sized off the near-full viewport (the /6.4 divisor fits
+     the longest name, COGNITIV, on one line; same trick as the stacked
+     cloud rows above) so the word breaks out past the card's edges. */
+  font-size: clamp(2.2rem, calc((100vw - 16px) / 6.4), 4rem);
+  white-space: nowrap;
   text-transform: uppercase;
   color: var(--cream);
   transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease;
@@ -1396,42 +1541,32 @@
   color: transparent;
   -webkit-text-stroke: 1.5px var(--orange);
 }
+/* Category pill — the bare muted text was illegible over bright photos, so
+   it sits on a blurred ink scrim instead (same pill-tag language as the
+   Services section). Hardcoded ink rgba rather than var(--cream)-derived so
+   it never flips with a light-section token swap. */
 .kloaq-mobile-hero-tag {
   font-family: var(--body);
-  font-weight: 400;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f9f9f9;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(5, 5, 5, 0.55);
+  border: 1px solid rgba(245, 240, 232, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-/* Progress dots — bottom center. */
-.kloaq-mobile-hero-dots {
-  position: absolute;
-  z-index: 2;
-  bottom: 48px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-.kloaq-mobile-hero-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(245, 240, 232, 0.28);
-  transition: background 0.4s ease, transform 0.4s ease;
-}
-.kloaq-mobile-hero-dot.is-active {
-  background: var(--orange);
-  transform: scale(1.4);
-}
-
-/* Scroll affordance — fades once past the first project. */
+/* Scroll affordance — fades once past the first project. The ↓ arrow does
+   real work here: the touch instinct for a carousel is a sideways swipe, so
+   the cue must say "down" explicitly. */
 .kloaq-mobile-hero-hint {
   position: absolute;
   z-index: 2;
-  bottom: 72px;
+  bottom: 56px;
   left: 0;
   right: 0;
   text-align: center;
@@ -1442,6 +1577,12 @@
   color: var(--muted);
   opacity: 1;
   transition: opacity 0.5s ease;
+}
+.kloaq-mobile-hero-hint-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--orange);
+  /* Only the arrow bobs — animating the whole line made the text shimmer. */
   animation: kloaq-hero-hint-bob 1.8s ease-in-out infinite;
 }
 .kloaq-mobile-hero-hint.is-hidden {
@@ -1478,16 +1619,17 @@
      just reveal all stacked images/titles at once, laid out relatively. */
   .kloaq-mobile-hero-img {
     position: relative;
-    opacity: 1;
+    clip-path: none;
     transform: none;
   }
   .kloaq-mobile-hero-titles { height: auto; }
   .kloaq-mobile-hero-title {
     position: relative;
     opacity: 1;
+    transform: none;
     pointer-events: auto;
     margin-bottom: 60px;
   }
   .kloaq-mobile-hero-hint,
-  .kloaq-mobile-hero-dots { display: none; }
+  .kloaq-mobile-hero-ghost { display: none; }
 }

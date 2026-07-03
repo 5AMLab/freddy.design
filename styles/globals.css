@@ -175,7 +175,12 @@ html.has-custom-cursor * {
 }
 
 /* ── FULL-PAGE MOBILE MENU ── */
-.mobile-menu {
+/* Scoped under .kloaq-root so these out-specific `.kloaq-root > *`
+   (position: relative; z-index: 2) in kloaq.css — the mobile menu is a direct
+   child of .kloaq-root, and at equal specificity that grain-layer rule was
+   winning on cascade order, collapsing this fixed full-screen overlay to
+   position:relative/height:0 (menu rendered but invisible behind the hero). */
+.kloaq-root .mobile-menu {
   display: none;
   position: fixed;
   inset: 0;
@@ -184,7 +189,7 @@ html.has-custom-cursor * {
   pointer-events: none;
 }
 @media (max-width: 768px) {
-  .mobile-menu { display: block; }
+  .kloaq-root .mobile-menu { display: block; }
 }
 .mobile-menu-accent,
 .mobile-menu-bg {

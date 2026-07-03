@@ -17,6 +17,16 @@ export function prefersReducedMotion() {
   );
 }
 
+// The live Lenis instance, for components that must drive scroll through it.
+// Programmatic scrolls (ScrollTrigger snap tweens, window.scrollTo) fight
+// Lenis's own animated value and can spiral — anything that moves the scroll
+// position must go through lenis.scrollTo instead. Null while unmounted or
+// under prefers-reduced-motion (no Lenis runs at all then).
+let activeLenis: Lenis | null = null;
+export function getLenis() {
+  return activeLenis;
+}
+
 export default function MotionProvider({
   children,
 }: {
@@ -31,6 +41,7 @@ export default function MotionProvider({
     gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({ lerp: 0.1, anchors: true });
+    activeLenis = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const raf = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(raf);
@@ -80,6 +91,7 @@ export default function MotionProvider({
     return () => {
       gsap.ticker.remove(raf);
       lenis.destroy();
+      activeLenis = null;
       ScrollTrigger.getAll().forEach((st) => st.kill());
     };
   }, []);
