@@ -1,7 +1,6 @@
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
-import HeroCloudV3 from "@/components/v3/HeroCloudV3";
-import KloaqCasesMobile from "@/components/v2/KloaqCasesMobile";
+import HeroStatementV4 from "@/components/v4/HeroStatementV4";
 import KloaqLogos from "@/components/v2/KloaqLogos";
 import KloaqServices from "@/components/v2/KloaqServices";
 import KloaqIndustries from "@/components/v2/KloaqIndustries";
@@ -18,13 +17,20 @@ export default function Home() {
     <div className="kloaq-root" style={{ minHeight: "100vh", width: "100%" }}>
       <KloaqNavbar />
       <main>
-        {/* Desktop hero: the full-viewport typographic cloud (no showreel),
-            with the preloader→cloud staggered entrance and scroll-velocity
-            skew. Touch/narrow swaps to the pinned one-project-at-a-time
-            scroll carousel — exactly one is shown via CSS at the 820px
-            breakpoint (.v3-hero / .kloaq-cases-section vs .kloaq-mobile-hero). */}
-        <HeroCloudV3 />
-        <KloaqCasesMobile />
+        {/* Hero: the statement-led "receipts" split hero (HeroStatementV4).
+            It is now fully responsive on its own — the split columns stack into
+            a single centered column below lg (1024px) and hold their content
+            (label, retainer line, all six service nouns, the object, the About
+            feet) all the way down to 375px. No separate mobile-carousel hero:
+            one component, one message, every breakpoint. */}
+        <HeroStatementV4 />
+
+        {/* What I Do — numbered service rows. Moved up directly under the hero:
+            the hero states WHAT I make (the six service nouns), so the natural
+            next beat is WHAT I DO (those services in full) before the proof
+            block. Also breaks up the old back-to-back cream About+Services pair
+            — the fields now alternate ink→cream→ink→ink→cream→ink cleanly. */}
+        <KloaqServices />
 
         {/* Intro — mirrors the About section's grid so both align down the page */}
         <section className="kloaq-logos-intro-section">
@@ -42,7 +48,11 @@ export default function Home() {
         {/* Logo wall */}
         <KloaqLogos />
 
-        {/* About — flat two-column text + accented closing statement */}
+        {/* About — flat two-column text + accented closing statement. The two
+            middle paragraphs used to repeat the hero feet ("One designer on
+            speed dial…" / "Ten years and counting…") verbatim; reworded here so
+            About adds new substance (how the work runs, what stays consistent)
+            instead of echoing the hero. */}
         <section className="kloaq-about-section kloaq-light-section">
           <div className="kloaq-vlabel">About</div>
           <div>
@@ -52,17 +62,18 @@ export default function Home() {
                   We are freddi.design — your dedicated design partner.
                 </p>
                 <p>
-                  One designer on speed dial, not an agency layer cake. Campaign
-                  visuals, editorial, decks and brand guidelines all stem from a
-                  single hand, so the work stays coherent and the line stays
-                  direct — concept to delivery, no drama.
+                  You brief one person and that person stays with it — no account
+                  layer, no handoffs between teams, no telephone game between the
+                  idea and the file that ships. The thinking and the making are
+                  the same hand, so nothing gets lost in translation.
                 </p>
               </div>
               <div>
                 <p>
-                  Ten years and counting, working with brands that care about the
-                  details — from annual reports to fragrance campaigns to the
-                  brandbooks that hold it all together.
+                  That&apos;s how the work stays coherent across a whole brand —
+                  the identity, the campaign, the deck and the guidelines all
+                  speak in one voice because they come from one place. Fast when
+                  it needs to be, considered where it counts.
                 </p>
                 <p className="kloaq-about-statement">
                   Instead of adding to the <em>noise</em>, we sharpen the signal —
@@ -72,9 +83,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* What I Do — numbered service rows */}
-        <KloaqServices />
 
         {/* Industries — horizontal marquee */}
         <KloaqIndustries />

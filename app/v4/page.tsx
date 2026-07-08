@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import HeroStatementV4 from "@/components/v4/HeroStatementV4";
-import KloaqCasesMobile from "@/components/v2/KloaqCasesMobile";
 import KloaqLogos from "@/components/v2/KloaqLogos";
 import KloaqServices from "@/components/v2/KloaqServices";
 import KloaqIndustries from "@/components/v2/KloaqIndustries";
@@ -27,10 +26,14 @@ export default function HeroV4Review() {
     <div className="kloaq-root" style={{ minHeight: "100vh", width: "100%" }}>
       <KloaqNavbar />
       <main>
-        {/* Desktop: the statement hero. Touch/narrow swaps to the same pinned
-            scroll-carousel hero as the homepage (CSS toggle at 820px). */}
+        {/* The statement hero, now responsive on its own down to 375px (the
+            split columns stack below lg). No separate mobile carousel. */}
         <HeroStatementV4 />
-        <KloaqCasesMobile />
+
+        {/* What I Do moved directly under the hero (mirrors app/page.tsx) —
+            hero states what I make, this is what I do; also splits the old
+            back-to-back cream About+Services pair. */}
+        <KloaqServices />
 
         <section className="kloaq-logos-intro-section">
           <div className="kloaq-vlabel">Inside Freddi</div>
@@ -46,6 +49,8 @@ export default function HeroV4Review() {
 
         <KloaqLogos />
 
+        {/* About middle paragraphs reworded so they no longer repeat the hero
+            feet verbatim (mirrors app/page.tsx). */}
         <section className="kloaq-about-section kloaq-light-section">
           <div className="kloaq-vlabel">About</div>
           <div>
@@ -55,17 +60,18 @@ export default function HeroV4Review() {
                   We are freddi.design — your dedicated design partner.
                 </p>
                 <p>
-                  One designer on speed dial, not an agency layer cake. Campaign
-                  visuals, editorial, decks and brand guidelines all stem from a
-                  single hand, so the work stays coherent and the line stays
-                  direct — concept to delivery, no drama.
+                  You brief one person and that person stays with it — no account
+                  layer, no handoffs between teams, no telephone game between the
+                  idea and the file that ships. The thinking and the making are
+                  the same hand, so nothing gets lost in translation.
                 </p>
               </div>
               <div>
                 <p>
-                  Ten years and counting, working with brands that care about the
-                  details — from annual reports to fragrance campaigns to the
-                  brandbooks that hold it all together.
+                  That&apos;s how the work stays coherent across a whole brand —
+                  the identity, the campaign, the deck and the guidelines all
+                  speak in one voice because they come from one place. Fast when
+                  it needs to be, considered where it counts.
                 </p>
                 <p className="kloaq-about-statement">
                   Instead of adding to the <em>noise</em>, we sharpen the signal —
@@ -76,7 +82,6 @@ export default function HeroV4Review() {
           </div>
         </section>
 
-        <KloaqServices />
         <KloaqIndustries />
         <KloaqCTA />
       </main>

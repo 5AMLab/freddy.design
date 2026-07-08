@@ -18,6 +18,65 @@
 :root {
   --font-display: 'Boldonse', sans-serif;
   --orange: #FC5000;
+
+  /* ── RESPONSIVE DESIGN SYSTEM — single source of truth ──
+     Breakpoints, section rhythm and the display type ramp all live here so
+     every component derives from ONE scale instead of inventing its own.
+     Mirrors tailwind.config.ts `screens`/`spacing`/`fontSize.tile`.
+
+     Canonical breakpoints (documented for reference; CSS media queries use the
+     literal px, Tailwind utilities use the named screens):
+       md 768  ·  lg 1024  ·  xl 1280
+     The primary layout switch is lg (1024): at/above it the multi-column
+     desktop layouts hold; below it they collapse to the stacked mobile layout.
+
+     Section rhythm — FLUID, not stepped. The old CSS jumped section padding
+     from 160/80 straight to 96/24 at a single breakpoint (no tablet midpoint).
+     These clamps ramp continuously from a 375px phone to a 1440px desktop, so
+     "tablet" is just a natural point on the same curve, never a bespoke tier. */
+  --section-pad-y: clamp(88px, 11vw, 160px);
+  --section-pad-x: clamp(24px, 6vw, 80px);
+  --gap-lg: clamp(40px, 6vw, 80px);
+  --gap-md: clamp(24px, 4vw, 64px);
+  --gap-sm: clamp(16px, 3vw, 32px);
+
+  /* ── SHARED CONTAINER — the single source of truth for horizontal alignment ──
+     Every section (hero included) and the footer share ONE content column:
+       max-width = --container-max, centered, with --section-pad-x gutters.
+     The old code hardcoded 1600px in four separate places and let the hero use
+     its own narrower gutter; both now reference these tokens so no section can
+     drift to a one-off width or edge. Use the `.site-container` helper below,
+     or reference the tokens directly (max-width:var(--container-max);
+     margin-inline:auto; padding-inline:var(--section-pad-x)).
+     The nav deliberately ignores this container BELOW 2560px (full-width bar);
+     at/above the `ultrawide` breakpoint it snaps its inner content to the same
+     column so it doesn't float away from the page content on huge displays. */
+  --container-max: 1600px;
+  --ultrawide: 2560px; /* documented; the media query uses the literal px */
+
+  /* Display type ramp — ONE fluid clamp for the big titles (hero nouns,
+     project tile names, work-index titles). Replaces four divergent per-band
+     formulas so a title scales on one continuous line 375→1440, no jumps at
+     breakpoints. The 1.75rem (28px) floor is deliberate: the widest nowrap
+     noun ("ANNUAL REPORTS", ~14ch) then clears the 375px inner width with
+     ~40px to spare (at a 2rem floor it fit with only 5px, which a wider
+     system-font fallback or a 360px device would overflow). The hero caps it
+     at 4.3rem locally (via min()) so the widest noun fits the shared-gutter
+     column; other titles ride the full ramp. */
+  --type-tile: clamp(1.75rem, 4.6vw, 4.8rem);
+}
+
+/* Shared content container. One rule that produces the canonical content
+   column — capped, centered, guttered. Anything that should align to the page
+   grid can use this class instead of re-declaring max-width + margin + padding.
+   box-sizing keeps the gutter INSIDE the cap (so the content box is
+   --container-max minus two gutters, identical for every section). */
+.site-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--section-pad-x);
+  box-sizing: border-box;
 }
 
 html {
@@ -234,6 +293,24 @@ html.is-transitioning .work-hero-frame {
   .kloaq-nav-wrapper { padding: 39px 24px; }
   .kloaq-nav-links { display: none; }
   .kloaq-nav-hamburger { display: flex !important; }
+}
+
+/* ── ULTRA-WIDE NAV ALIGNMENT (≥2560px, the `ultrawide` screen) ──
+   The nav is a full-width fixed bar at all normal widths — intentionally NOT
+   tied to the content container below 2560px (leave that behavior alone). But
+   on ultra-wide displays the page content centers inside --container-max while
+   the nav's logo/links/CTA stayed pinned to the viewport edges (72px), floating
+   disconnected far outside the content column. Above 2560px, pad the nav so its
+   inner content lands on the SAME left/right edge as every section's content:
+   the section content edge sits at (100vw - container-max)/2 + section-pad-x
+   from each viewport edge, so the nav uses exactly that as its side padding.
+   The bar itself stays full-width (background/blur still span edge to edge);
+   only its content is constrained. */
+@media (min-width: 2560px) {
+  .kloaq-nav-wrapper {
+    padding-left: calc((100vw - var(--container-max)) / 2 + var(--section-pad-x));
+    padding-right: calc((100vw - var(--container-max)) / 2 + var(--section-pad-x));
+  }
 }
 
 /* ── FULL-PAGE MOBILE MENU ── */

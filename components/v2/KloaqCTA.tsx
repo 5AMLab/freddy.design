@@ -5,7 +5,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import Magnetic from "@/components/motion/Magnetic";
 import { openBrief } from "@/components/v2/BriefFlow";
-import { RETAINER_SLOTS } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -138,21 +137,11 @@ export default function KloaqCTA() {
             Brief Me in 20 Seconds
           </button>
           </Magnetic>
-          <div
-            className="kloaq-cta-slots"
-            style={{
-              marginTop: "18px",
-              fontFamily: "'Inter Tight', 'Sohne', sans-serif",
-              fontSize: "0.7rem",
-              fontWeight: 300,
-              letterSpacing: "0.1em",
-              color: "rgba(252,80,0,0.7)",
-              textTransform: "uppercase",
-            }}
-          >
-            {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots open
-            for {RETAINER_SLOTS.month}
-          </div>
+          {/* The "N of M retainer slots open" scarcity line was removed here:
+              it already appears in the hero strip and the footer Availability
+              block, and a third instance directly under the primary CTA button
+              read as boilerplate rather than a live constraint. The button is
+              the one clear action; nothing competes with it now. */}
         </div>
       </div>
     </section>

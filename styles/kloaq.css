@@ -64,15 +64,17 @@
   z-index: 2;
 }
 
-/* Page-wide widescreen cap: every top-level section keeps its own
-   full-bleed background, but its content stops growing past 1600px and
-   centers with equal breathing room on both sides — otherwise every
-   section's grid/columns (number, title, marks, description, etc.) just
-   kept stretching wider forever on ultra-wide viewports. Box-sizing keeps
-   each section's own horizontal padding inside the 1600px cap rather than
-   adding to it. */
+/* ── SHARED CONTAINER (section level) ──
+   Every top-level section is capped + centered to the ONE shared content
+   column (--container-max), then each adds the shared --section-pad-x gutter
+   inside (box-sizing keeps the gutter within the cap). This — plus every
+   section using --section-pad-x, including the hero — is what makes all
+   sections share identical left/right content edges at any width. A section
+   keeps its own full-bleed background (::before breakout); only its content
+   box is constrained. Do NOT reintroduce a per-section max-width or a
+   different side padding — that's the drift this rule exists to prevent. */
 .kloaq-root main > section {
-  max-width: 1600px;
+  max-width: var(--container-max);
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
@@ -468,7 +470,9 @@
 /* ── LOGOS INTRO — mirrors .kloaq-about-section's padding exactly (160px
    top/bottom, 80px left/right) so content aligns identically down the page. ── */
 .kloaq-logos-intro-section {
-  padding: 160px 80px;
+  /* Fluid section rhythm (globals.css tokens): ramps continuously 375→1440
+     instead of the old hard 160/80 → 96/24 jump at a single breakpoint. */
+  padding: var(--section-pad-y) var(--section-pad-x);
   display: grid;
   grid-template-columns: 1fr;
 }
@@ -500,7 +504,7 @@
    160px top/bottom, 80px left/right — matches the navbar's 72px + the rail's
    old 48px + 40px gap on the left, now applied symmetrically on the right too. */
 .kloaq-about-section {
-  padding: 160px 80px;
+  padding: var(--section-pad-y) var(--section-pad-x);
   display: grid;
   grid-template-columns: 1fr;
 }
@@ -540,7 +544,7 @@
    trailing image preview, tag pill), recolored to this page's system:
    Boldonse for the headline, Inter Tight for body/tags, orange not gold. */
 .kloaq-whatido-section {
-  padding: 160px 80px;
+  padding: var(--section-pad-y) var(--section-pad-x);
   display: grid;
   grid-template-columns: 1fr;
   position: relative;
@@ -679,20 +683,25 @@
   color: var(--orange);
   white-space: nowrap;
 }
+/* Secondary/tertiary link (Services "See pricing", Industries "See our work").
+   DEMOTED from full orange + orange underline to a muted text link so it no
+   longer competes with the primary orange "Brief Me" CTA button — the section
+   CTAs are now clearly subordinate wayfinding, and the eye keeps one clear
+   primary path. The orange accent only appears on the arrow and on hover. */
 .kloaq-whatido-link {
   font-family: var(--body);
   font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: var(--orange);
+  color: var(--muted);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-top: 48px;
-  border-bottom: 1px solid rgba(252, 80, 0, 0.35);
+  border-bottom: 1px solid var(--hairline);
   padding-bottom: 2px;
-  transition: border-color 0.2s, gap 0.2s;
+  transition: color 0.2s, border-color 0.2s, gap 0.2s;
 }
 /* Touch-only accordion image, rendered inline under a row's copy when that
    row is tapped active (see KloaqServices' ServiceRow onClick) — desktop's
@@ -794,6 +803,9 @@
 }
 
 .kloaq-whatido-link:hover {
+  /* Resting state is muted (see the base rule) so it doesn't compete with the
+     primary orange CTA; the accent appears only on hover. */
+  color: var(--orange);
   border-color: var(--orange);
   gap: 14px;
 }
@@ -809,7 +821,7 @@
    of vertical rows with a cursor-trailing one — keeps the two sections from
    reading as the same component twice. */
 .kloaq-industries-section {
-  padding: 160px 80px;
+  padding: var(--section-pad-y) var(--section-pad-x);
   display: grid;
   grid-template-columns: 1fr;
 }
@@ -943,11 +955,11 @@
 }
 
 /* ── START A CONVERSATION (KloaqCTA) ──
-   Overrides the shared .cta-v2-section's 72px L/R padding (the old site-wide
-   default) with the 80px used by every other kloaq section, so this is the
-   only section on the page that doesn't fall out of the grid. */
+   Uses the shared section rhythm tokens (--section-pad-*), overriding the old
+   site-wide .cta-v2-section 72px L/R default so this section shares the exact
+   same content edges as every other section (see the grid-container system). */
 .kloaq-cta-section.cta-v2-section {
-  padding: 160px 80px;
+  padding: var(--section-pad-y) var(--section-pad-x);
   /* globals.css's shared ".cta-v2-section" rule sets overflow-x: hidden
      site-wide (to clip other v2 sections' own overflow) — that also clips
      .kloaq-light-section's full-bleed ::before breakout below, undoing the
@@ -977,9 +989,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
-.kloaq-cta-slots {
-  text-align: left;
 }
 
 /* ── FOOTER REVEAL ──
@@ -1048,9 +1057,13 @@
   border-top: 1px solid var(--hairline);
 }
 .kloaq-footer-inner {
-  max-width: 1600px;
+  /* Same shared container as the sections (footer isn't a `main > section`,
+     so it opts in here explicitly) — cap + centre + the shared --section-pad-x
+     gutter, so footer content shares the page's left/right edges. Vertical
+     padding is the footer's own rhythm. */
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 96px 80px 56px;
+  padding: 96px var(--section-pad-x) 56px;
   position: relative;
   z-index: 2;
 }
@@ -1188,9 +1201,11 @@
 .kloaq-footer-watermark {
   position: relative;
   z-index: 1;
-  max-width: 1600px;
+  /* Shares the container cap + gutter so the big wordmark's left edge lines up
+     with the footer content above it (was a one-off 72px side padding). */
+  max-width: var(--container-max);
   margin: 48px auto 0;
-  padding: 8px 72px 96px;
+  padding: 8px var(--section-pad-x) 96px;
   display: flex;
   align-items: center;
   font-family: var(--display);
@@ -1312,10 +1327,14 @@
   .kloaq-vlabel + * {
     grid-column: 1;
   }
-  /* Swap the desktop cloud for the mobile scroll-carousel hero. */
-  .kloaq-cases-section { display: none; }
+  /* Swap the desktop cloud for the mobile scroll-carousel hero — legacy
+     /kloaq only. The v4 statement hero (.v4-hero) is now the homepage and is
+     fully responsive on its own (its columns stack below lg, see the v4 block),
+     so it must NOT be hidden here; the :not() keeps it visible while the old
+     KloaqCases cloud + carousel keep their existing swap. */
+  .kloaq-cases-section:not(.v4-hero) { display: none; }
   .kloaq-mobile-hero { display: block; }
-  .kloaq-cases-section { padding: 0 24px; min-height: auto; grid-template-columns: 1fr; gap: 24px; }
+  .kloaq-cases-section:not(.v4-hero) { padding: 0 24px; min-height: auto; grid-template-columns: 1fr; gap: 24px; }
   /* Desktop's 8-col grid (cloud in cols 1-6, reel in cols 7-8) collapses to a
      single stacked column — reel falls below the cloud again on mobile. */
   .kloaq-cases-content {
@@ -1397,13 +1416,15 @@
     width: 100%;
     margin: 0 0 56px;
   }
-  .kloaq-about-section { padding: 96px 24px; grid-template-columns: 1fr; gap: 24px; }
+  /* Padding is no longer overridden here — the fluid --section-pad-* tokens
+     (globals.css) already ramp to ~96/24 at this width, continuously, so a
+     hard override would only re-introduce the jump we removed. Only the
+     structural collapses (single column, gaps, touch behaviors) stay. */
+  .kloaq-about-section { grid-template-columns: 1fr; gap: var(--gap-sm); }
   .kloaq-about-grid { grid-template-columns: 1fr; gap: 48px; }
-  .kloaq-industries-section { padding: 96px 24px; }
   .kloaq-industry-item { padding: 24px 24px; gap: 10px; }
   .kloaq-industries-preview { display: none; } /* no hover on touch — nothing to anchor the preview to */
   .kloaq-industry-tag { opacity: 1; transform: none; } /* always show tags on touch */
-  .kloaq-cta-section.cta-v2-section { padding: 96px 24px; }
   /* Stack the copy and the action below it — the flex row would otherwise
      stay two columns and squeeze the button next to the headline. */
   .kloaq-cta-inner { flex-direction: column; align-items: stretch; gap: 40px; }
@@ -1411,12 +1432,11 @@
   .kloaq-cta-action { align-items: stretch; }
   .kloaq-cta-action > div { display: block; } /* Magnetic wrapper: fill width */
   .kloaq-cta-action .kloaq-cta-btn { width: 100%; text-align: center; }
-  .kloaq-cta-slots { text-align: center; }
-  .kloaq-logos-intro-section { padding: 96px 24px; grid-template-columns: 1fr; gap: 24px; }
+  .kloaq-logos-intro-section { grid-template-columns: 1fr; gap: var(--gap-sm); }
   .kloaq-logos-intro { grid-template-columns: 1fr; gap: 24px; }
   .kloaq-logos-section { padding: 40px 0 72px; }
   .kloaq-logos-set { gap: 40px; padding-right: 40px; }
-  .kloaq-whatido-section { padding: 96px 24px; grid-template-columns: 1fr; gap: 24px; }
+  .kloaq-whatido-section { grid-template-columns: 1fr; gap: var(--gap-sm); }
   /* Desktop's 9-col row (num/title/marks/gap/desc) uses line-based
      grid-column placement (e.g. "6 / span 4") on its children — those line
      numbers don't exist in a single-column grid, so the browser was adding
@@ -2694,12 +2714,12 @@
 .v4-hero {
   overflow-x: clip;
   position: relative;
-  /* Narrower inline padding than the 80px page default: the 1.2×-scaled title
-     columns need the extra width to fit symmetrically at ~1440 without the
-     object drifting off-centre. Strip, columns and feet all share this edge,
-     so they stay aligned. */
-  padding-left: clamp(24px, 3.6vw, 52px);
-  padding-right: clamp(24px, 3.6vw, 52px);
+  /* Shared page gutter — the hero aligns to the SAME left/right content edge as
+     every other section (was a one-off clamp(24px,3.6vw,52px), which put the
+     hero ~28px further out than the rest of the page). --v4-col-w is sized to
+     fit the split-column titles inside this 80px gutter (see .v4-grid). */
+  padding-left: var(--section-pad-x);
+  padding-right: var(--section-pad-x);
   /* Override v3's `auto 1fr auto`, which centered the title band in a tall
      middle row and stranded the top strip far above it. Four rows: a top
      spacer and bottom spacer center the STRIP+GRID as one unit, so the
@@ -2787,21 +2807,15 @@
 .v4-grid {
   align-self: stretch;
   display: grid;
-  /* Equal fixed side columns keep the object on the hero's true optical
-     centre (unequal content-sized columns let the wider left title steal
-     width and shoved the object off-centre). --v4-col-w is sized to hold the
-     widest 1.2×-scaled title ("ANNUAL REPORTS", ~660px at 1440) so both sides
-     match and nothing clips; the center lane is the leftover 1fr. At ~1440 the
-     two columns intrude the 80px section padding a little — .v4-hero's
-     overflow-x:clip absorbs it without a scrollbar; the responsive block below
-     shrinks the title + columns on narrower viewports. */
   /* Equal fixed side columns keep the object on the hero's true optical centre
-     (unequal content-sized columns shoved it off). Sized to hold the widest
-     1.2×-scaled title ("ANNUAL REPORTS", ~660px). Two 660px columns + centre +
-     gaps don't fit inside the section's default 80px page margins at 1440, so
-     the v4 hero narrows its own inline padding (below) to buy the room while
-     keeping strip / columns / feet all aligned to one edge. */
-  --v4-col-w: clamp(340px, 46vw, 668px);
+     (unequal content-sized columns let the wider left title steal width and
+     shoved the object off-centre); the center lane is the leftover 1fr.
+     --v4-col-w is sized to hold the widest noun ("ANNUAL REPORTS") INSIDE the
+     shared 80px page gutter — the hero now aligns to the same edge as every
+     other section (it used to steal ~28px/side to fit wider columns). Sized in
+     lockstep with the noun cap below (var(--type-tile), max 4.4rem here): bump
+     one and you must bump the other or the title clips / the object drifts. */
+  --v4-col-w: clamp(320px, 43vw, 620px);
   grid-template-columns: var(--v4-col-w) minmax(0, 1fr) var(--v4-col-w);
   align-items: center;
   /* Gap 0: with fixed columns and a minmax(0,1fr) centre, any non-zero gap
@@ -2832,14 +2846,12 @@
   align-items: flex-end;
   text-align: right;
 }
-/* A noun = one whole hoverable case link, one row. Faint hairline under each
-   at rest (the row structure the mock drew); orange ghost + underline flip on
-   hover, shared with the v3 cloud's hover language. */
+/* A noun = one whole hoverable case link, one row. No underline/hairline —
+   orange ghost text-stroke alone carries the hover state. */
 .v4-noun {
   position: relative;
   display: block;
   padding: clamp(2px, 0.4vw, 8px) 0;
-  border-bottom: 1px solid rgba(249, 249, 249, 0.14);
   text-decoration: none;
   line-height: 0.98;
   touch-action: manipulation;
@@ -2852,11 +2864,14 @@
   display: block;
   font-family: var(--display);
   font-weight: 400; /* Boldonse is single-weight, natively heavy */
-  /* Capped so the widest noun ("ANNUAL REPORTS", ~14ch) fits inside
-     --v4-col-w without overrunning into the object's gutter. Bump the cap and
-     you must bump --v4-col-w in lockstep or the tail clips. (Scaled 1.2× from
-     the original 1.8/3.8/4 — --v4-col-w bumped to match.) */
-  font-size: clamp(2.16rem, 4.56vw, 4.8rem);
+  /* Shared display ramp (globals.css --type-tile): the SAME fluid curve every
+     big title on the site rides, so hero nouns / project tiles / work-index
+     titles scale together with no per-breakpoint jumps. Capped here at 3.7rem
+     via min() so the widest noun ("ANNUAL REPORTS", ~14ch, ~595px) fits inside
+     the now shared-gutter --v4-col-w (620px cap) on desktop — the ramp still
+     governs every width below the cap. Bump this cap and you must bump
+     --v4-col-w in lockstep or the title clips into the object gutter. */
+  font-size: min(var(--type-tile), 3.7rem);
   letter-spacing: 0.004em;
   text-transform: uppercase;
   color: var(--cream);
@@ -2866,27 +2881,6 @@
 .v4-noun:hover .v4-noun-label {
   color: transparent;
   -webkit-text-stroke: 1.4px var(--orange);
-}
-/* Rest-state underline accent: a thin orange rule that the hover grows, so
-   the row hairline reads as "this is a link" without shouting. */
-.v4-noun::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  height: 2px;
-  width: 0;
-  background: var(--orange);
-  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.v4-col-left .v4-noun::after {
-  left: 0;
-}
-.v4-col-right .v4-noun::after {
-  right: 0;
-}
-.v4-noun:hover::after,
-.v4-noun.is-active::after {
-  width: 100%;
 }
 /* Client attribution — quiet, hover-only, sits just inside the row edge so it
    never pushes the noun's layout. */
@@ -3093,76 +3087,74 @@
   text-align: left;
 }
 
-/* ── RESPONSIVE ──
-   .v4-hero (like .v3-hero) is display:none ≤820px via the shared
-   .kloaq-cases-section rule — the mobile carousel hero takes over. Between
-   ~820 and ~1100 the three-column split gets cramped; collapse the center
-   track narrower, shrink the type, and let the object shrink so the type keeps
-   room. The two side columns must stay EQUAL (both 1fr) so the left and right
-   titles clip symmetrically — an asymmetric center track drifted the object
-   off-centre and clipped the right column harder than the left. */
-/* 1000–1100: still the desktop split, just rebalanced — equal minmax(0,1fr)
-   sides + a narrower centre lane, type shrunk to fit. Below 1000 the stacked
-   block takes over (see next media query). */
-@media (max-width: 1100px) {
-  .v4-grid {
-    /* Equal sides + a fixed, narrow centre lane. minmax(0,1fr) — NOT a bare
-       1fr — so the left column's long nowrap label ("ANNUAL REPORTS") can't
-       inflate its track past its fair half (a bare 1fr resolves to
-       minmax(auto,1fr) and the label's min-content width stole ~40px from the
-       right column, clipping "PACKAGING" harder than the left). Now both sides
-       are truly equal and the type is sized to fit inside them. */
-    grid-template-columns: minmax(0, 1fr) clamp(150px, 20vw, 220px) minmax(0, 1fr);
-    gap: 0 clamp(8px, 1.5vw, 20px);
-  }
-  .v4-noun-label {
-    font-size: clamp(1.9rem, 3.3vw, 3.2rem);
-  }
-  .v4-stage-object {
-    width: clamp(200px, 22vw, 320px);
-  }
-  .v4-foot-copy {
-    font-size: clamp(1rem, 1.6vw, 1.2rem);
-  }
-}
+/* ── RESPONSIVE ── (canonical breakpoints only: lg 1024, md 768)
+   The v4 hero is now the homepage at EVERY width — there is no separate mobile
+   carousel to swap to. Above lg it's the desktop split; at/below lg it becomes
+   ONE stacked centred column that carries all its content (label, retainer
+   line, all six service nouns, the object, both About feet) down to 375px.
 
-/* ── STACKED TABLET (≤1000px, above the 820 mobile cutoff) ──
-   The 3-column split only reads as balanced when the columns are wide and the
-   object is huge (desktop). Squeezed onto a tablet it fell apart: titles
-   pulled to the outer edges with a dead centre gap, while the full-width top
-   strip + feet overhung them. So below 1000 we ABANDON the split and stack one
-   intentional centred column: RECEIPTS strip → big centred object → all six
-   titles centred in one run (left column then right, source order) → feet.
-   The object sits as its own centred block (not the gutter backdrop); the
-   titles centre-align and can grow back to a comfortable size with the full
-   width to themselves. */
-@media (max-width: 1000px) {
-  /* One column; rows place the object first (it's the middle DOM child), then
-     the two title columns beneath it. Center everything. */
+   The old 1100/1000/900 three-tier collapse is gone: it created a dead zone
+   (~1000–1100) where the object shrank to a tiny orphan floating in a top gap
+   while the columns stayed split. The base split now simply holds down to lg
+   on its own fluid sizing (--v4-col-w and the object width are both vw-based,
+   so they track the viewport continuously with no rebalance tier), then hands
+   off to the stacked layout in one clean switch at lg. */
+
+/* ── STACKED (≤lg 1024px) ──
+   Abandon the 3-column split — it only reads as balanced when the columns are
+   wide and the object is large. Stack one intentional centred column:
+   RECEIPTS strip → centred object → all six nouns centred in source order →
+   About feet. This single layout scales from 1024 down to the narrowest phone. */
+@media (max-width: 1024px) {
+  /* Let the hero grow with its content instead of being trapped at 100svh with
+     a 1fr bottom spacer — the stacked content is taller than one screen on a
+     phone, and the fixed-height rows clipped the feet below the ::before bg
+     (feet spilled onto black). Natural auto flow + real vertical padding makes
+     section height = content height, so the orange-grain ::before (inset:0)
+     always covers the full hero. clamp keeps the top clear of the fixed navbar. */
+  .v4-hero {
+    min-height: 100svh;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(28px, 5vw, 48px);
+    padding-top: clamp(112px, 20vw, 160px);
+    padding-bottom: var(--section-pad-y);
+    /* Reset the desktop 4-row grid; flex owns the vertical rhythm now. */
+    grid-template-rows: none;
+  }
+  /* Grid children were placed by grid-row on desktop; in the flex column they
+     flow in source order (strip is outside .v4-grid, so order the grid too). */
+  .v4-hero .v3-hero-top { margin-bottom: 0; }
+
+  /* One centred column: object first (middle DOM child → order 0), then the
+     left nouns, then the right nouns, then the feet flow after the grid. */
   .v4-grid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto auto;
     justify-items: center;
-    row-gap: clamp(20px, 4vw, 40px);
+    row-gap: var(--gap-sm);
     gap: 0;
   }
-  /* Reorder: object (stage) on top, then left titles, then right titles. */
   .v4-grid .v4-stage    { grid-row: 1; order: 0; }
   .v4-grid .v4-col-left { grid-row: 2; order: 1; }
   .v4-grid .v4-col-right{ grid-row: 3; order: 2; }
 
-  /* Both title columns now centre their nouns and read as one continuous
-     centred stack; the right column's right-align + inner-edge client tag are
-     dropped so the six rows share one axis. */
+  /* Both title columns centre their nouns and read as one continuous stack;
+     the right column's right-align + inner-edge client tag are dropped so all
+     six rows share one axis. */
   .v4-col,
   .v4-col-left,
   .v4-col-right {
     align-items: center;
     text-align: center;
     width: 100%;
+    /* Roomier gap between stacked nouns so the tall Boldonse glyphs never
+       collide (they overlapped at line-height:0.98 with a near-zero gap). */
+    gap: clamp(2px, 1.2vw, 10px);
   }
   .v4-col-right .v4-noun { text-align: center; }
-  /* Client tag centres under its noun instead of anchoring to a column edge. */
   .v4-col-left .v4-noun-client,
   .v4-col-right .v4-noun-client {
     left: 50%;
@@ -3170,41 +3162,38 @@
     transform: translateX(-50%);
     text-align: center;
   }
-  /* Underline grows from the centre out on both sides. */
-  .v4-col-left .v4-noun::after,
-  .v4-col-right .v4-noun::after {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+  /* Nouns keep the shared --type-tile ramp (no bespoke font-size here), just a
+     looser line-height so stacked rows breathe. This is the single biggest
+     narrow-width fix: at 0.98 the six rows overlapped into an unreadable pile. */
+  .v4-noun {
+    padding: clamp(3px, 1vw, 8px) 0;
+    line-height: 1.04;
   }
 
-  /* Titles get the full width back, so grow them to a real hero size again. */
-  .v4-noun-label {
-    font-size: clamp(2.2rem, 6vw, 3.4rem);
-  }
-
-  /* Object is now a standalone centred block with its own box — give it real
-     height (it was an absolutely-centred overlay on a stretched stage). */
+  /* Object becomes a standalone centred block with a real box (it was an
+     absolutely-centred overlay on a stretched stage). Width is a CONTINUOUS
+     fluid clamp (vw-based), so it genuinely rescales on every resize across the
+     whole stacked band — not flat within a tier. The upper bound (420px) meets
+     the desktop split's shrinking object near the 1024 handoff so the switch
+     isn't an abrupt jump; the 200px floor keeps it present on the narrowest
+     phone. aspect-ratio holds it square as it scales. */
   .v4-stage {
     align-self: center;
-    width: min(60vw, 360px);
+    width: clamp(200px, 45vw, 420px);
     aspect-ratio: 1 / 1;
     min-height: 0;
   }
   .v4-stage-object {
-    /* Fill the stage block now that the stage has a real size. */
     width: 100%;
   }
-  /* The center preview stays absolutely centred on the stage (its rect is still
-     the shared-element flight source), just sized to the stage. */
   .v4-stage-preview {
-    width: min(70vw, 420px);
+    width: clamp(240px, 52vw, 480px);
   }
 
   /* Feet stack into one centred column under the titles. */
   .v4-foot {
     grid-template-columns: 1fr;
-    gap: clamp(16px, 3vw, 28px);
+    gap: var(--gap-sm);
     text-align: center;
   }
   .v4-foot-copy,
@@ -3215,22 +3204,27 @@
     font-size: clamp(1rem, 2.4vw, 1.15rem);
   }
 
-  /* Top strip: keep RECEIPTS / slots on one line but let it sit centred over
-     the stack rather than spanning full width past the titles. */
+  /* Top strip centred over the stack; wrap gracefully on the narrowest phones
+     rather than forcing RECEIPTS + the long retainer line onto one overflowing
+     row (it wrapped mid-word and left-anchored before). */
   .v4-hero .v3-hero-top {
     justify-content: center;
-    gap: clamp(16px, 4vw, 40px);
+    flex-wrap: wrap;
+    gap: 8px clamp(16px, 4vw, 40px);
+    text-align: center;
   }
 }
 
-/* Narrowest tablet tier (just above the 820 cutoff): drop the object + type a
-   touch more so the stack stays comfortable on a ~830px portrait tablet. */
-@media (max-width: 900px) {
-  .v4-noun-label {
-    font-size: clamp(2rem, 6.4vw, 2.9rem);
-  }
+/* ── NARROW PHONES (≤md 768px) ──
+   One refinement tier on the same stacked layout: the object drops a touch so
+   the six-noun stack + feet clear a short phone viewport without the object
+   eating the fold. Everything else inherits from the ≤lg block above. */
+@media (max-width: 768px) {
+  /* Continue the same fluid ramp, just a touch smaller so the six-noun stack +
+     feet clear a short phone viewport without the object eating the fold.
+     Still a clamp (not a flat min()) so it keeps tracking the viewport. */
   .v4-stage {
-    width: min(56vw, 300px);
+    width: clamp(180px, 48vw, 320px);
   }
 }
 
