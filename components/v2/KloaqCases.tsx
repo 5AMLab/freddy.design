@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { projects } from "@/lib/work";
+import { projects, imageSrc } from "@/lib/work";
 import HeroReel from "@/components/v2/HeroReel";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 
@@ -178,7 +178,7 @@ export default function KloaqCases() {
                   the height of .kloaq-case-text next to it. */}
               <span className="kloaq-case-thumb" aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.images[0]} alt="" loading="lazy" />
+                <img src={imageSrc(p.images[0])} alt="" loading="lazy" />
               </span>
               <span className="kloaq-case-text">
                 <span className="kloaq-case-name">{DISPLAY_NAME[p.slug] ?? p.client}</span>
@@ -232,7 +232,7 @@ export default function KloaqCases() {
                 without being clipped by the image's overflow: hidden. */}
             <span className="kloaq-thumb-frame">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={activeProject.images[0]} alt="" />
+              <img src={imageSrc(activeProject.images[0])} alt="" />
             </span>
             <button
               type="button"

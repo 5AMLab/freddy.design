@@ -1,7 +1,7 @@
 import LegalLayout from "@/components/v2/LegalLayout";
 
 export const metadata = {
-  title: "Cookie Policy — freddy.design",
+  title: "Cookie Policy — freddi.design",
 };
 
 export default function CookiesPage() {
@@ -13,7 +13,7 @@ export default function CookiesPage() {
       sections={[
         {
           heading: "The Short Version",
-          body: "freddy.design does not use cookies for tracking, advertising, or analytics. This website is intentionally minimal — no third-party tracking scripts, no ad networks, no retargeting pixels.",
+          body: "freddi.design does not use tracking, advertising, or marketing cookies. This website is intentionally minimal — no third-party tracking scripts, no ad networks, no retargeting pixels. We measure basic, anonymous traffic with a privacy-first, cookieless analytics tool, so there is no consent banner to click through.",
         },
         {
           heading: "What Are Cookies",
@@ -23,7 +23,7 @@ export default function CookiesPage() {
           heading: "Cookies We Use",
           body: [
             "Essential / functional cookies only — these are set by the browser or our hosting infrastructure (Vercel) to ensure basic site functionality such as security and page delivery. They do not track you personally.",
-            "No analytics cookies — we do not currently use Google Analytics, Mixpanel, or any other analytics platform that sets cookies.",
+            "No analytics cookies — traffic is measured with Vercel Analytics, a privacy-first tool that is cookieless and does not collect personally identifiable information. We do not use Google Analytics, Mixpanel, or any analytics platform that sets cookies.",
             "No marketing or advertising cookies — we do not run retargeting campaigns or share data with ad networks.",
             "No social media tracking pixels — no Facebook Pixel, LinkedIn Insight Tag, or similar.",
           ],
@@ -42,7 +42,7 @@ export default function CookiesPage() {
         },
         {
           heading: "Contact",
-          body: "If you have any questions about our use of cookies, please contact us at hello@freddy.design.",
+          body: "If you have any questions about our use of cookies, please contact us at hello@freddi.design.",
         },
       ]}
     />

@@ -1,6 +1,7 @@
+import type { Metadata } from "next";
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
-import HeroCloudV3 from "@/components/v3/HeroCloudV3";
+import HeroStatementV4 from "@/components/v4/HeroStatementV4";
 import KloaqCasesMobile from "@/components/v2/KloaqCasesMobile";
 import KloaqLogos from "@/components/v2/KloaqLogos";
 import KloaqServices from "@/components/v2/KloaqServices";
@@ -10,23 +11,27 @@ import KloaqFooter from "@/components/v2/KloaqFooter";
 import BriefFlow from "@/components/v2/BriefFlow";
 
 /**
- * Homepage — the Kloaq design language is the site default: Boldonse +
- * Inter Tight typography, Flameburst-orange accent, 14px image rectangles.
+ * REVIEW MOCKUP — statement-led hero (see HeroStatementV4). Unlinked from
+ * the site nav and noindexed; the real homepage (app/page.tsx) still runs
+ * HeroCloudV3. Everything below the hero is the live homepage verbatim, so
+ * the candidate can be judged in full-page context. Promoting this means
+ * swapping the hero import in app/page.tsx and deleting this route.
  */
-export default function Home() {
+export const metadata: Metadata = {
+  title: "freddi.design — hero v4 mockup",
+  robots: { index: false, follow: false },
+};
+
+export default function HeroV4Review() {
   return (
     <div className="kloaq-root" style={{ minHeight: "100vh", width: "100%" }}>
       <KloaqNavbar />
       <main>
-        {/* Desktop hero: the full-viewport typographic cloud (no showreel),
-            with the preloader→cloud staggered entrance and scroll-velocity
-            skew. Touch/narrow swaps to the pinned one-project-at-a-time
-            scroll carousel — exactly one is shown via CSS at the 820px
-            breakpoint (.v3-hero / .kloaq-cases-section vs .kloaq-mobile-hero). */}
-        <HeroCloudV3 />
+        {/* Desktop: the statement hero. Touch/narrow swaps to the same pinned
+            scroll-carousel hero as the homepage (CSS toggle at 820px). */}
+        <HeroStatementV4 />
         <KloaqCasesMobile />
 
-        {/* Intro — mirrors the About section's grid so both align down the page */}
         <section className="kloaq-logos-intro-section">
           <div className="kloaq-vlabel">Inside Freddi</div>
           <div className="kloaq-logos-intro">
@@ -39,10 +44,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Logo wall */}
         <KloaqLogos />
 
-        {/* About — flat two-column text + accented closing statement */}
         <section className="kloaq-about-section kloaq-light-section">
           <div className="kloaq-vlabel">About</div>
           <div>
@@ -73,12 +76,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* What I Do — numbered service rows */}
         <KloaqServices />
-
-        {/* Industries — horizontal marquee */}
         <KloaqIndustries />
-
         <KloaqCTA />
       </main>
       <KloaqFooter />

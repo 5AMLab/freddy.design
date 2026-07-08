@@ -20,7 +20,7 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 // "unnatural" before). So the stagger here is deliberately tiny: the word moves
 // through the day→dusk arc almost in unison, one continuous sky, with just a
 // few frames of left-to-right lag so it feels alive rather than mechanical.
-const WORD = "freddy";
+const WORD = "freddi";
 
 // Frame units assume a 60fps tick (see the deltaTime accumulator in the
 // effect) so the sweep runs at one speed regardless of display refresh rate.
@@ -79,7 +79,7 @@ export default function KloaqFooterWordmark() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
     let frame = 0;
-    let raf: number;
+    let raf: number | null = null;
     let lastTime: number | null = null;
 
     const tick = (time: number) => {
@@ -117,9 +117,64 @@ export default function KloaqFooterWordmark() {
       });
       raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
 
-    return () => cancelAnimationFrame(raf);
+    // The footer is sticky-pinned and geometrically in the viewport at every
+    // scroll position — so observing the footer itself would always report
+    // "visible" and never gate anything. The wordmark only actually SHOWS
+    // once <main> stops covering it, i.e. main's bottom edge scrolls into
+    // view near the end of the page. So gate the rAF on <main>'s visibility:
+    // start the loop only when main's tail is on screen (footer being
+    // revealed), pause it for the whole upper scroll where the sunset wash is
+    // occluded anyway. This lifts the per-frame background-clip:text repaint
+    // off every scroll except the reveal itself.
+    const start = () => {
+      if (raf === null) {
+        lastTime = null; // don't jump the cycle after a long pause
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    const stop = () => {
+      if (raf !== null) {
+        cancelAnimationFrame(raf);
+        raf = null;
+      }
+    };
+
+    // Gate: observe the last content section of <main> (the CTA, which sits
+    // directly above the footer). It enters the viewport exactly as the footer
+    // begins to reveal, so it's the clean "footer is showing now" signal — the
+    // sticky footer itself is geometrically in the viewport at every scroll
+    // position (occluded, not off-screen), and <main> is page-tall, so neither
+    // can gate this. A real, stable element beats an injected sentinel (no
+    // StrictMode mount/cleanup race). The large bottom rootMargin starts the
+    // wash a viewport early so it's already alive by the time it's uncovered.
+    const trigger =
+      document.querySelector<HTMLElement>(".kloaq-root main #cta") ??
+      document.querySelector<HTMLElement>(".kloaq-root main > :last-child");
+    let io: IntersectionObserver | null = null;
+    if (trigger) {
+      // Loop runs while the CTA overlaps the viewport — which spans the whole
+      // reveal band: the CTA enters from the bottom just before the footer
+      // starts uncovering, and its bottom edge is still on screen at full
+      // scroll when the footer is fully shown, so the wash stays alive across
+      // the reveal and pauses for the upper page where it's occluded. A small
+      // bottom margin gives a little lead so it's already running when
+      // uncovered. (An earlier "100%" bottom margin was the bug — it flipped
+      // the gate OFF right at the bottom, killing the wash on full reveal.)
+      io = new IntersectionObserver(
+        ([entry]) => (entry.isIntersecting ? start() : stop()),
+        { rootMargin: "0px 0px 200px 0px", threshold: 0 }
+      );
+      io.observe(trigger);
+    } else {
+      // No trigger found (defensive): keep the old always-on behavior.
+      start();
+    }
+
+    return () => {
+      io?.disconnect();
+      stop();
+    };
   }, []);
 
   return (

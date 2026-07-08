@@ -10,17 +10,23 @@ import { CONTACT_EMAIL } from "@/lib/site";
 
 // Homepage nav (also used on /kloaq). Links map to the sections the Kloaq
 // composition actually renders: #services (KloaqServices) and #industries
-// (KloaqIndustries), plus Portfolio → /work. There is no pricing section on
-// this page, so "Pricing" is intentionally not listed (it would dead-anchor).
+// (KloaqIndustries), plus Portfolio → /work and Pricing → the standalone
+// /pricing route.
 const MENU_ITEMS: { label: string; href?: string; anchor?: string }[] = [
   { label: "Portfolio", href: "/work" },
   { label: "Services", anchor: "#services" },
   { label: "Industries", anchor: "#industries" },
+  { label: "Pricing", href: "/pricing" },
 ];
 
 export default function KloaqNavbar() {
   const pathname = usePathname();
   const onHome = pathname === "/";
+  // Pages where the section directly under the nav is the cream light field
+  // (no dark hero above it) — flip the nav ink to near-black so links,
+  // logo and hamburger stay legible on cream. Scrolled state still swaps
+  // the wrapper to dark, at which point cream ink takes over via CSS.
+  const onLightBg = pathname === "/pricing";
 
   // On the homepage, anchors stay bare hashes so Lenis smooth-scrolls them.
   // Off-homepage (e.g. /kloaq), prefix with "/" so they navigate home then jump.
@@ -157,6 +163,7 @@ export default function KloaqNavbar() {
           "background 0.4s, border-color 0.4s, backdrop-filter 0.4s, transform 0.5s cubic-bezier(0.16,1,0.3,1)",
       }}
       className="kloaq-nav-wrapper"
+      data-nav-theme={onLightBg && !scrolled ? "light-bg" : undefined}
     >
 
       <a
@@ -165,13 +172,13 @@ export default function KloaqNavbar() {
           fontFamily: "'Boldonse', 'Anton', 'Sohne Breit', sans-serif",
           fontSize: "1.5rem",
           fontWeight: 400,
-          color: "#F5F0E8",
+          color: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8",
           textDecoration: "none",
           letterSpacing: "0.02em",
           textTransform: "none",
         }}
       >
-        freddy<span style={{ color: "#FC5000" }}>.</span>
+        freddi<span style={{ color: "#FC5000" }}>.</span>
       </a>
 
       <ul
@@ -244,19 +251,19 @@ export default function KloaqNavbar() {
         style={{ display: "none", flexDirection: "column", gap: "6px", cursor: "pointer", position: "relative", width: "22px", height: "16px" }}
       >
         <span style={{
-          width: "22px", height: "1px", background: "#F5F0E8", display: "block",
+          width: "22px", height: "1px", background: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8", display: "block",
           position: "absolute", top: open ? "7px" : "0px",
           transform: open ? "rotate(45deg)" : "rotate(0deg)",
           transition: "top 0.25s, transform 0.25s",
         }} />
         <span style={{
-          width: "14px", height: "1px", background: "#F5F0E8", display: "block",
+          width: "14px", height: "1px", background: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8", display: "block",
           position: "absolute", top: "7px",
           opacity: open ? 0 : 1,
           transition: "opacity 0.2s",
         }} />
         <span style={{
-          width: "22px", height: "1px", background: "#F5F0E8", display: "block",
+          width: "22px", height: "1px", background: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8", display: "block",
           position: "absolute", top: open ? "7px" : "14px",
           transform: open ? "rotate(-45deg)" : "rotate(0deg)",
           transition: "top 0.25s, transform 0.25s",

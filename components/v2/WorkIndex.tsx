@@ -1,166 +1,207 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import gsap from "gsap";
 import "@/styles/kloaq.css";
-import { type Project } from "@/lib/work";
+import { type Project, imageSrc } from "@/lib/work";
+import { prefersReducedMotion } from "@/components/motion/MotionProvider";
+import { startTransition } from "@/lib/pageTransition";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
 
-function IndexCard({ project }: { project: Project }) {
-  const [hovered, setHovered] = useState(false);
-  const hasImage = project.images.length > 0;
-
-  return (
-    <Link
-      href={`/work/${project.slug}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      data-cursor={hasImage ? "view" : undefined}
-      style={{ textDecoration: "none", display: "block" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          aspectRatio: "3/2",
-          backgroundColor: "#141414",
-          borderRadius: "14px", // rounded-image — Kloaq canonical image radius
-          border: "1px solid",
-          borderColor: hovered ? "rgba(252,80,0,0.3)" : "rgba(249,249,249,0.06)",
-          position: "relative",
-          overflow: "hidden",
-          transition: "border-color 0.35s",
-        }}
-      >
-        {hasImage && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              transform: hovered ? "scale(1.05)" : "scale(1)",
-              transition: "transform 0.9s cubic-bezier(0.16,1,0.3,1)",
-            }}
-          >
-            <Image
-              src={project.images[0]}
-              alt={`${project.title} — ${project.client}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              style={{ objectFit: "cover", objectPosition: "center" }}
-              loading="lazy"
-            />
-          </div>
-        )}
-      </div>
-
-      <div
-        style={{
-          paddingTop: "16px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: "16px",
-          transform: hovered ? "translateY(-7px)" : "translateY(0px)",
-          transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1)",
-        }}
-      >
-        <div>
-          <div
-            style={{
-              fontFamily: "var(--font-display), sans-serif",
-              fontSize: "1.05rem",
-              fontWeight: 400,
-              textTransform: "uppercase",
-              letterSpacing: "0.005em",
-              color: "#f9f9f9", // full cream at rest — matches .kloaq-case-name
-              marginBottom: "4px",
-              lineHeight: 1.25,
-            }}
-          >
-            {project.title}
-          </div>
-          <div
-            style={{
-              fontFamily: "var(--font-body), sans-serif",
-              fontSize: "0.72rem",
-              fontWeight: 400,
-              color: "rgba(249,249,249,0.55)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            {project.client}
-          </div>
-        </div>
-        {/* Category tag — the homepage's bracketed-orange tag language
-            (matches .kloaq-service-tag: [TEXT], orange, uppercase, 600).
-            No pill/border — brightens on hover instead of flipping to a block. */}
-        <div
-          style={{
-            fontFamily: "var(--font-body), sans-serif",
-            fontSize: "0.72rem",
-            fontWeight: 600,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            color: hovered ? "#FC5000" : "rgba(252,80,0,0.7)",
-            whiteSpace: "nowrap",
-            flexShrink: 0,
-            transition: "color 0.3s",
-          }}
-        >
-          [{project.category.toUpperCase()}]
-        </div>
-      </div>
-    </Link>
-  );
-}
-
+/**
+ * /work index — the hero's typographic cloud "unpacked" into an ordered
+ * archive list. Each project is a full-width hairline row (index number,
+ * title in display caps, client + bracketed category tag); the portfolio
+ * image is not laid out in a grid but revealed on demand, exactly like the
+ * homepage cloud:
+ *
+ *  - fine pointers: a cursor-trailing preview (.kloaq-thumb, GSAP quickTo)
+ *    fades in while a row is hovered; the hovered title flips to the
+ *    orange-outline ghost treatment and sibling rows dim (CSS :has).
+ *  - touch: first tap pins the preview at the tap point, a × button (or a
+ *    second tap, which navigates) dismisses it — the same interaction
+ *    KloaqCases/HeroCloudV3 established, including the activeRef race fix
+ *    for fast Android taps and the coarse-gating on synthetic mouse events.
+ *
+ * Entrance uses the site-wide .v2-fade vocabulary (MotionProvider), applied
+ * to each row's INNER wrapper — GSAP leaves inline opacity:1 behind on
+ * .v2-fade targets, which would permanently defeat the :has() sibling-dim
+ * if it sat on the row element itself.
+ */
 export default function WorkIndex({ projects }: { projects: Project[] }) {
+  const router = useRouter();
+  const thumbRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<string | null>(null);
+  // Synchronous mirror of `active` — see KloaqCases on the Android
+  // double-tap race this prevents.
+  const activeRef = useRef<string | null>(null);
+
+  // GSAP quickTo setters for the thumb trail, built once on mount (fine
+  // pointer + motion allowed only) and read from the handlers via this ref.
+  const thumbToRef = useRef<{ x: gsap.QuickToFunc; y: gsap.QuickToFunc } | null>(null);
+
+  const isCoarse = () => !window.matchMedia("(pointer: fine)").matches;
+
+  useEffect(() => {
+    if (isCoarse() || prefersReducedMotion()) return;
+    const thumb = thumbRef.current;
+    if (!thumb) return;
+    // Starting scale set through GSAP, not CSS — quickTo(x)/quickTo(y)
+    // claims the transform property, so a CSS scale would be frozen at its
+    // rest value (see the .kloaq-thumb comment in kloaq.css).
+    gsap.set(thumb, { scale: 0.92 });
+    thumbToRef.current = {
+      x: gsap.quickTo(thumb, "x", { duration: 0.5, ease: "power3.out" }),
+      y: gsap.quickTo(thumb, "y", { duration: 0.5, ease: "power3.out" }),
+    };
+  }, []);
+
+  // Fine-pointer only — touch browsers fire synthetic mousemoves mid-tap,
+  // which would drag the pinned preview around (see KloaqCases).
+  const move = (e: React.MouseEvent) => {
+    if (isCoarse()) return;
+    thumbToRef.current?.x(e.clientX);
+    thumbToRef.current?.y(e.clientY);
+  };
+
+  const setActiveCase = (id: string | null) => {
+    activeRef.current = id;
+    setActive(id);
+  };
+
+  // Touch tap-to-reveal: first tap on an inactive row pins the preview at
+  // the tap point instead of navigating; tapping the active row navigates
+  // through. Same handler as the homepage cloud.
+  const tap = (e: React.MouseEvent, id: string) => {
+    if (!isCoarse()) return;
+    if (activeRef.current !== id) {
+      e.preventDefault();
+      // No quickTo setters on touch — pin via left/top, offset by half the
+      // frame so the preview centers under the tap point.
+      const el = thumbRef.current;
+      if (el) {
+        const { width, height } = el.getBoundingClientRect();
+        el.style.left = `${e.clientX - width / 2}px`;
+        el.style.top = `${e.clientY - height / 2}px`;
+      }
+      setActiveCase(id);
+    }
+  };
+
+  // Desktop click → shared-element flight, identical to HeroCloudV3's: the
+  // hovered row's trailing preview thumb is the grab point, so its rect + the
+  // project image fly into the case hero (SharedElementOverlay, mounted in the
+  // root layout, survives the route change). router.push instead of letting
+  // <Link> navigate, so the transition starts before the nav. Bails to normal
+  // navigation on touch, reduced motion, modified/non-left clicks, or if the
+  // preview thumb isn't visible to fly from.
+  const navigate = (e: React.MouseEvent, project: Project) => {
+    if (isCoarse()) return;
+    if (prefersReducedMotion()) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+
+    const frame = thumbRef.current?.querySelector<HTMLElement>(".kloaq-thumb-frame");
+    if (!frame) return;
+
+    const r = frame.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return;
+
+    e.preventDefault();
+    startTransition({
+      src: imageSrc(project.images[0]),
+      from: { top: r.top, left: r.left, width: r.width, height: r.height },
+      slug: project.slug,
+    });
+    setActiveCase(null);
+    router.push(`/work/${project.slug}`);
+  };
+
+  // Grow the thumb 0.92 → 1 while a row is hovered. Plain gsap.to (not
+  // quickTo) — see KloaqCases on why quickTo can't animate scale here.
+  useEffect(() => {
+    if (isCoarse() || prefersReducedMotion()) return;
+    const thumb = thumbRef.current;
+    if (!thumb) return;
+    gsap.to(thumb, { scale: active ? 1 : 0.92, duration: 0.45, ease: "power3.out" });
+  }, [active]);
+
+  const activeProject = projects.find((p) => p.id === active);
+
   return (
-    <div style={{ background: "#050505", minHeight: "100vh" }}>
+    <div className="work-index-page">
       <KloaqNavbar />
 
-      {/* Header — mirrors the homepage section language: shared .kloaq-vlabel
-          orange label, Boldonse display heading, cream lead paragraph, 80px rail. */}
-      <div
-        style={{ padding: "160px 80px 80px", borderBottom: "1px solid rgba(249,249,249,0.06)" }}
-        className="legal-header"
-      >
-        <div className="kloaq-vlabel">Projects</div>
-        <h1
-          style={{
-            fontFamily: "var(--font-display), sans-serif", fontSize: "clamp(2rem, 3.6vw, 3.2rem)",
-            fontWeight: 400, textTransform: "uppercase", letterSpacing: "0.005em",
-            lineHeight: 1.45, color: "#f9f9f9", marginBottom: "24px",
-          }}
-        >
-          Selected work
-        </h1>
-        <p
-          style={{
-            fontFamily: "var(--font-body), sans-serif", fontSize: "1.2rem", fontWeight: 400,
-            color: "rgba(249,249,249,0.7)", lineHeight: 1.7, maxWidth: "600px",
-          }}
-        >
-          Annual reports, investor decks, brand systems, campaigns and packaging —
-          a cross-section of recent projects. Client names anonymised where
-          confidentiality applies.
-        </p>
-      </div>
-
-      {/* Grid */}
-      <div style={{ padding: "80px" }} className="work-index-grid-wrap">
-        <div
-          className="work-index-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "32px",
-          }}
-        >
-          {projects.map((project) => (
-            <IndexCard key={project.id} project={project} />
-          ))}
+      <header className="work-index-header">
+        <div className="work-index-header-top v2-fade">
+          <div className="kloaq-vlabel">Projects</div>
+          <div className="work-index-count">[{projects.length} PROJECTS]</div>
         </div>
+        <h1 className="v2-fade">Selected Work</h1>
+        <p className="work-index-lead v2-fade">
+          Annual reports, investor decks, brand systems, campaigns and
+          packaging — a cross-section of recent projects. Client names
+          anonymised where confidentiality applies.
+        </p>
+      </header>
+
+      <section className="work-index-list" onMouseMove={move}>
+        {projects.map((project, i) => (
+          <Link
+            key={project.id}
+            href={`/work/${project.slug}`}
+            className={`work-index-row${active === project.id ? " is-active" : ""}`}
+            onMouseEnter={() => {
+              if (!isCoarse()) setActiveCase(project.id);
+            }}
+            onMouseLeave={() => {
+              if (!isCoarse() && activeRef.current === project.id) setActiveCase(null);
+            }}
+            onClick={(e) => {
+              tap(e, project.id);
+              if (!e.defaultPrevented) navigate(e, project);
+            }}
+          >
+            <span className="work-index-row-inner v2-fade">
+              <span className="work-index-num" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="work-index-title">{project.title}</span>
+              <span className="work-index-meta">
+                <span className="work-index-client">{project.client}</span>
+                <span className="work-index-tag">[{project.category.toUpperCase()}]</span>
+              </span>
+            </span>
+          </Link>
+        ))}
+      </section>
+
+      {/* Single floating preview shared across rows — trails the cursor on
+          desktop, pins at the tap point on touch. Reuses the homepage
+          cloud's .kloaq-thumb classes wholesale (incl. the touch-only close
+          button) so both pages share one preview language. */}
+      <div
+        ref={thumbRef}
+        className={`kloaq-thumb${active ? " is-visible" : ""}`}
+        aria-hidden="true"
+      >
+        {activeProject && activeProject.images.length > 0 && (
+          <>
+            <span className="kloaq-thumb-frame">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={imageSrc(activeProject.images[0])} alt="" />
+            </span>
+            <button
+              type="button"
+              className="kloaq-thumb-close"
+              aria-label="Close preview"
+              onClick={() => setActiveCase(null)}
+            >
+              ×
+            </button>
+          </>
+        )}
       </div>
 
       <KloaqFooter />

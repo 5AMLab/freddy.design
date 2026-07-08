@@ -46,7 +46,12 @@ body {
   /* Inter Tight is the site-wide body/UI face (Kloaq design system).
      var(--font-body) is set by next/font on <html>. */
   font-family: var(--font-body), sans-serif;
-  overflow-x: hidden;
+  /* NO overflow-x here. Setting overflow-x:hidden on a box forces the other
+     axis to compute as `auto` (per CSS overflow spec), which turns <body>
+     into a scroll container — that silently breaks `position: sticky` for
+     every descendant (e.g. the case-study meta rail). The horizontal-overflow
+     guard lives on <html> above (overflow-x: hidden) instead, which clips
+     full-bleed breakouts without making body a scroller. */
 }
 
 /* ── MOTION VOCABULARY (see MOTION.md; driven by GSAP in MotionProvider) ──
@@ -119,14 +124,61 @@ html.has-custom-cursor * {
   transition: opacity 0.2s;
 }
 
-/* ── GRAIN OVERLAY ── */
+/* ── GRAIN OVERLAY ──
+   A fixed full-viewport semi-transparent layer at the top of the stack.
+   Safari (unlike Firefox/Chrome) re-rasterizes such an overlay against the
+   scrolling content every frame — worst where a large solid light section
+   (the .kloaq-light-section cream bands, starting at the logo wall) scrolls
+   under it, which is exactly where the reported scroll jank appeared and only
+   in Safari. Promoting the grain to its own compositor layer (translateZ +
+   will-change + contain) lets Safari composite it once and skip the per-frame
+   repaint; no visual change, and a no-op on engines that were already smooth. */
 .grain-overlay {
   position: fixed;
   inset: 0;
-  background-image: url("/noise.svg");
+  /* noise.png, NOT noise.svg — the SVG is an feTurbulence filter that WebKit
+     re-rasterizes during scroll compositing; it was THE confirmed source of
+     the Safari-only scroll jank (isolated via the ?dbg=nograin toggle:
+     Firefox rasterizes the filter once, Safari re-runs it). The PNG is the
+     same SVG baked to its 256px tile — identical pixels, zero runtime filter
+     cost. Keep any future grain asset as a raster, never a live SVG filter. */
+  background-image: url("/noise.png");
   pointer-events: none;
   opacity: 0.5;
   z-index: 1500;
+  transform: translateZ(0);
+  will-change: transform;
+  contain: strict;
+}
+
+/* ── SHARED-ELEMENT PAGE TRANSITION ──
+   The flying image clone (SharedElementOverlay): a fixed layer above the page
+   but below the grain/cursor, painting a project's image as it flies from the
+   hero cloud preview into the case-study hero. GSAP owns the clone's position/
+   size/radius per-frame (set inline), so this only styles the shell. Sits at
+   z-index 1400 — over page content and the (opacity:0) destination hero, under
+   the grain (1500) and cursor (1600) so those stay coherent through the flight. */
+.shared-el-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  pointer-events: none;
+}
+.shared-el-overlay img {
+  display: block;
+  object-fit: cover;
+  /* GSAP sets position:fixed + top/left/width/height/borderRadius each frame;
+     overflow hidden keeps the rounding crisp while the radius animates to 0. */
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+}
+/* Destination hero is held invisible while a flight is in progress so the real
+   image never pops in before the clone lands on it; SharedElementOverlay sets
+   its inline opacity back to 1 the moment the flight completes (or on its
+   failsafe). Only the hero frame is held — the rest of the page (title overlay,
+   intro, body) reveals normally underneath. */
+html.is-transitioning .work-hero-frame {
+  opacity: 0;
 }
 
 /* ── BRIEF FLOW ── */
@@ -161,6 +213,16 @@ html.has-custom-cursor * {
   transition: color 0.3s;
 }
 .nav-link:hover {
+  color: #FC5000;
+}
+
+/* Light-bg variant: on pages where a cream section sits directly under the
+   nav (e.g. /pricing), flip link ink to near-black at rest so it stays
+   legible. Scrolled state removes the attribute in JS, restoring cream. */
+.kloaq-nav-wrapper[data-nav-theme="light-bg"] .nav-link {
+  color: #0A0A0A;
+}
+.kloaq-nav-wrapper[data-nav-theme="light-bg"] .nav-link:hover {
   color: #FC5000;
 }
 
@@ -312,14 +374,11 @@ html.has-custom-cursor * {
   .legal-footer { padding: 32px 24px !important; flex-direction: column !important; align-items: flex-start !important; }
 }
 
-/* Work pages (/work index + /work/[slug] detail) */
-@media (max-width: 1024px) {
-  .work-index-grid { grid-template-columns: repeat(2, 1fr) !important; }
-}
+/* Work detail (/work/[slug]) — the index page's responsive rules live in
+   kloaq.css with the rest of its work-index-* classes. */
 @media (max-width: 768px) {
-  .work-index-grid-wrap { padding: 48px 24px !important; }
-  .work-index-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-  .work-detail-images { padding: 40px 24px !important; gap: 20px !important; }
+  /* .work-detail-images layout + its responsive collapse live in kloaq.css
+     with the rest of the case-study grid. */
   .work-detail-meta { gap: 28px !important; }
   .work-detail-next { padding: 48px 24px !important; }
 }

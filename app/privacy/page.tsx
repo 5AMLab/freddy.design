@@ -1,19 +1,19 @@
 import LegalLayout from "@/components/v2/LegalLayout";
 
 export const metadata = {
-  title: "Privacy Policy — freddy.design",
+  title: "Privacy Policy — freddi.design",
 };
 
 export default function PrivacyPage() {
   return (
     <LegalLayout
       title="Privacy Policy"
-      subtitle="How we collect, use, and protect your personal information when you use freddy.design."
+      subtitle="How we collect, use, and protect your personal information when you use freddi.design."
       lastUpdated="June 2025"
       sections={[
         {
           heading: "Who We Are",
-          body: "freddy.design is a freelance design studio based in Singapore, operated by Freddy Balian. We provide on-demand graphic design services including presentation decks, brand assets, campaign materials, and more. You can contact us at hello@freddy.design.",
+          body: "freddi.design is a freelance design studio based in Singapore, operated by Freddy Balian. We provide on-demand graphic design services including presentation decks, brand assets, campaign materials, and more. You can contact us at hello@freddi.design.",
         },
         {
           heading: "What Information We Collect",
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
             "Deletion — request that we delete your personal data.",
             "Objection — object to our processing of your data.",
             "Portability — receive your data in a structured, machine-readable format.",
-            "To exercise any of these rights, email hello@freddy.design.",
+            "To exercise any of these rights, email hello@freddi.design.",
           ],
         },
         {

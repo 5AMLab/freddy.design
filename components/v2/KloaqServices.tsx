@@ -17,29 +17,29 @@ const services = [
   {
     num: "01",
     title: "Brand & Visual Identity",
-    desc: "We craft identities that capture your essence and set the foundation for your audience experiences.",
-    tags: ["Branding", "Art Direction", "Visual Systems"],
+    desc: "The logo, the type, the colour, the rules that hold it together — a coherent identity and the brand guidelines that keep it that way long after handoff.",
+    tags: ["Branding", "Art Direction", "Guidelines"],
     img: "/portfolio/brand-guideline-01.jpg",
   },
   {
     num: "02",
     title: "Web Design & Development",
-    desc: "We design and build high-performing websites that feel refined, intuitive, and engineered for long-term growth.",
+    desc: "Sites that carry the brand across — designed and built in Webflow, quick to load, easy to update, nothing you can't run yourself once it's live.",
     tags: ["Web Design", "Webflow Dev", "UX/UI"],
     img: "/portfolio/deck-generic-01.jpg",
   },
   {
     num: "03",
-    title: "Creative Direction",
-    desc: "We guide the visual language of your brand through storytelling, imagery, and cohesive creative vision.",
-    tags: ["Storytelling", "Art Direction"],
+    title: "Campaign & Editorial",
+    desc: "Key visuals that carry a campaign, editorial spreads that earn the page turn, event identities that hold a room — the work a brand is actually seen through.",
+    tags: ["Key Visuals", "Editorial", "Event Identity"],
     img: "/portfolio/ooh-generic-01.jpg",
   },
   {
     num: "04",
-    title: "Print & Collateral",
-    desc: "Menus, brochures, event materials, packaging mockups and more — print-ready files delivered clean and accurate every time.",
-    tags: ["Print", "Packaging"],
+    title: "Decks & Collateral",
+    desc: "Presentation decks that don't fight the speaker, reports, brochures and event collateral — print- and pitch-ready files, delivered clean and on time.",
+    tags: ["Decks", "Print", "Reports"],
     img: "/portfolio/coffee-mockup-01.jpg",
   },
 ];
@@ -189,13 +189,43 @@ export default function KloaqServices() {
 
     const xTo = gsap.quickTo(el, "x", { duration: 0.55, ease: "power3.out" });
     const yTo = gsap.quickTo(el, "y", { duration: 0.55, ease: "power3.out" });
+
+    // Cache the section's offset instead of calling getBoundingClientRect on
+    // every mousemove — that read forces a synchronous layout each event
+    // (60–120×/s on a trackpad), and reflowing this .kloaq-light-section (it
+    // has a full-bleed ::before breakout + its own stacking context) is
+    // notably heavier in Safari, which is where the section's scroll/hover
+    // felt un-smooth. The rect only changes on scroll/resize, so refresh it
+    // there and read the cached value in the hot path.
+    let rectLeft = 0;
+    let rectTop = 0;
+    // Scroll/resize only mark the cache dirty (a boolean — no layout read in
+    // the scroll path); the next mousemove re-reads the rect once. Reading
+    // getBoundingClientRect inside the scroll handler itself would reintroduce
+    // a per-scroll-frame forced layout, the exact thrash this cache exists to
+    // avoid.
+    let dirty = true;
+    const markDirty = () => {
+      dirty = true;
+    };
     const onMove = (e: MouseEvent) => {
-      const r = section.getBoundingClientRect();
-      xTo(e.clientX - r.left - 135);
-      yTo(e.clientY - r.top - 177);
+      if (dirty) {
+        const r = section.getBoundingClientRect();
+        rectLeft = r.left;
+        rectTop = r.top;
+        dirty = false;
+      }
+      xTo(e.clientX - rectLeft - 135);
+      yTo(e.clientY - rectTop - 177);
     };
     section.addEventListener("mousemove", onMove, { passive: true });
-    return () => section.removeEventListener("mousemove", onMove);
+    window.addEventListener("scroll", markDirty, { passive: true });
+    window.addEventListener("resize", markDirty);
+    return () => {
+      section.removeEventListener("mousemove", onMove);
+      window.removeEventListener("scroll", markDirty);
+      window.removeEventListener("resize", markDirty);
+    };
     // Re-run once the preview mounts: it's gated behind isFinePointer, so on
     // the initial pass previewRef.current is still null and the listener would
     // never attach — leaving the preview stuck at its top-left default.
@@ -256,10 +286,8 @@ export default function KloaqServices() {
           ))}
         </div>
 
-        {/* No pricing section on /kloaq — link to the live homepage's
-            #pricing (matches KloaqNavbar's "Pricing" item, which also
-            resolves to /#pricing off-homepage). */}
-        <a href="/#pricing" className="kloaq-whatido-link">
+        {/* Pricing now lives on the standalone /pricing route (KloaqPricing). */}
+        <a href="/pricing" className="kloaq-whatido-link">
           See pricing &amp; plans →
         </a>
       </div>

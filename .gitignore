@@ -42,6 +42,9 @@ next-env.d.ts
 /Reference/
 /Canela_Collection/
 /public/portfolio/hero video/
+# raw 3D render source PNGs (36–88MB each, ~404MB total) — only the derived
+# /public/3drender/hero-object.webp is shipped
+/public/3d render/
 *.psd
 
 # scratch

@@ -3,6 +3,7 @@ import { Inter_Tight } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import MotionProvider from "@/components/motion/MotionProvider";
 import Preloader from "@/components/motion/Preloader";
+import SharedElementOverlay from "@/components/motion/SharedElementOverlay";
 import KloaqCursor from "@/components/v2/KloaqCursor";
 import "../styles/globals.css";
 
@@ -21,7 +22,7 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "freddy.design — Design on Demand, Singapore",
+  title: "freddi.design — Design on Demand, Singapore",
   description:
     "Skip the overhead of a full-time hire. Get a dedicated designer on speed dial — fast turnarounds, direct line, always on brand.",
 };
@@ -47,6 +48,7 @@ export default function RootLayout({
         <MotionProvider>
           {children}
           <Preloader />
+          <SharedElementOverlay />
           <KloaqCursor suppressOnKloaq />
           <div className="grain-overlay" aria-hidden />
         </MotionProvider>

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { projects } from "@/lib/work";
+import { projects, imageSrc } from "@/lib/work";
 import { getLenis, prefersReducedMotion } from "@/components/motion/MotionProvider";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -180,7 +180,7 @@ export default function KloaqCasesMobile() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={p.id}
-                src={p.images[0]}
+                src={imageSrc(p.images[0])}
                 alt=""
                 className="kloaq-mobile-hero-img"
                 loading={i === 0 ? "eager" : "lazy"}

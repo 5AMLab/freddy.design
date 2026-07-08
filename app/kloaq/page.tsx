@@ -33,7 +33,7 @@ export default function KloaqReview() {
         {/* Intro — mirrors the About section's grid (label column + 2-col
             content) so both sections align identically down the page */}
         <section className="kloaq-logos-intro-section">
-          <div className="kloaq-vlabel">Inside Freddy</div>
+          <div className="kloaq-vlabel">Inside Freddi</div>
           <div className="kloaq-logos-intro">
             <h2>Brands that trust the process</h2>
             <p>
@@ -54,7 +54,7 @@ export default function KloaqReview() {
             <div className="kloaq-about-grid">
               <div>
                 <p className="lead">
-                  We are freddy.design — your dedicated design partner.
+                  We are freddi.design — your dedicated design partner.
                 </p>
                 <p>
                   One designer on speed dial, not an agency layer cake. Identity,

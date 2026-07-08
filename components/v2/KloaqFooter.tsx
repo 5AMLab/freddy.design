@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
 import KloaqFooterWordmark from "@/components/v2/KloaqFooterWordmark";
 import BackToTop from "@/components/v2/BackToTop";
+import { CONTACT_EMAIL, RETAINER_SLOTS } from "@/lib/site";
 
 // Footer for the /kloaq review page. Speaks the same language as the rest
 // of the study — Boldonse wordmark, Inter Tight UI, Flameburst orange — and
@@ -12,6 +12,7 @@ import BackToTop from "@/components/v2/BackToTop";
 const PAGE_LINKS = [
   { label: "Home", href: "/" },
   { label: "Work", href: "/work" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Contact", href: "#cta" },
 ];
 
@@ -50,15 +51,6 @@ function FooterColumn({
 }
 
 export default function KloaqFooter() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubmitted(true);
-  };
-
   return (
     <footer className="kloaq-footer">
       <div className="kloaq-footer-inner">
@@ -95,31 +87,23 @@ export default function KloaqFooter() {
             </ul>
           </FooterColumn>
 
+          {/* Availability + direct contact — replaces the old newsletter
+              form, which only flipped local state and never sent the email
+              anywhere. Reuses the same live data as the hero/CTA scarcity
+              line so it can't drift out of date separately. */}
           <div className="kloaq-footer-newsletter">
-            <div className="kloaq-vlabel">Newsletter</div>
+            <div className="kloaq-vlabel">Availability</div>
             <p>
-              Stay updated on our latest insights, new projects, and the
-              next steps of our design journey together.
+              {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots
+              open for {RETAINER_SLOTS.month}. One designer, direct line —
+              usually replies same day, Singapore time.
             </p>
-            {submitted ? (
-              <div className="kloaq-footer-newsletter-success">
-                You&apos;re on the list.
-              </div>
-            ) : (
-              <form className="kloaq-footer-newsletter-form" onSubmit={handleSubmit}>
-                <input
-                  type="email"
-                  required
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  aria-label="Email address"
-                />
-                <button type="submit" aria-label="Subscribe">
-                  →
-                </button>
-              </form>
-            )}
+            <a
+              className="kloaq-footer-contact-link"
+              href={`mailto:${CONTACT_EMAIL}`}
+            >
+              {CONTACT_EMAIL} →
+            </a>
 
             <div className="kloaq-footer-bottom">
               <ul className="kloaq-footer-legal">

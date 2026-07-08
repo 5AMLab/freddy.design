@@ -43,12 +43,17 @@
 }
 /* Film grain for tactile depth (live-site noise asset). Plain low-opacity
    layer rather than mix-blend-mode, which forces a full-page blend
-   recompute on every scroll frame. */
+   recompute on every scroll frame.
+   noise.png, NOT noise.svg: the SVG is an feTurbulence filter, and WebKit
+   re-rasterizes SVG filter backgrounds during scroll compositing — the
+   confirmed source of the Safari-only scroll jank (Firefox rasterizes once).
+   The PNG is that same SVG baked to its 256px tile: identical pixels, zero
+   runtime filter cost. Keep any future grain as a raster asset. */
 .kloaq-root::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("/noise.svg");
+  background-image: url("/noise.png");
   opacity: 0.05;
   pointer-events: none;
   z-index: 1;
@@ -414,11 +419,13 @@
 /* ── LOGO WALL (reference: LogosV2 on the live site) ──
    Same brands, sized up 1.5x (28px → 42px). Unlike the live site's static
    centered row, this scrolls edge-to-edge as a continuous marquee — full
-   bleed, no section padding. Marks render flat white at rest and flip to
-   the page's orange accent on hover. brightness(0) + invert(1) flattens any
-   source SVG to solid white regardless of its native colors; the hover state
-   layers a sepia/hue-rotate chain tuned to land on #FC5000 from that white
-   base, so every logo recolors identically. */
+   bleed, no section padding. Marks sit as quiet dim-grey ghosts at rest and
+   light up to the page's orange accent on hover, so the wall reads as
+   intentional rather than a flat template row. brightness(0) + invert(1)
+   flattens any source SVG to solid white regardless of its native colors,
+   then a low opacity dims it to grey; the hover state layers a
+   sepia/hue-rotate chain tuned to land on #FC5000 from that white base, so
+   every logo recolors identically. */
 .kloaq-logos-section {
   padding: 56px 0 120px;
   overflow: hidden;
@@ -444,7 +451,10 @@
 }
 .kloaq-logo-item img {
   filter: brightness(0) invert(1);
-  opacity: 0.75;
+  /* Dim grey at rest so the wall recedes as a quiet trust signal — the
+     orange hover then reads as a real "lights up" moment rather than a
+     subtle brighten. */
+  opacity: 0.38;
   transition: filter 0.35s ease, opacity 0.35s ease;
 }
 .kloaq-logo-item:hover img {
@@ -627,6 +637,13 @@
   z-index: 5;
   opacity: 0;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  /* GSAP animates this element's transform continuously as it trails the
+     cursor. The large soft box-shadow is expensive to re-rasterize per frame
+     in Safari (Firefox caches it) — promoting it to its own compositor layer
+     lets the shadow rasterize once and just move as a layer, which is what
+     made the "What I Do" trailing preview feel un-smooth in Safari. */
+  will-change: transform;
+  transform: translateZ(0);
 }
 .kloaq-service-copy {
   grid-column: 6 / span 4;
@@ -899,6 +916,23 @@
   z-index: 5;
   transition: opacity 0.3s ease;
 }
+/* Touch has no hover to drive the preview swap or the tag reveal, and the
+   ≤820px responsive block below only covered phones — iPads and other
+   coarse-pointer devices in the 821–1360px range were left with a
+   permanently-blank preview slot and hidden tags. Capability-gated (not
+   width-gated) so any touch device gets the fallback: no preview box,
+   tags always visible. The marquee itself keeps auto-scrolling — items
+   aren't links, so nothing is interaction-gated behind hover. */
+@media (hover: none) and (pointer: coarse) {
+  .kloaq-industries-preview {
+    display: none;
+  }
+  .kloaq-industry-tag {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .kloaq-industries-section .kloaq-whatido-link {
   margin-top: 40px;
   /* Grid items stretch to fill their column by default regardless of the
@@ -949,24 +983,39 @@
 }
 
 /* ── FOOTER REVEAL ──
-   Curtain effect: <main> (everything through the CTA) is pinned with
-   position: sticky at top:0 while the footer, which follows it in normal
-   flow, keeps scrolling up underneath. Because <main> is sticky it stops
-   moving once its top hits the viewport top and just sits there — so the
-   footer sliding up from below reads as it rising up *over* the page,
-   uncovering itself, rather than the page simply scrolling away to reveal
-   the next section. The footer needs its own stacking context above <main>
-   (z-index + relative) so it visibly overlaps rather than tucking behind. */
+   Curtain effect, inverted: the footer is pinned UNDER the page (sticky
+   bottom:0, z-index below <main>) and <main> scrolls away above it, so the
+   footer reads as already lying beneath the page, uncovered as you reach
+   the end. The previous version pinned <main> sticky at top:0 instead,
+   which had two fatal side effects: ~footer-height of dead scroll at the
+   top of the page (main froze while the sticky slack was consumed), and
+   the footer arriving footer-height "early" relative to main's content —
+   fully burying the CTA section, which was never visible at any scroll
+   position. <main> keeps an opaque --ink background so the pinned footer
+   stays hidden behind it until main's bottom edge passes. Scoped to
+   .kloaq-root (home, /kloaq, pricing) — on work/legal pages the footer
+   sits in plain flow via the base rule below. */
+.kloaq-footer {
+  position: relative;
+  margin-top: -1px; /* seam guard against sub-pixel gaps */
+}
 .kloaq-root main {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 1;
   background: var(--ink);
 }
-.kloaq-footer {
-  position: relative;
-  z-index: 2;
-  margin-top: -1px; /* seam guard against sub-pixel gaps */
+.kloaq-root .kloaq-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 0;
+  /* The footer is sticky-pinned and geometrically in the viewport at every
+     scroll position (occluded only by main's opaque background). Its animated
+     background-clip:text wordmark repaints per frame; contain:paint fences
+     that paint to the footer's own box so it can't invalidate main's layer
+     while you scroll the rest of the page. Pair with the wordmark's own
+     sentinel-gated rAF (KloaqFooterWordmark) which stops the loop entirely
+     until the footer is actually being revealed. */
+  contain: paint;
 }
 
 /* ── FOOTER ──
@@ -1045,54 +1094,23 @@
   max-width: 340px;
   margin-bottom: 24px;
 }
-.kloaq-footer-newsletter-form {
-  display: flex;
-  align-items: center;
-  background: var(--cream);
-  border-radius: 8px;
-  max-width: 340px;
-  padding: 4px 4px 4px 16px;
-}
-.kloaq-footer-newsletter-form input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  padding: 12px 0;
+/* Direct-contact mailto — replaces the old newsletter form's slot in the
+   column, so it keeps the same 340px measure as the paragraph above it. */
+.kloaq-footer-contact-link {
+  display: inline-block;
   font-family: var(--body);
   font-size: 0.9rem;
-  color: var(--ink);
-}
-.kloaq-footer-newsletter-form input::placeholder {
-  color: rgba(5, 5, 5, 0.4);
-}
-.kloaq-footer-newsletter-form button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  background: var(--ink);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: var(--orange);
-  font-size: 1rem;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: background 0.2s;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(252, 80, 0, 0.35);
+  padding-bottom: 4px;
+  transition: border-color 0.25s ease, color 0.25s ease;
 }
-.kloaq-footer-newsletter-form button:hover {
-  background: var(--orange);
-  color: var(--ink);
-}
-.kloaq-footer-newsletter-success {
-  font-family: var(--body);
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--orange);
+.kloaq-footer-contact-link:hover {
+  color: var(--cream);
+  border-color: var(--cream);
 }
 
 .kloaq-footer-links {
@@ -1683,4 +1701,1542 @@
   }
   .kloaq-mobile-hero-hint,
   .kloaq-mobile-hero-ghost { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   V3 HERO (review slug /v3) — the cases cloud recomposed to own the viewport.
+   Scoped entirely under .v3-hero so the live homepage hero is untouched;
+   promoting v3 later means swapping the component import, and this block
+   simply travels with it. Structure: top strip (label + tagline) / cloud
+   (vertically centered, full width — the showreel column is gone) / bottom
+   strip (scroll cue + availability). Hidden ≤820px like the v2 hero — the
+   mobile scroll-carousel hero takes over there via the shared class.
+   ══════════════════════════════════════════════════════════════════════════ */
+.v3-hero {
+  /* svh, not vh: on mobile-ish tablet viewports vh includes the collapsed
+     browser chrome and overshoots, leaving the foot strip below the fold. */
+  min-height: 100svh;
+  grid-template-rows: auto 1fr auto;
+}
+.v3-hero .v3-hero-top {
+  /* Clears the fixed navbar. Flex (not the grid's own columns) so the
+     tagline can right-align against the label on one baseline. */
+  margin-top: 130px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+}
+.v3-hero .v3-hero-top .kloaq-vlabel {
+  margin: 0;
+}
+/* Interaction affordance, top-right where the tagline used to sit. Small,
+   uppercase, muted — a whisper, not a button. The dot ticks orange so the
+   eye clocks "there's something to do here". Fine pointers only (the whole
+   .v3-hero is desktop-only), so "Hover" is always accurate. */
+.v3-hero-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.v3-hero-cue::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+  animation: v3-cue-pulse 2s ease-in-out infinite;
+}
+@keyframes v3-cue-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.7); }
+}
+/* Cloud row: single full-width column (no reel). The 1fr track holds the
+   voice line stacked above the cloud, the pair centered as one block so the
+   type still sits mid-viewport. */
+.v3-hero .kloaq-cases-content {
+  grid-template-columns: 1fr;
+  grid-auto-rows: max-content;
+  align-content: center;
+}
+/* Orientation line — the site's display voice (Boldonse), same face as the
+   cloud and the About statement, so the page speaks once. Sized between body
+   copy and the cloud names: present, not competing. */
+.v3-hero-voice {
+  margin: 0 0 8px;
+  max-width: 22ch;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.05rem, 1.9vw, 1.7rem);
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.v3-hero-voice em {
+  font-style: normal;
+  color: var(--orange);
+}
+.v3-hero .kloaq-cloud {
+  grid-column: 1;
+  padding: 24px 0;
+  gap: 34px 32px;
+}
+/* With the right two columns reclaimed, the names can breathe up a size. */
+.v3-hero .kloaq-case-name {
+  font-size: clamp(2.4rem, 6vw, 6.2rem);
+}
+.v3-hero .kloaq-case-tag {
+  font-size: clamp(0.62rem, 0.95vw, 1rem);
+}
+/* Sibling dim: while one case is active (hover or touch-pin), the rest of
+   the cloud recedes so the pair of hovered word + trailing image owns the
+   field. :has-less browsers just keep the flat cloud — pure enhancement. */
+.v3-hero .kloaq-case {
+  transition: opacity 0.35s ease;
+}
+.v3-hero .kloaq-cloud:has(.kloaq-case.is-active) .kloaq-case:not(.is-active) {
+  opacity: 0.25;
+}
+/* Bottom strip: scroll cue left, availability right. */
+.v3-hero-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 30px;
+  font-family: var(--body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.v3-hero-scrollcue {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.v3-hero-scrollcue::after {
+  content: "↓";
+  color: var(--orange);
+  animation: v3-scroll-bob 1.7s ease-in-out infinite;
+}
+@keyframes v3-scroll-bob {
+  0%, 100% { transform: translateY(-2px); }
+  50% { transform: translateY(3px); }
+}
+.v3-hero-slots {
+  color: rgba(252, 80, 0, 0.8);
+}
+/* Thumb wipe: on fine pointers the trailing preview opens with a clip-path
+   sweep from the left edge instead of a plain fade. Fine pointers ONLY —
+   clip-path on .kloaq-thumb would also clip away the touch close button,
+   which deliberately hangs outside the frame (see .kloaq-thumb-close). */
+@media (hover: hover) and (pointer: fine) {
+  .v3-hero .kloaq-thumb {
+    clip-path: inset(6% 94% 6% 0 round 14px);
+    transition:
+      clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.25s ease;
+  }
+  .v3-hero .kloaq-thumb.is-visible {
+    clip-path: inset(0 0 0 0 round 14px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v3-hero-scrollcue::after {
+    animation: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PRICING PAGE (/pricing → KloaqPricing) — retainer plans restyled in the
+   Kloaq language. Header + grid sit on one cream light-section field (the
+   .kloaq-light-section modifier already re-points --cream/--muted/--hairline
+   to their ink-on-cream values and paints the full-bleed breakout, so the
+   tokens below resolve dark-on-cream automatically). Orange stays the accent.
+   ══════════════════════════════════════════════════════════════════════════ */
+.kloaq-pricing-section {
+  padding: 220px 80px 180px;
+}
+.kloaq-pricing-head {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 80px;
+  align-items: end;
+  margin-bottom: 120px;
+}
+/* Reuses .kloaq-whatido-heading (Boldonse, uppercase); just clears its
+   default bottom margin since the head grid owns spacing now. */
+.kloaq-pricing-heading {
+  margin: 0;
+}
+.kloaq-pricing-intro {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--cream);
+  max-width: 480px;
+}
+
+/* Three equal plan columns separated by hairlines (the old design's 1px-gap
+   grid, redrawn with borders so the featured card can lift without a seam
+   gap showing through). */
+.kloaq-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.kloaq-plan {
+  position: relative;
+  padding: 72px 56px;
+  border-left: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+}
+.kloaq-plan:first-child {
+  border-left: none;
+}
+/* Featured tier: a faint orange wash + a top accent line, matching the
+   old "Popular" card's lift without leaving the cream field. */
+.kloaq-plan.is-featured {
+  background: rgba(252, 80, 0, 0.06);
+  box-shadow: inset 0 2px 0 0 var(--orange);
+}
+.kloaq-plan-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: var(--body);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+  border: 1px solid rgba(252, 80, 0, 0.4);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.kloaq-plan-hours {
+  font-family: var(--body);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.kloaq-plan-name {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  margin-bottom: 40px;
+}
+.kloaq-plan-price {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 3.4vw, 3.2rem);
+  line-height: 1.15;
+  color: var(--cream);
+  margin-bottom: 10px;
+}
+.kloaq-plan-period {
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 48px;
+}
+.kloaq-plan-features {
+  list-style: none;
+  margin: 0 0 56px;
+  padding: 0;
+  /* Push the CTA to the card's base so all three buttons align regardless of
+     differing feature counts. */
+  flex: 1;
+}
+.kloaq-plan-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--body);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--cream);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.kloaq-plan-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--orange);
+  flex-shrink: 0;
+}
+/* Default CTA is outlined orange; the featured tier gets the solid orange
+   fill (the page's primary action), matching KloaqCTA's button. */
+.kloaq-plan-cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  background: transparent;
+  border: 1px solid rgba(252, 80, 0, 0.45);
+  padding: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.kloaq-plan-cta:hover {
+  background: rgba(252, 80, 0, 0.12);
+  border-color: var(--orange);
+}
+.kloaq-plan-cta.is-featured {
+  color: #050505;
+  background: var(--orange);
+  border-color: var(--orange);
+}
+.kloaq-plan-cta.is-featured:hover {
+  background: #d94600;
+  border-color: #d94600;
+}
+.kloaq-pricing-note {
+  margin: 56px 0 0;
+  max-width: 640px;
+  font-family: var(--body);
+  font-size: 0.82rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.kloaq-pricing-slots {
+  margin: 24px 0 0;
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(252, 80, 0, 0.8);
+}
+
+/* ── PRICING RESPONSIVE ── */
+@media (max-width: 980px) {
+  .kloaq-pricing-head {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: start;
+    margin-bottom: 80px;
+  }
+  /* Stack the three plans; each becomes a full-width card divided by top
+     borders instead of left borders. */
+  .kloaq-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+  .kloaq-plan {
+    border-left: none;
+    border-top: 1px solid var(--hairline);
+  }
+  .kloaq-plan:first-child {
+    border-top: none;
+  }
+}
+@media (max-width: 600px) {
+  .kloaq-pricing-section {
+    padding: 160px 24px 120px;
+  }
+  .kloaq-plan {
+    padding: 56px 32px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CASE-STUDY HERO (WorkDetail) — the lead image full-bleed at the very top
+   with the client + title overlaid. This is the shared-element flight's
+   landing target (SharedElementOverlay flies the cloud preview to a
+   full-viewport 16/9 band at top), so the image genuinely being the top
+   section keeps the transition honest — no drop-in after text. The fixed
+   navbar sits over it (transparent until scrolled); the back link and title
+   overlay ride on top of a bottom scrim for legibility.
+   ══════════════════════════════════════════════════════════════════════════ */
+.work-hero {
+  position: relative;
+}
+.work-hero-frame {
+  position: relative;
+  width: 100%;
+  /* 16/9 matches the flight's target band exactly, so the clone lands 1:1. */
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #141414;
+}
+.work-hero-media {
+  position: absolute;
+  inset: 0;
+}
+/* Bottom-anchored ink scrim so the overlaid title stays legible over any
+   image, fading to clear in the upper half so the photo still reads. */
+.work-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(5, 5, 5, 0.78) 0%,
+    rgba(5, 5, 5, 0.28) 38%,
+    rgba(5, 5, 5, 0) 68%
+  );
+  pointer-events: none;
+}
+.work-hero-back {
+  position: absolute;
+  top: 120px;
+  left: 80px;
+  z-index: 2;
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(249, 249, 249, 0.75);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.work-hero-back:hover {
+  color: var(--orange);
+}
+.work-hero-caption {
+  position: absolute;
+  left: 80px;
+  right: 80px;
+  bottom: 56px;
+  z-index: 2;
+}
+.work-hero-caption .kloaq-vlabel {
+  margin-bottom: 16px;
+}
+.work-hero-title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 4.4vw, 4rem);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.1;
+  color: #f9f9f9;
+  margin: 0;
+  max-width: 16ch;
+}
+
+/* Intro band under the hero — the lead paragraph, framing the work now that
+   the image leads. Matches the body's 80px inset. */
+.work-intro {
+  padding: 72px 80px;
+  border-bottom: 1px solid rgba(249, 249, 249, 0.06);
+}
+/* The lede: brightest + largest body text on the page, so it out-ranks the
+   narrative beats woven through the images below. The reading ladder is
+   title → this intro → beats (a step dimmer/smaller) → image captions. */
+.work-intro p {
+  font-family: var(--body);
+  font-size: 1.55rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: #f9f9f9;
+  max-width: 720px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .work-hero-frame {
+    /* Taller crop on narrow screens so the overlaid title has room. */
+    aspect-ratio: 3 / 4;
+  }
+  .work-hero-back {
+    top: 92px;
+    left: 24px;
+  }
+  .work-hero-caption {
+    left: 24px;
+    right: 24px;
+    bottom: 32px;
+  }
+  .work-intro {
+    padding: 48px 24px;
+  }
+  .work-intro p {
+    /* Stays above the beat body's mobile floor (1.15rem) so the lede reads
+       larger than the annotations on small screens too, not just by colour. */
+    font-size: 1.3rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CASE-STUDY BODY (WorkDetail) — a sticky meta rail beside an editorial image
+   rhythm. The body is a 2-col grid: a fixed rail column (Client/Discipline/
+   Year/Role, position:sticky so it rides the scroll) and the image column.
+   Row roles are chosen in WorkDetail's buildRows(); this lays each kind out.
+   Images share the homepage language: 14px radius, hairline border, #141414
+   backing, mask-scale reveal on entry. The full-bleed row breaks out past
+   BOTH the image column and the rail to reach the true viewport edges.
+   ══════════════════════════════════════════════════════════════════════════ */
+.work-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 64px;
+  padding: 80px 80px 80px 80px;
+  /* NOT align-items:start — the rail column must stretch to the full body
+     height so its sticky child has the whole image run to travel within.
+     With align-items:start the rail column would only be as tall as its own
+     content, and position:sticky can't ride past its containing block, so
+     the rail would unstick the moment the images grew taller than it. */
+  align-items: stretch;
+}
+.work-rail {
+  /* Column stretches to the row height (see .work-body align-items); the
+     inner .work-rail-sticky is what actually sticks within it. */
+  position: relative;
+}
+.work-rail-sticky {
+  position: sticky;
+  /* Clear the fixed navbar (≈88px) plus breathing room. */
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.work-detail-images {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  min-width: 0; /* let the grid column shrink rather than overflow wide images */
+}
+
+/* Shared frame: clips the mask-scale media to the rounded corners. */
+.work-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #141414;
+  border: 1px solid rgba(249, 249, 249, 0.06);
+}
+/* The element MotionProvider scales 1.12→1 on scroll-in. Sits inside the
+   clipped frame so the scale-up never shows past the corners. Reduced motion
+   leaves it at rest (MotionProvider skips the tween). */
+.work-frame-media {
+  position: absolute;
+  inset: 0;
+}
+/* Parallax variant (full-bleed only): over-tall + top-anchored so the media
+   can drift vertically (GSAP yPercent, see WorkImage) without exposing an
+   unpainted edge. Only the top:0 anchor differs from the mask-scale base;
+   height:120% gives the 20% of travel the tween uses. */
+.work-frame-media.is-parallax {
+  inset: auto 0 auto 0;
+  top: 0;
+  height: 120%;
+}
+
+/* Two-up: equal columns side by side. */
+.work-row-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+/* Full-bleed: breaks out of the image column AND the rail to span the whole
+   viewport. The image column's left edge sits at 80(pad)+240(rail)+64(gap)=
+   384px in from the viewport on desktop; pull left by that and right by the
+   80px page padding, so the band reaches both true edges. calc keeps it exact
+   if those tokens change. Square off the radius so it reads edge-to-edge. */
+.work-row-full {
+  margin-left: calc(-1 * (80px + 240px + 64px));
+  margin-right: -80px;
+}
+.work-row-full .work-frame {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
+
+/* Offset: contained but only ~78% of the image column, alternating which edge
+   it hugs so the scroll gains asymmetry. The empty space is intentional. */
+.work-row-offset {
+  display: flex;
+}
+.work-row-offset .work-frame {
+  width: 78%;
+}
+.work-row-offset-left {
+  justify-content: flex-start;
+}
+.work-row-offset-right {
+  justify-content: flex-end;
+}
+
+/* ── CASE-STUDY BODY RESPONSIVE ── */
+/* Tablet/lower-desktop: the 240px rail eats too much of the image column, so
+   drop the rail to a horizontal strip above the images (still not sticky —
+   there's not enough height headroom to be useful) and let images span full
+   width. */
+@media (max-width: 1100px) {
+  .work-body {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 56px 80px 80px;
+  }
+  .work-rail-sticky {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(249, 249, 249, 0.06);
+  }
+  /* Full-bleed now only has the 80px page padding to break out of on each
+     side (no rail column offset anymore). */
+  .work-row-full {
+    margin-left: -80px;
+    margin-right: -80px;
+  }
+}
+@media (max-width: 900px) {
+  .work-body {
+    padding: 48px 24px 64px;
+    gap: 32px;
+  }
+  .work-detail-images {
+    gap: 32px;
+  }
+  .work-rail-sticky {
+    gap: 28px;
+  }
+  .work-row-full {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
+  /* Collapse the rhythm: pairs stack, offsets go full-width. One readable
+     column, but the desktop rhythm above keeps the variety where there's
+     room for it. */
+  .work-row-pair {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .work-row-offset .work-frame {
+    width: 100%;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NARRATIVE BEATS (WorkDetail) — short process copy interleaved between the
+   image rows (problem → move → result). Sits as a normal flex child of
+   .work-detail-images, so the container's gap spaces it from the images
+   around it; extra top/bottom padding gives each beat room to read as a
+   pause in the scroll rather than a caption glued to a photo. Constrained to
+   a readable measure and left-aligned to the image column.
+   ══════════════════════════════════════════════════════════════════════════ */
+.work-beat {
+  max-width: 560px;
+  padding: 32px 0;
+}
+.work-beat-inner {
+  display: block;
+}
+/* Hidden at rest so there's no flash before BeatBlock's GSAP reveal runs;
+   the effect animates opacity/y in. Reduced motion (or no-JS) forces it
+   visible so the copy is never stuck hidden. */
+.work-beat-inner.is-anim {
+  opacity: 0;
+}
+.reduced-motion .work-beat-inner.is-anim {
+  opacity: 1 !important;
+}
+.work-beat-kicker {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 18px;
+}
+/* Kept at the larger, more legible size (restored per preference). Colour —
+   not size — carries the rank now: the beats sit a touch dimmer than full
+   cream while the intro lede stays full cream, so the eye still lands on the
+   intro first even though both are large. */
+.work-beat-body {
+  font-family: var(--body);
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(249, 249, 249, 0.82);
+  margin: 0;
+}
+@media (max-width: 900px) {
+  .work-beat {
+    padding: 16px 0;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NEXT-PROJECT BRIDGE (WorkDetail) — echoes the homepage hero cloud: the next
+   project's name huge in Boldonse, cream at rest, flipping to an orange
+   outline on hover, with its lead image revealing behind the type. Loops the
+   portfolio instead of dead-ending.
+   ══════════════════════════════════════════════════════════════════════════ */
+.work-next {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  border-top: 1px solid rgba(249, 249, 249, 0.06);
+  padding: clamp(80px, 12vw, 160px) 80px;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+/* Lead image sits behind the type, dim and slightly zoomed at rest, settling
+   in + brightening on hover — the reveal that makes the bridge feel alive. */
+.work-next-media {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.08);
+  transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+}
+.work-next-media::after {
+  /* Ink scrim so the type stays legible over any image. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(5, 5, 5, 0.82), rgba(5, 5, 5, 0.55));
+}
+.work-next:hover .work-next-media {
+  opacity: 0.5;
+  transform: scale(1);
+}
+.work-next-inner {
+  position: relative;
+  z-index: 1;
+}
+.work-next-label {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 20px;
+}
+/* Cloud-language title: cream at rest, transparent-with-orange-outline on
+   hover, exactly like .kloaq-case-name so the bridge rhymes with the hero. */
+.work-next-title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 6vw, 5.5rem);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.05;
+  color: var(--cream);
+  margin: 0 0 20px;
+  transition: color 0.3s ease, -webkit-text-stroke-color 0.3s ease;
+}
+.work-next:hover .work-next-title {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--orange);
+}
+.work-next-client {
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+@media (max-width: 900px) {
+  .work-next {
+    padding: 72px 24px;
+  }
+}
+/* Touch: no hover to trigger the reveal, so show the image dim at rest and
+   the outline title by default (matches the cloud's coarse-pointer fallback). */
+@media (hover: none) and (pointer: coarse) {
+  .work-next-media {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   WORK INDEX (/work, WorkIndex.tsx) — the hero cloud unpacked into an
+   ordered archive: full-width hairline rows (num / display-caps title /
+   client + bracketed tag), portfolio image revealed via the shared
+   .kloaq-thumb cursor-trailing preview instead of a static grid.
+   ══════════════════════════════════════════════════════════════════════════ */
+.work-index-page {
+  /* Self-contained tokens, same reasoning as .kloaq-footer: /work has no
+     .kloaq-root wrapper, so every kloaq.css rule this page reuses
+     (.kloaq-vlabel, .kloaq-thumb, …) must find its tokens here. */
+  --ink: #050505;
+  --cream: #f9f9f9;
+  --gold: #c9a96e;
+  --orange: #fc5000;
+  --muted: rgba(245, 240, 232, 0.55);
+  --hairline: rgba(245, 240, 232, 0.18);
+  --display: 'Boldonse', 'Anton', 'Sohne Breit', sans-serif;
+  --body: 'Inter Tight', 'Sohne', sans-serif;
+
+  min-height: 100vh;
+  color: var(--cream);
+  /* Same faint 200px grid as .kloaq-root so the archive sits on the
+     homepage's canvas rather than a flat field. */
+  background:
+    repeating-linear-gradient(to right, rgba(245, 240, 232, 0.02) 0 1px, transparent 1px 200px),
+    repeating-linear-gradient(to bottom, rgba(245, 240, 232, 0.02) 0 1px, transparent 1px 200px),
+    var(--ink);
+}
+
+.work-index-header {
+  padding: 160px 80px 72px;
+  border-bottom: 1px solid rgba(249, 249, 249, 0.06);
+}
+.work-index-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+}
+.work-index-count {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--orange);
+  white-space: nowrap;
+}
+/* Archive-scale headline — between the legal pages' h1 and the hero cloud's
+   display names, same Boldonse voice. */
+.work-index-header h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+  color: var(--cream);
+  margin: 0 0 24px;
+}
+.work-index-lead {
+  font-family: var(--body);
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: rgba(249, 249, 249, 0.7);
+  line-height: 1.7;
+  max-width: 600px;
+}
+
+.work-index-list {
+  padding: 32px 80px 120px;
+}
+/* Row = the whole link. The dim transition lives here; GSAP's .v2-fade
+   entrance targets the INNER wrapper so its leftover inline opacity never
+   fights the :has() sibling-dim below. */
+.work-index-row {
+  display: block;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(249, 249, 249, 0.08);
+  transition: opacity 0.35s ease, border-color 0.35s ease;
+  /* Same Android tap-delay guard as .kloaq-case. */
+  touch-action: manipulation;
+}
+.work-index-row:hover {
+  border-bottom-color: rgba(252, 80, 0, 0.35);
+}
+.work-index-row-inner {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) max-content;
+  grid-template-areas: "num title meta";
+  align-items: baseline;
+  column-gap: 40px;
+  padding: 34px 0;
+}
+.work-index-num {
+  grid-area: num;
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  color: var(--orange);
+}
+/* Cloud-language title: cream at rest, orange-outline ghost on row hover —
+   the same treatment as .kloaq-case-name / .work-next-title. */
+.work-index-title {
+  grid-area: title;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 3vw, 3rem);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.15;
+  color: var(--cream);
+  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease;
+}
+.work-index-row:hover .work-index-title {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--orange);
+}
+/* Only the hovered row's title punches above the trailing preview
+   (.kloaq-thumb, z-index: 10) — same stacking trick as the hero cloud. */
+.work-index-row.is-active .work-index-title {
+  position: relative;
+  z-index: 11;
+}
+.work-index-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+.work-index-client {
+  font-family: var(--body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(249, 249, 249, 0.55);
+}
+.work-index-tag {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(252, 80, 0, 0.7);
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+.work-index-row:hover .work-index-tag {
+  color: var(--orange);
+}
+/* Sibling dim while one row is hovered — the industries/cloud focus
+   language. Hover-capable pointers only, so a tapped row on touch doesn't
+   leave the rest of the list stuck dimmed. */
+@media (hover: hover) {
+  .work-index-list:has(.work-index-row:hover) .work-index-row:not(:hover) {
+    opacity: 0.35;
+  }
+}
+
+@media (max-width: 820px) {
+  .work-index-header {
+    padding: 120px 24px 48px;
+  }
+  .work-index-list {
+    padding: 16px 24px 96px;
+  }
+  /* Stack num / title / meta, matching the mobile cloud's type-led rows —
+     the portfolio image stays on demand (tap-to-reveal .kloaq-thumb),
+     not a permanent inline decoration. */
+  .work-index-row-inner {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "num"
+      "title"
+      "meta";
+    row-gap: 10px;
+    padding: 24px 0;
+  }
+  .work-index-title {
+    font-size: clamp(1.5rem, 6.4vw, 2.2rem);
+    line-height: 1.15;
+  }
+  .work-index-meta {
+    gap: 12px;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   V4 HERO (review slug /v4) — the "receipts" split-column hero.
+   The section carries BOTH .v3-hero and .v4-hero: v3's chrome (top strip,
+   foot, ≤820px hide, preloader gating) is inherited; this block builds the
+   split-column layout, center stage, and hover→center-preview interaction.
+   The homepage still mounts HeroCloudV3 — nothing here touches it.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* The whole hero is one three-band grid inside .v4-hero: top strip / body /
+   feet. The section already inherits grid-template-rows: auto 1fr auto and
+   100svh from .v3-hero, so the body band (.v4-grid) takes the 1fr middle.
+   overflow-x: clip contains the decorative bleeds (column scrims inset past
+   the padding, the object spilling its center track) so they can't widen the
+   document — without clipping vertical content or, unlike overflow:hidden,
+   creating a scroll container that would re-break sticky elsewhere. */
+.v4-hero {
+  overflow-x: clip;
+  position: relative;
+  /* Narrower inline padding than the 80px page default: the 1.2×-scaled title
+     columns need the extra width to fit symmetrically at ~1440 without the
+     object drifting off-centre. Strip, columns and feet all share this edge,
+     so they stay aligned. */
+  padding-left: clamp(24px, 3.6vw, 52px);
+  padding-right: clamp(24px, 3.6vw, 52px);
+  /* Override v3's `auto 1fr auto`, which centered the title band in a tall
+     middle row and stranded the top strip far above it. Four rows: a top
+     spacer and bottom spacer center the STRIP+GRID as one unit, so the
+     RECEIPTS label sits directly above the titles; the feet stay near the
+     bottom in the last auto row.
+     CAPPED spacers (minmax(auto, …vh) — NOT a bare 1fr): a bare 1fr grows
+     linearly with viewport height, so on a tall/short-wide desktop viewport
+     the two spacers ballooned to ~440px each and the composition lost its
+     proportions (huge dead gaps above the strip and between titles and feet).
+     The caps let the spacers shrink on a short viewport (content still fits)
+     but stop them growing past a sensible band on a tall one — the block stays
+     optically centred with the same rhythm regardless of height. The top cap
+     also clears the fixed navbar; the bottom stays a touch larger so the feet
+     read as a footer, not glued to the titles.
+     Structure: a CAPPED top spacer (minmax(px, vh)) clears the navbar and
+     stops the strip+titles sliding to dead-centre on a tall viewport; the
+     strip+grid are two adjacent auto rows glued as a unit (26px margin); a
+     single bottom 1fr soaks ALL leftover height and pins the feet to the
+     bottom as a footer. On a taller viewport the extra height opens ONE bounded
+     gap between titles and feet (not two ballooning spacers, and never an
+     overlap) — the content stays top-anchored with the same strip→titles
+     rhythm, and the feet stay a real footer at the bottom edge. */
+  grid-template-rows:
+    minmax(88px, 12vh) auto auto 1fr;
+}
+.v4-hero .v3-hero-top {
+  grid-row: 2;
+}
+.v4-hero .v4-grid {
+  grid-row: 3;
+}
+.v4-hero .v4-foot {
+  grid-row: 4;
+  align-self: end;
+}
+/* Full-bleed hero background: the orange-grain field (orange glow left third,
+   near-black right two-thirds, organic seam down the middle) that the split
+   columns sit on — orange behind the left type column, dark behind the right.
+   A ::before layer (not background on the section) so it sits cleanly under
+   ALL content at a known z-index and bleeds past the 80px section padding to
+   the viewport edges. */
+.v4-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("/bg/bg-orange-grain.jpg");
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+/* Everything above the bg. The section's own children are lifted so the
+   ::before can't cover them; the grid/top/foot get their own z-index too. */
+.v4-hero > * {
+  position: relative;
+  z-index: 1;
+}
+/* [ RECEIPTS ] left, retainer slots right — a label sitting just above the
+   project titles. Kept in the grid's top `auto` row (removing it from flow
+   broke the 3-row assignment), but pushed DOWN with a large margin-top so it
+   drops from under the navbar to just above the centered title band, and the
+   body row's 1fr slack absorbs the difference. margin-bottom is the final
+   breath to the titles. */
+.v4-hero .v3-hero-top {
+  margin-top: 0;
+  margin-bottom: clamp(14px, 1.8vw, 26px);
+  align-items: center;
+}
+/* RECEIPTS + retainer slots share one treatment: cream, Inter Tight Black,
+   generously kerned — reads as a matched pair of caps labels flanking the
+   hero, not a muted micro-tag. */
+.v4-hero .kloaq-vlabel,
+.v4-hero .v3-hero-slots {
+  color: var(--cream);
+  font-family: var(--body);
+  font-weight: 800; /* Inter Tight Black */
+  font-size: 0.82rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+/* Body: [ left column | center stage | right column ]. The center track is
+   sized to the object; the columns take the rest evenly. align-self stretch
+   fights .kloaq-cases-section's align-items:start so the band fills 1fr. */
+.v4-grid {
+  align-self: stretch;
+  display: grid;
+  /* Equal fixed side columns keep the object on the hero's true optical
+     centre (unequal content-sized columns let the wider left title steal
+     width and shoved the object off-centre). --v4-col-w is sized to hold the
+     widest 1.2×-scaled title ("ANNUAL REPORTS", ~660px at 1440) so both sides
+     match and nothing clips; the center lane is the leftover 1fr. At ~1440 the
+     two columns intrude the 80px section padding a little — .v4-hero's
+     overflow-x:clip absorbs it without a scrollbar; the responsive block below
+     shrinks the title + columns on narrower viewports. */
+  /* Equal fixed side columns keep the object on the hero's true optical centre
+     (unequal content-sized columns shoved it off). Sized to hold the widest
+     1.2×-scaled title ("ANNUAL REPORTS", ~660px). Two 660px columns + centre +
+     gaps don't fit inside the section's default 80px page margins at 1440, so
+     the v4 hero narrows its own inline padding (below) to buy the room while
+     keeping strip / columns / feet all aligned to one edge. */
+  --v4-col-w: clamp(340px, 46vw, 668px);
+  grid-template-columns: var(--v4-col-w) minmax(0, 1fr) var(--v4-col-w);
+  align-items: center;
+  /* Gap 0: with fixed columns and a minmax(0,1fr) centre, any non-zero gap
+     pushes the tracks past the content width and the overflow lands rightward
+     only, drifting the object off-centre. Zero gap lets columns + a symmetric
+     centre lane fill the content width exactly, so the object stays centred.
+     The object bleeds over the columns anyway, so it never touches the type. */
+  gap: 0;
+  min-height: 0;
+}
+
+/* Type columns. Each is a vertical stack of nouns; the scrim sits behind them
+   as a soft radial wash so the cream type always wins over the object's
+   highlights, regardless of what the render is doing behind it. */
+.v4-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(4px, 0.6vw, 12px);
+  z-index: 2; /* above the center stage, so type is never occluded */
+}
+.v4-col-left {
+  align-items: flex-start;
+  text-align: left;
+}
+.v4-col-right {
+  align-items: flex-end;
+  text-align: right;
+}
+/* A noun = one whole hoverable case link, one row. Faint hairline under each
+   at rest (the row structure the mock drew); orange ghost + underline flip on
+   hover, shared with the v3 cloud's hover language. */
+.v4-noun {
+  position: relative;
+  display: block;
+  padding: clamp(2px, 0.4vw, 8px) 0;
+  border-bottom: 1px solid rgba(249, 249, 249, 0.14);
+  text-decoration: none;
+  line-height: 0.98;
+  touch-action: manipulation;
+}
+.v4-col-right .v4-noun {
+  /* Client tag anchors to the inner edge on each side (see .v4-noun-client). */
+  text-align: right;
+}
+.v4-noun-label {
+  display: block;
+  font-family: var(--display);
+  font-weight: 400; /* Boldonse is single-weight, natively heavy */
+  /* Capped so the widest noun ("ANNUAL REPORTS", ~14ch) fits inside
+     --v4-col-w without overrunning into the object's gutter. Bump the cap and
+     you must bump --v4-col-w in lockstep or the tail clips. (Scaled 1.2× from
+     the original 1.8/3.8/4 — --v4-col-w bumped to match.) */
+  font-size: clamp(2.16rem, 4.56vw, 4.8rem);
+  letter-spacing: 0.004em;
+  text-transform: uppercase;
+  color: var(--cream);
+  white-space: nowrap; /* each noun is one unbroken hover target */
+  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease;
+}
+.v4-noun:hover .v4-noun-label {
+  color: transparent;
+  -webkit-text-stroke: 1.4px var(--orange);
+}
+/* Rest-state underline accent: a thin orange rule that the hover grows, so
+   the row hairline reads as "this is a link" without shouting. */
+.v4-noun::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  width: 0;
+  background: var(--orange);
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.v4-col-left .v4-noun::after {
+  left: 0;
+}
+.v4-col-right .v4-noun::after {
+  right: 0;
+}
+.v4-noun:hover::after,
+.v4-noun.is-active::after {
+  width: 100%;
+}
+/* Client attribution — quiet, hover-only, sits just inside the row edge so it
+   never pushes the noun's layout. */
+.v4-noun-client {
+  position: absolute;
+  bottom: 0.5em;
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: clamp(0.6rem, 0.72vw, 0.78rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+.v4-col-left .v4-noun-client {
+  right: 0;
+}
+.v4-col-right .v4-noun-client {
+  left: 0;
+}
+.v4-noun:hover .v4-noun-client,
+.v4-noun.is-active .v4-noun-client {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Sibling dim: while one noun is active, the other five recede so the hovered
+   noun + its center preview own the field. */
+.v4-hero:has(.v4-noun.is-active) .v4-noun:not(.is-active) {
+  opacity: 0.32;
+}
+.v4-noun {
+  transition: opacity 0.35s ease;
+}
+
+/* ── CENTER STAGE ──
+   Holds the 3D object at rest; the active preview cross-fades in over it in
+   the same box. Both layers are absolutely stacked so they occupy one frame.
+   The stage sits UNDER the type columns (z-index) — the object can bleed
+   toward the type but the scrim + stacking keep the words legible. */
+.v4-stage {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+  min-height: 0;
+  /* Purely decorative: the object + fading preview must never capture the
+     pointer. Toward the hero's centre the fading-in preview overlaps the long
+     noun labels; if it caught the cursor it would steal hover from the noun,
+     fire its mouseleave, fade back out — and the resulting mouseenter/leave
+     thrash flickered both the object and the sibling-dim on the titles. All
+     hover + click lives on the noun <a>, so the stage opts out entirely. */
+  pointer-events: none;
+}
+/* Both layers center on the stage's midpoint with the classic top/left 50%
+   + translate(-50%,-50%). The object is deliberately WIDER than the narrow
+   center track (it spills into the column gutters, per the mock), so it can't
+   be centered by containment — it's centered on the track's centre line and
+   allowed to overflow symmetrically both ways. The centering transform lives
+   HERE on the wrapper; GSAP's idle float + skew animate the inner <img>
+   (.v4-stage-object img) instead, so the two never fight over `transform`. */
+.v4-stage-object,
+.v4-stage-preview {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+/* The transparent render. Scaled a touch beyond the center track so it reads
+   as spilling into the negative space between the columns, like the mock. */
+.v4-stage-object {
+  width: clamp(360px, 42vw, 640px);
+  aspect-ratio: 1 / 1;
+  will-change: transform;
+}
+.v4-stage-object img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* A soft orange glow behind the chrome, echoing the render's own lighting
+     and tying it to the accent. filter drop-shadow follows the alpha shape,
+     not a box, so it haloes the object rather than a square. */
+  filter: drop-shadow(0 24px 80px rgba(252, 80, 0, 0.28));
+}
+/* Preview image — a contained case shot in the same center box, 4/3, rounded
+   to match the site's 14px image language. Hidden until a noun is active. */
+.v4-stage-preview {
+  width: clamp(300px, 34vw, 520px);
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  scale: 0.94;
+  transition: opacity 0.4s ease, scale 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.v4-stage-preview.is-visible {
+  opacity: 1;
+  scale: 1;
+}
+.v4-stage-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Object fades back as the preview comes forward — they share the stage, so
+   only one reads as present at a time (the intended trade). */
+.v4-hero:has(.v4-noun.is-active) .v4-stage-object {
+  opacity: 0.12;
+  transition: opacity 0.4s ease;
+}
+
+/* ── HOVER: IMAGE OVER DIMMED HERO ──
+   Matching the main site (HeroCloudV3) feel: on hover the case preview rises
+   ABOVE everything and the hero behind it darkens so the image is the clear
+   focal point. The main hero sits on a FLAT dark field, so an even dim is
+   trivial there. v4 sits on the orange/dark split bg, where a flat black
+   overlay dims the two sides UNEVENLY (crushes the dark right to near-black
+   while barely touching the bright orange left). So instead of overlaying
+   black, we DIM THE BRIGHT LAYERS THEMSELVES — the bg image and the object
+   fade toward the section's near-black base, which reads evenly dark on both
+   sides — and a light, uniform scrim finishes the recede. */
+
+/* Fade the orange-grain bg down to the near-black base while active, so the
+   left (orange) and right (dark) halves both settle to the same dark field. */
+.v4-hero::before {
+  transition: opacity 0.4s ease;
+}
+.v4-hero:has(.v4-noun.is-active)::before {
+  opacity: 0.18;
+}
+/* A light, even scrim over the (now uniformly dark) hero — just enough to
+   push the type back behind the preview without crushing either side. Sits
+   above bg / object / nouns (z-index 3, over columns' z-index 2), below the
+   lifted preview. */
+.v4-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: rgba(5, 5, 5, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.v4-hero:has(.v4-noun.is-active)::after {
+  opacity: 1;
+}
+/* Lift the whole stage above the scrim while active so its preview reads in
+   front of the darkened hero. The object inside is already faded, so only the
+   preview shows through — over the dim, in front of the type.
+   NOTE: `.v4-grid` is a z-index:1 stacking context (from `.v4-hero > *`), so a
+   z-index on `.v4-stage` alone stays trapped BELOW the hero-level scrim
+   (z-index 3) and the scrim veils the preview. The grid itself must clear the
+   scrim; then the stage's own z-index orders things inside the lifted grid. */
+.v4-hero:has(.v4-noun.is-active) .v4-grid {
+  z-index: 4;
+}
+.v4-hero:has(.v4-noun.is-active) .v4-stage {
+  z-index: 4;
+}
+/* The active noun lifts above the scrim too, so the word you're hovering stays
+   lit (orange ghost) over the dimmed field — echoes v3's hovered name punching
+   above its own preview. */
+.v4-hero:has(.v4-noun.is-active) .v4-noun.is-active {
+  position: relative;
+  z-index: 5;
+}
+
+/* ── FEET ──
+   The two About paragraphs as muted column feet, aligned under each type
+   column. Knocked down from body scale and dimmed so the nouns stay the
+   focus and these read as supporting proof. */
+.v4-foot {
+  padding-bottom: 34px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 5vw, 88px);
+}
+/* Based on the "Inside Freddi" body copy (.kloaq-logos-intro p): 1.35rem /
+   cream / ~50ch measure. Deviates deliberately on two axes — Medium weight
+   (500) for a touch more presence in the hero, and a tighter 1.4 line-height
+   so the foot block reads more compact than the airier 1.6 body sections. */
+.v4-foot-copy {
+  margin: 0;
+  /* ~50ch to match the Inside Freddi paragraph's measure (uncapped, ~637px /
+     3 lines here) — a tighter 42ch cap forced an extra wrap, so the block read
+     taller and the line spacing looked mismatched even though line-height is
+     identical. */
+  max-width: 50ch;
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 1.35rem;
+  line-height: 1.4;
+  color: var(--cream);
+}
+/* Right column's foot sits under the right type column (justify-self:end) but
+   its text is LEFT-aligned — a ragged-right block reads more naturally than a
+   right-aligned paragraph. */
+.v4-foot-copy:last-child {
+  justify-self: end;
+  text-align: left;
+}
+
+/* ── RESPONSIVE ──
+   .v4-hero (like .v3-hero) is display:none ≤820px via the shared
+   .kloaq-cases-section rule — the mobile carousel hero takes over. Between
+   ~820 and ~1100 the three-column split gets cramped; collapse the center
+   track narrower, shrink the type, and let the object shrink so the type keeps
+   room. The two side columns must stay EQUAL (both 1fr) so the left and right
+   titles clip symmetrically — an asymmetric center track drifted the object
+   off-centre and clipped the right column harder than the left. */
+/* 1000–1100: still the desktop split, just rebalanced — equal minmax(0,1fr)
+   sides + a narrower centre lane, type shrunk to fit. Below 1000 the stacked
+   block takes over (see next media query). */
+@media (max-width: 1100px) {
+  .v4-grid {
+    /* Equal sides + a fixed, narrow centre lane. minmax(0,1fr) — NOT a bare
+       1fr — so the left column's long nowrap label ("ANNUAL REPORTS") can't
+       inflate its track past its fair half (a bare 1fr resolves to
+       minmax(auto,1fr) and the label's min-content width stole ~40px from the
+       right column, clipping "PACKAGING" harder than the left). Now both sides
+       are truly equal and the type is sized to fit inside them. */
+    grid-template-columns: minmax(0, 1fr) clamp(150px, 20vw, 220px) minmax(0, 1fr);
+    gap: 0 clamp(8px, 1.5vw, 20px);
+  }
+  .v4-noun-label {
+    font-size: clamp(1.9rem, 3.3vw, 3.2rem);
+  }
+  .v4-stage-object {
+    width: clamp(200px, 22vw, 320px);
+  }
+  .v4-foot-copy {
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+  }
+}
+
+/* ── STACKED TABLET (≤1000px, above the 820 mobile cutoff) ──
+   The 3-column split only reads as balanced when the columns are wide and the
+   object is huge (desktop). Squeezed onto a tablet it fell apart: titles
+   pulled to the outer edges with a dead centre gap, while the full-width top
+   strip + feet overhung them. So below 1000 we ABANDON the split and stack one
+   intentional centred column: RECEIPTS strip → big centred object → all six
+   titles centred in one run (left column then right, source order) → feet.
+   The object sits as its own centred block (not the gutter backdrop); the
+   titles centre-align and can grow back to a comfortable size with the full
+   width to themselves. */
+@media (max-width: 1000px) {
+  /* One column; rows place the object first (it's the middle DOM child), then
+     the two title columns beneath it. Center everything. */
+  .v4-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    justify-items: center;
+    row-gap: clamp(20px, 4vw, 40px);
+    gap: 0;
+  }
+  /* Reorder: object (stage) on top, then left titles, then right titles. */
+  .v4-grid .v4-stage    { grid-row: 1; order: 0; }
+  .v4-grid .v4-col-left { grid-row: 2; order: 1; }
+  .v4-grid .v4-col-right{ grid-row: 3; order: 2; }
+
+  /* Both title columns now centre their nouns and read as one continuous
+     centred stack; the right column's right-align + inner-edge client tag are
+     dropped so the six rows share one axis. */
+  .v4-col,
+  .v4-col-left,
+  .v4-col-right {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+  .v4-col-right .v4-noun { text-align: center; }
+  /* Client tag centres under its noun instead of anchoring to a column edge. */
+  .v4-col-left .v4-noun-client,
+  .v4-col-right .v4-noun-client {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  /* Underline grows from the centre out on both sides. */
+  .v4-col-left .v4-noun::after,
+  .v4-col-right .v4-noun::after {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  /* Titles get the full width back, so grow them to a real hero size again. */
+  .v4-noun-label {
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+  }
+
+  /* Object is now a standalone centred block with its own box — give it real
+     height (it was an absolutely-centred overlay on a stretched stage). */
+  .v4-stage {
+    align-self: center;
+    width: min(60vw, 360px);
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+  }
+  .v4-stage-object {
+    /* Fill the stage block now that the stage has a real size. */
+    width: 100%;
+  }
+  /* The center preview stays absolutely centred on the stage (its rect is still
+     the shared-element flight source), just sized to the stage. */
+  .v4-stage-preview {
+    width: min(70vw, 420px);
+  }
+
+  /* Feet stack into one centred column under the titles. */
+  .v4-foot {
+    grid-template-columns: 1fr;
+    gap: clamp(16px, 3vw, 28px);
+    text-align: center;
+  }
+  .v4-foot-copy,
+  .v4-foot-copy:last-child {
+    justify-self: center;
+    text-align: center;
+    max-width: 46ch;
+    font-size: clamp(1rem, 2.4vw, 1.15rem);
+  }
+
+  /* Top strip: keep RECEIPTS / slots on one line but let it sit centred over
+     the stack rather than spanning full width past the titles. */
+  .v4-hero .v3-hero-top {
+    justify-content: center;
+    gap: clamp(16px, 4vw, 40px);
+  }
+}
+
+/* Narrowest tablet tier (just above the 820 cutoff): drop the object + type a
+   touch more so the stack stays comfortable on a ~830px portrait tablet. */
+@media (max-width: 900px) {
+  .v4-noun-label {
+    font-size: clamp(2rem, 6.4vw, 2.9rem);
+  }
+  .v4-stage {
+    width: min(56vw, 300px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v4-stage-preview {
+    transition: opacity 0.2s ease;
+    scale: 1;
+  }
 }

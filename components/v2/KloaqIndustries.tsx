@@ -151,9 +151,9 @@ export default function KloaqIndustries() {
         </div>
       </div>
 
-      {/* No portfolio grid on /kloaq (the case cloud up top is the hero) —
-          link to the live homepage's #portfolio section instead. */}
-      <a href="/#portfolio" className="kloaq-whatido-link">
+      {/* No portfolio grid on this page (the case cloud up top is the hero) —
+          the old /#portfolio anchor never existed, so link the work index. */}
+      <a href="/work" className="kloaq-whatido-link">
         See our work across these verticals →
       </a>
     </section>

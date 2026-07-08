@@ -151,7 +151,7 @@ export default function Preloader() {
               lineHeight: 1.3,
             }}
           >
-            freddy<span style={{ color: "#FC5000" }}>.</span>
+            freddi<span style={{ color: "#FC5000" }}>.</span>
           </span>
         </span>
       </span>

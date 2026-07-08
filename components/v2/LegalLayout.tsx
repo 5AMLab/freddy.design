@@ -98,8 +98,8 @@ export default function LegalLayout({ title, subtitle, lastUpdated, sections }: 
             lineHeight: 1.8, color: "rgba(249,249,249,0.4)",
           }}>
             Questions about this policy? Reach out at{" "}
-            <a href="mailto:hello@freddy.design" style={{ color: "#FC5000", textDecoration: "none" }}>
-              hello@freddy.design
+            <a href="mailto:hello@freddi.design" style={{ color: "#FC5000", textDecoration: "none" }}>
+              hello@freddi.design
             </a>
           </p>
         </div>

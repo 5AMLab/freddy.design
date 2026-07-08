@@ -51,15 +51,35 @@ export default function KloaqLogos() {
 
     lastScrollYRef.current = window.scrollY;
 
-    const setWidth = () => track.scrollWidth / 2;
+    // scrollWidth is a forced-layout read — doing it inside the scroll
+    // handler meant a synchronous reflow on EVERY scroll event, page-wide,
+    // interleaved with this handler's own transform write (classic
+    // read-after-write thrash; Safari pays for it far more than Blink/Gecko).
+    // Cache it and refresh only when the track actually resizes.
+    let half = track.scrollWidth / 2;
+    const ro = new ResizeObserver(() => {
+      half = track.scrollWidth / 2;
+    });
+    ro.observe(track);
+
+    // Only scrub the marquee while it's actually near the viewport — a
+    // transform write per scroll event on an off-screen track still dirties
+    // style/layout every frame for the whole rest of the page.
+    let onScreen = true;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        onScreen = entry.isIntersecting;
+      },
+      { rootMargin: "200px 0px" }
+    );
+    io.observe(track);
 
     const onScroll = () => {
       const y = window.scrollY;
       const delta = y - lastScrollYRef.current;
       lastScrollYRef.current = y;
 
-      const half = setWidth();
-      if (half <= 0) return;
+      if (!onScreen || half <= 0) return;
 
       let next = offsetRef.current + delta;
       // wrap so the seam between the two duplicated sets is never visible
@@ -70,7 +90,11 @@ export default function KloaqLogos() {
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      ro.disconnect();
+      io.disconnect();
+    };
   }, []);
 
   return (
