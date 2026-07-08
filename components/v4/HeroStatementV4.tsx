@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { projects, imageSrc, getProject, type Project } from "@/lib/work";
+import { imageSrc, getProject, type Project } from "@/lib/work";
 import { RETAINER_SLOTS } from "@/lib/site";
 import { PRELOADER_DONE_EVENT } from "@/components/motion/Preloader";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
