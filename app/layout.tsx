@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter_Tight } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import MotionProvider from "@/components/motion/MotionProvider";
@@ -27,6 +27,17 @@ export const metadata: Metadata = {
     "Skip the overhead of a full-time hire. Get a dedicated designer on speed dial — fast turnarounds, direct line, always on brand.",
 };
 
+// App Router owns the viewport meta via this export — NOT a hand-written
+// <meta name="viewport"> in <head>. Rendering it manually produced TWO
+// viewport metas in the built HTML (App Router injects its own), which some
+// mobile browsers resolve by falling back to a ~980px desktop layout viewport
+// — making a phone render the desktop hero squeezed. One canonical tag here
+// fixes that. Do NOT re-add a manual <meta name="viewport">.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,7 +46,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={interTight.variable}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
