@@ -1268,6 +1268,20 @@
   }
   .kloaq-footer-watermark { font-size: 20vw; margin-top: 32px; padding: 8px 24px 72px; }
   .back-to-top { right: 24px; bottom: 72px; }
+
+  /* Disable the sticky footer curtain here. Once the link groups stack into a
+     single column (above) the footer becomes TALLER than a phone viewport
+     (~1150px vs ~840px). A `position: sticky; bottom: 0` element that's taller
+     than the viewport pins its BOTTOM to bottom:0 and pushes its TOP above the
+     viewport permanently out of reach — so the top of the footer (Recent Works,
+     the first contact rows) was clipped and unreachable. Reverting to normal
+     flow lets the whole footer scroll into view. The curtain is a large-screen
+     flourish; on phones a normally-scrolling footer is the correct behaviour.
+     `contain` is also cleared so nothing paint-clips the now-static footer. */
+  .kloaq-root .kloaq-footer {
+    position: static;
+    contain: none;
+  }
 }
 
 /* ── RESPONSIVE ── */
