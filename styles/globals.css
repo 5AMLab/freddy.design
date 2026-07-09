@@ -81,7 +81,15 @@
 
 html {
   scroll-behavior: smooth;
+  /* overflow-x:hidden alone is DEFEATED by Lenis: `html.lenis { height: auto }`
+     (below) stops <html> from acting as the overflow container, so a wide
+     descendant (marquee tracks, full-bleed breakouts, the CTA watermark) still
+     inflates the document width and the page scrolls sideways on mobile.
+     `clip` clips regardless and — unlike `hidden` — never creates a scroll
+     container, so it can't be neutralized the same way. Both are listed:
+     `hidden` for any engine without `clip`, `clip` (later, wins) for the rest. */
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* ── LENIS SMOOTH SCROLL ── */
@@ -105,12 +113,14 @@ body {
   /* Inter Tight is the site-wide body/UI face (Kloaq design system).
      var(--font-body) is set by next/font on <html>. */
   font-family: var(--font-body), sans-serif;
-  /* NO overflow-x here. Setting overflow-x:hidden on a box forces the other
-     axis to compute as `auto` (per CSS overflow spec), which turns <body>
-     into a scroll container — that silently breaks `position: sticky` for
-     every descendant (e.g. the case-study meta rail). The horizontal-overflow
-     guard lives on <html> above (overflow-x: hidden) instead, which clips
-     full-bleed breakouts without making body a scroller. */
+  /* Horizontal-overflow guard, second line of defense (the <html> guard is
+     the first, but Lenis can neutralize it — see above). Use `clip`, NOT
+     `hidden`: `hidden` would force overflow-y to compute as `auto` per the CSS
+     overflow spec, turning <body> into a scroll container and silently breaking
+     `position: sticky` site-wide (the case-study meta rail, the footer
+     curtain). `overflow-x: clip` clips the horizontal axis WITHOUT creating a
+     scroll container, so sticky keeps working. Do NOT change this to `hidden`. */
+  overflow-x: clip;
 }
 
 /* ── MOTION VOCABULARY (see MOTION.md; driven by GSAP in MotionProvider) ──
