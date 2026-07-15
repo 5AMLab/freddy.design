@@ -8,14 +8,13 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { openBrief } from "@/components/v2/BriefFlow";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-// Homepage nav (also used on /kloaq). Links map to the sections the Kloaq
-// composition actually renders: #services (KloaqServices) and #industries
-// (KloaqIndustries), plus Portfolio → /work and Pricing → the standalone
-// /pricing route.
+// Homepage nav (also used on /kloaq). Services and Industries live as
+// sections on the homepage itself (KloaqServices / KloaqIndustries) but are
+// intentionally left out of the menu. About → /about, Portfolio → /work,
+// Pricing → the standalone /pricing route.
 const MENU_ITEMS: { label: string; href?: string; anchor?: string }[] = [
+  { label: "About", href: "/about" },
   { label: "Portfolio", href: "/work" },
-  { label: "Services", anchor: "#services" },
-  { label: "Industries", anchor: "#industries" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -32,7 +31,6 @@ export default function KloaqNavbar() {
   // Off-homepage (e.g. /kloaq), prefix with "/" so they navigate home then jump.
   const resolveHref = (item: { href?: string; anchor?: string }) =>
     item.href ?? (onHome ? item.anchor! : `/${item.anchor}`);
-  const ctaHref = onHome ? "#cta" : "/#cta";
 
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -147,8 +145,13 @@ export default function KloaqNavbar() {
     </div>
     <nav
       style={{
-        display: "flex",
-        justifyContent: "space-between",
+        // Three zones — [logo] [links] [CTA] — not a single space-between row:
+        // the 1fr side tracks are equal, so the middle track (and the links in
+        // it) sits centered on the VIEWPORT regardless of how wide the logo or
+        // the CTA are. With space-between, the links' position drifted with the
+        // width of whatever sat beside them.
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
         alignItems: "center",
         background: scrolled ? "rgba(5,5,5,0.96)" : "transparent",
         backdropFilter: scrolled ? "blur(12px)" : "none",
@@ -157,7 +160,16 @@ export default function KloaqNavbar() {
         left: 0,
         right: 0,
         zIndex: 100,
-        borderBottom: scrolled ? "1px solid rgba(252,80,0,0.20)" : "none",
+        // The bar spans the full viewport width and is ~114–144px tall. While
+        // transparent (unscrolled) it is invisible, yet as a z-index:100 element
+        // with default pointer-events it silently swallowed every click landing
+        // in its empty area — which is exactly where the case-study "← All work"
+        // link sits (top:120px). Hit-testing now follows visibility: transparent
+        // bar lets clicks through to the page beneath; once scrolled the bar is
+        // an opaque blurred surface, so it blocks clicks like a solid bar should.
+        // Its own controls opt back in via pointerEvents:"auto" (see below).
+        pointerEvents: scrolled ? "auto" : "none",
+        borderBottom: scrolled ? "1px solid rgba(var(--orange-rgb), 0.20)" : "none",
         transform: hidden && !open ? "translateY(-100%)" : "translateY(0)",
         transition:
           "background 0.4s, border-color 0.4s, backdrop-filter 0.4s, transform 0.5s cubic-bezier(0.16,1,0.3,1)",
@@ -172,25 +184,35 @@ export default function KloaqNavbar() {
           fontFamily: "'Boldonse', 'Anton', 'Sohne Breit', sans-serif",
           fontSize: "1.5rem",
           fontWeight: 400,
-          color: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8",
+          color: onLightBg && !scrolled ? "var(--black)" : "var(--off-white)",
           textDecoration: "none",
           letterSpacing: "0.02em",
           textTransform: "none",
+          // Re-enable hit-testing: the bar sets pointer-events:none.
+          pointerEvents: "auto",
         }}
       >
-        freddi<span style={{ color: "#FC5000" }}>.</span>
+        freddi<span style={{ color: "var(--orange)" }}>.</span>
       </a>
 
+      {/* Zone 2 — the centered link group. The CTA is NOT in here anymore: it
+          lives in its own right-hand zone, so these three links center on the
+          viewport rather than on "links + button". */}
       <ul
         className="kloaq-nav-links"
         style={{
           gap: "40px",
           listStyle: "none",
           alignItems: "center",
+          justifyContent: "center",
         }}
       >
+        {/* pointer-events is re-enabled per <li>, NOT on the <ul>: the list is a
+            wide flex row whose 40px gaps are dead space. Making the <ul>
+            clickable would just recreate a smaller invisible click-eater over
+            whatever sits beneath it. */}
         {MENU_ITEMS.map((item) => (
-          <li key={item.label}>
+          <li key={item.label} style={{ pointerEvents: "auto" }}>
             <a
               href={resolveHref(item)}
               onClick={() => setOpen(false)}
@@ -208,62 +230,57 @@ export default function KloaqNavbar() {
             </a>
           </li>
         ))}
-        <li>
-          <Magnetic strength={8}>
-          <a
-            href={ctaHref}
-            onClick={() => setOpen(false)}
-            style={{
-              fontFamily: "'Inter Tight', 'Sohne', sans-serif",
-              fontWeight: 700,
-              fontSize: "1rem",
-              color: "#FC5000",
-              textDecoration: "none",
-              letterSpacing: "0.01em",
-              textTransform: "none",
-              background: "transparent",
-              border: "1px solid #FC5000",
-              padding: "12px 32px",
-              borderRadius: "10px",
-              transition: "background 0.2s, color 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.background = "#FC5000";
-              el.style.color = "#050505";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.background = "transparent";
-              el.style.color = "#FC5000";
-            }}
-          >
-            Let&apos;s Talk
-          </a>
-          </Magnetic>
-        </li>
       </ul>
+
+      {/* Zone 3 — the CTA, pinned right. Hidden ≤768px (the hamburger takes
+          over), where it would otherwise sit on top of the burger. */}
+      <div
+        className="kloaq-nav-cta"
+        style={{ justifySelf: "end", pointerEvents: "auto" }}
+      >
+        <Magnetic strength={8}>
+        {/* Opens the brief flow directly — was an <a href="#cta"> that scrolled
+            to the Manifesto section, where the ONLY thing to do was click
+            another button ("Let's work together") to reach this same
+            openBrief() call. Two clicks to do what this button's whole job is.
+            Now it does what the mobile menu's identical CTA already does.
+            .btn.btn-accent — the site's one button shape (kloaq.css), not a
+            one-off inline style; this used to be a third divergent shape
+            (700 weight, 10px radius, 12/32 padding) with no reason to differ
+            from "View All Works" or the Manifesto CTA. */}
+        <button
+          type="button"
+          className="btn btn-accent"
+          onClick={() => {
+            setOpen(false);
+            openBrief();
+          }}
+        >
+          Let&apos;s Talk
+        </button>
+        </Magnetic>
+      </div>
 
       <div
         className="kloaq-nav-hamburger"
         onClick={() => setOpen(!open)}
         aria-label={open ? "Close menu" : "Open menu"}
-        style={{ display: "none", flexDirection: "column", gap: "6px", cursor: "pointer", position: "relative", width: "22px", height: "16px" }}
+        style={{ display: "none", flexDirection: "column", gap: "6px", cursor: "pointer", position: "relative", width: "22px", height: "16px", pointerEvents: "auto", justifySelf: "end", gridColumn: 3, gridRow: 1 }}
       >
         <span style={{
-          width: "22px", height: "1px", background: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8", display: "block",
+          width: "22px", height: "1px", background: onLightBg && !scrolled ? "var(--black)" : "var(--off-white)", display: "block",
           position: "absolute", top: open ? "7px" : "0px",
           transform: open ? "rotate(45deg)" : "rotate(0deg)",
           transition: "top 0.25s, transform 0.25s",
         }} />
         <span style={{
-          width: "14px", height: "1px", background: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8", display: "block",
+          width: "14px", height: "1px", background: onLightBg && !scrolled ? "var(--black)" : "var(--off-white)", display: "block",
           position: "absolute", top: "7px",
           opacity: open ? 0 : 1,
           transition: "opacity 0.2s",
         }} />
         <span style={{
-          width: "22px", height: "1px", background: onLightBg && !scrolled ? "#0A0A0A" : "#F5F0E8", display: "block",
+          width: "22px", height: "1px", background: onLightBg && !scrolled ? "var(--black)" : "var(--off-white)", display: "block",
           position: "absolute", top: open ? "7px" : "14px",
           transform: open ? "rotate(-45deg)" : "rotate(0deg)",
           transition: "top 0.25s, transform 0.25s",

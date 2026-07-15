@@ -60,10 +60,10 @@ export default function HeroV4Review() {
                   We are freddi.design — your dedicated design partner.
                 </p>
                 <p>
-                  You brief one person and that person stays with it — no account
-                  layer, no handoffs between teams, no telephone game between the
-                  idea and the file that ships. The thinking and the making are
-                  the same hand, so nothing gets lost in translation.
+                  You brief one small team and that team stays with it — no account
+                  layer, no handoffs between departments, no telephone game between
+                  the idea and the file that ships. The thinking and the making are
+                  the same two hands, so nothing gets lost in translation.
                 </p>
               </div>
               <div>

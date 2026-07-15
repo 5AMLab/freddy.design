@@ -13,7 +13,7 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div style={{ background: "#050505", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ background: "var(--black)", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <KloaqNavbar />
 
       <main
@@ -38,7 +38,7 @@ export default function NotFound() {
             fontFamily: "var(--font-display), sans-serif",
             fontSize: "clamp(12rem, 26vw, 30rem)",
             fontWeight: 400,
-            color: "rgba(252,80,0,0.06)",
+            color: "rgba(var(--orange-rgb), 0.06)",
             lineHeight: 1,
             pointerEvents: "none",
             userSelect: "none",
@@ -68,7 +68,7 @@ export default function NotFound() {
               fontWeight: 500,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#FC5000",
+              color: "var(--orange)",
               marginBottom: "28px",
             }}
           >
@@ -82,14 +82,14 @@ export default function NotFound() {
               fontWeight: 400,
               lineHeight: 1.2,
               textTransform: "uppercase",
-              color: "#f9f9f9",
+              color: "var(--off-white)",
               letterSpacing: "0.005em",
               marginBottom: "24px",
             }}
           >
             Looks like this page
             <br />
-            <span style={{ color: "#FC5000" }}>got lost in the brief.</span>
+            <span style={{ color: "var(--orange)" }}>got lost in the brief.</span>
           </h1>
 
           <p
@@ -117,8 +117,8 @@ export default function NotFound() {
                 fontSize: "0.8rem",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "#f9f9f9",
-                background: "#FC5000",
+                color: "var(--off-white)",
+                background: "var(--orange)",
                 padding: "18px 44px",
                 borderRadius: "8px",
                 textDecoration: "none",
@@ -148,8 +148,8 @@ export default function NotFound() {
                 fontSize: "0.8rem",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "#FC5000",
-                border: "1px solid rgba(252,80,0,0.45)",
+                color: "var(--orange)",
+                border: "1px solid rgba(var(--orange-rgb), 0.45)",
                 padding: "18px 44px",
                 borderRadius: "8px",
                 textDecoration: "none",
@@ -157,13 +157,13 @@ export default function NotFound() {
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement;
-                el.style.background = "#FC5000";
-                el.style.color = "#050505";
+                el.style.background = "var(--orange)";
+                el.style.color = "var(--black)";
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement;
                 el.style.background = "transparent";
-                el.style.color = "#FC5000";
+                el.style.color = "var(--orange)";
               }}
             >
               Get in Touch
@@ -179,7 +179,7 @@ export default function NotFound() {
             left: "72px",
             right: "72px",
             height: "1px",
-            background: "rgba(252,80,0,0.12)",
+            background: "rgba(var(--orange-rgb), 0.12)",
           }}
           className="not-found-rule"
         />

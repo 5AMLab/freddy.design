@@ -57,8 +57,8 @@ export default function KloaqReview() {
                   We are freddi.design — your dedicated design partner.
                 </p>
                 <p>
-                  One designer on speed dial, not an agency layer cake. Identity,
-                  editorial, packaging and decks all stem from a single hand, so
+                  One small team on speed dial, not an agency layer cake. Identity,
+                  editorial, packaging and decks all speak in one voice, so
                   the work stays coherent and the line stays direct — concept to
                   delivery, no drama.
                 </p>

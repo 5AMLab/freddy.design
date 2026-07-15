@@ -67,7 +67,7 @@ export default function KloaqCursor({ suppressOnKloaq = false }: { suppressOnKlo
 
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest(".kloaq-case, .kloaq-service-row, .kloaq-industry-item")) setMode("pulse");
+      if (t.closest(".kloaq-case, .kloaq-service-row, .kloaq-industry-item, .v4-noun")) setMode("pulse");
       else if (t.closest('[data-cursor="view"]')) setMode("view");
       else if (t.closest("a, button, [role='button'], [data-cursor='link']")) setMode("link");
       else setMode("default");

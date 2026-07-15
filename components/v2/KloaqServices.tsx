@@ -265,13 +265,13 @@ export default function KloaqServices() {
       </div>
       )}
 
-      <div className="kloaq-vlabel">What I Do</div>
+      <div className="kloaq-vlabel">What We Do</div>
 
       <div>
         <h2 className="kloaq-whatido-heading">
           Design for every brief,
           <br />
-          every industry.
+          <span className="kloaq-heading-accent">every industry.</span>
         </h2>
 
         <div className="kloaq-whatido-list">

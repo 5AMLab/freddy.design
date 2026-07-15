@@ -97,7 +97,7 @@ export default function Preloader() {
         position: "fixed",
         inset: 0,
         zIndex: 2000,
-        background: "#050505",
+        background: "var(--black)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -128,7 +128,7 @@ export default function Preloader() {
               fontFamily: "var(--font-display), sans-serif",
               fontSize: "clamp(1.4rem, 4vw, 2.8rem)",
               fontWeight: 400,
-              color: "#f9f9f9",
+              color: "var(--off-white)",
               letterSpacing: "0.01em",
               lineHeight: 1.3,
               whiteSpace: "nowrap",
@@ -146,12 +146,12 @@ export default function Preloader() {
               fontFamily: "var(--font-display), sans-serif",
               fontSize: "clamp(1.4rem, 2.6vw, 2.1rem)",
               fontWeight: 400,
-              color: "#f9f9f9",
+              color: "var(--off-white)",
               letterSpacing: "0.02em",
               lineHeight: 1.3,
             }}
           >
-            freddi<span style={{ color: "#FC5000" }}>.</span>
+            freddi<span style={{ color: "var(--orange)" }}>.</span>
           </span>
         </span>
       </span>

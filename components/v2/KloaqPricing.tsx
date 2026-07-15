@@ -78,7 +78,7 @@ export default function KloaqPricing() {
               zero overhead.
             </h1>
             <p className="kloaq-pricing-intro">
-              One designer on speed dial for a flat monthly rate. Pick the hours
+              One small team on speed dial for a flat monthly rate. Pick the hours
               you need — everything else stays the same: direct line, shared
               asset folder, every service type included.
             </p>

@@ -16,7 +16,7 @@ interface LegalLayoutProps {
 
 export default function LegalLayout({ title, subtitle, lastUpdated, sections }: LegalLayoutProps) {
   return (
-    <div style={{ background: "#050505", minHeight: "100vh" }}>
+    <div style={{ background: "var(--black)", minHeight: "100vh" }}>
       {/* Nav — same header as the homepage for site-wide consistency */}
       <KloaqNavbar />
 
@@ -25,14 +25,14 @@ export default function LegalLayout({ title, subtitle, lastUpdated, sections }: 
         className="legal-header">
         <div style={{
           fontFamily: "var(--font-body), sans-serif", fontSize: "0.65rem", fontWeight: 600,
-          letterSpacing: "0.22em", textTransform: "uppercase", color: "#FC5000", marginBottom: "20px",
+          letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--orange)", marginBottom: "20px",
         }}>
           Legal
         </div>
         <h1 style={{
           fontFamily: "var(--font-display), sans-serif", fontSize: "clamp(2.2rem, 4vw, 3.6rem)",
           fontWeight: 400, lineHeight: 1.15, textTransform: "uppercase",
-          color: "#f9f9f9", marginBottom: "20px",
+          color: "var(--off-white)", marginBottom: "20px",
         }}>
           {title}
         </h1>
@@ -58,7 +58,7 @@ export default function LegalLayout({ title, subtitle, lastUpdated, sections }: 
           <div key={i} style={{ marginBottom: "56px" }}>
             <h2 style={{
               fontFamily: "var(--font-display), sans-serif", fontSize: "clamp(1.1rem, 2vw, 1.5rem)",
-              fontWeight: 400, textTransform: "uppercase", color: "#f9f9f9",
+              fontWeight: 400, textTransform: "uppercase", color: "var(--off-white)",
               marginBottom: "16px", lineHeight: 1.3,
             }}>
               {section.heading}
@@ -72,7 +72,7 @@ export default function LegalLayout({ title, subtitle, lastUpdated, sections }: 
                     paddingLeft: "20px", position: "relative", marginBottom: "8px",
                   }}>
                     <span style={{
-                      position: "absolute", left: 0, color: "#FC5000", fontSize: "0.7rem", top: "6px",
+                      position: "absolute", left: 0, color: "var(--orange)", fontSize: "0.7rem", top: "6px",
                     }}>—</span>
                     {item}
                   </li>
@@ -98,7 +98,7 @@ export default function LegalLayout({ title, subtitle, lastUpdated, sections }: 
             lineHeight: 1.8, color: "rgba(249,249,249,0.4)",
           }}>
             Questions about this policy? Reach out at{" "}
-            <a href="mailto:hello@freddi.design" style={{ color: "#FC5000", textDecoration: "none" }}>
+            <a href="mailto:hello@freddi.design" style={{ color: "var(--orange)", textDecoration: "none" }}>
               hello@freddi.design
             </a>
           </p>

@@ -24,7 +24,7 @@ const interTight = Inter_Tight({
 export const metadata: Metadata = {
   title: "freddi.design — Design on Demand, Singapore",
   description:
-    "Skip the overhead of a full-time hire. Get a dedicated designer on speed dial — fast turnarounds, direct line, always on brand.",
+    "Skip the overhead of a full-time hire. Get a dedicated design team on speed dial — fast turnarounds, direct line, always on brand.",
 };
 
 // App Router owns the viewport meta via this export — NOT a hand-written
@@ -53,6 +53,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="preconnect" href="https://va.vercel-scripts.com" />
+        {/* The homepage hero's rest-state backdrop (HeroStatementV4). It is the
+            first thing the hero paints, so preload it — discovered late it
+            flashes in after first paint. */}
+        <link rel="preload" as="image" href="/bg/bg-orange-grain.jpg" />
       </head>
       <body>
         <MotionProvider>

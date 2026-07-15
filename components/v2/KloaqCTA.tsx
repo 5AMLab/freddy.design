@@ -11,7 +11,9 @@ gsap.registerPlugin(ScrollTrigger);
 // CTA for the homepage and /kloaq. Flameburst orange accent throughout, and
 // headline/watermark use Boldonse (the same display face as the word cloud)
 // so the page stays on its two-typeface system (Boldonse + Inter Tight).
-const ORANGE = "#FC5000";
+// Resolves to the brand accent token (globals.css :root --orange). Never
+// hardcode the hex — see the palette block there.
+const ORANGE = "var(--orange)";
 
 export default function KloaqCTA() {
   const ref = useRef<HTMLElement>(null);
@@ -42,7 +44,7 @@ export default function KloaqCTA() {
       id="cta"
       ref={ref}
       className="cta-v2-section kloaq-cta-section kloaq-light-section"
-      style={{ background: "#f9f9f9", position: "relative" }}
+      style={{ background: "var(--off-white)", position: "relative" }}
     >
       {/* Background large type */}
       <div
@@ -83,7 +85,7 @@ export default function KloaqCTA() {
               fontWeight: 400,
               textTransform: "uppercase",
               lineHeight: 1.4,
-              color: "#050505",
+              color: "var(--black)",
               marginBottom: "20px",
             }}
           >
@@ -97,7 +99,7 @@ export default function KloaqCTA() {
               fontSize: "1.35rem",
               fontWeight: 400,
               lineHeight: 1.6,
-              color: "#050505",
+              color: "var(--black)",
               maxWidth: "440px",
             }}
           >
@@ -106,34 +108,12 @@ export default function KloaqCTA() {
         </div>
 
         <div className="kloaq-cta-action">
+          {/* .kloaq-cta-btn is the site's one shared button shape (kloaq.css,
+              aliased to .btn.btn-accent) — this used to override it entirely
+              with its own inline style (700 weight, 0.82rem all-caps, 10px
+              radius), the fourth divergent button shape on the site. */}
           <Magnetic>
-          <button
-            className="kloaq-cta-btn"
-            onClick={openBrief}
-            style={{
-              display: "inline-block",
-              border: "none",
-              cursor: "pointer",
-              fontFamily: "'Inter Tight', 'Sohne', sans-serif",
-              fontWeight: 700,
-              fontSize: "0.82rem",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "#050505",
-              background: ORANGE,
-              padding: "20px 52px",
-              borderRadius: "10px",
-              textDecoration: "none",
-              transition: "background 0.2s",
-              whiteSpace: "nowrap",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "#D94600";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = ORANGE;
-            }}
-          >
+          <button className="kloaq-cta-btn" onClick={openBrief}>
             Brief Me in 20 Seconds
           </button>
           </Magnetic>

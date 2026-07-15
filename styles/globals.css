@@ -11,13 +11,40 @@
 /* Display face (Boldonse) token. Declared statically here — not as an inline
    style on <html> — so it never participates in hydration reconciliation.
    Boldonse itself is loaded via the Google Fonts <link> in layout.tsx.
-   (--font-body is provided by next/font's generated class on <html>.)
-   --orange is the same Flameburst accent kloaq.css scopes to .kloaq-root —
-   redeclared here at :root so components that need it (e.g. KloaqCursor)
-   still resolve the color on pages without a .kloaq-root wrapper, like /work. */
+   (--font-body is provided by next/font's generated class on <html>.) */
 :root {
   --font-display: 'Boldonse', sans-serif;
-  --orange: #FC5000;
+
+  /* ── BRAND PALETTE — the single source of truth for colour ──
+     These six are the whole palette. Declared once here at :root so EVERY
+     page resolves them, including routes with no .kloaq-root wrapper (/work,
+     the case pages, the legal pages).
+
+     Do not redeclare these anywhere else, and do not hardcode their hex values
+     in a component or a rule — reference the token. They previously lived in
+     four separate blocks with three different values for --orange alone
+     (#ff8c00, #ff6d00, and #FC5000 in tailwind.config), so `var(--orange)`
+     resolved to a DIFFERENT colour depending on which wrapper an element
+     happened to sit under. That is what left stale colour scattered across the
+     site. Mirrored in tailwind.config.ts `colors` — change both together.
+
+     --off-white is a neutral light gray, not the warm cream it once was; the
+     --cream alias in kloaq.css still points at it, so that name reads as
+     historical rather than descriptive. */
+  --black: #171717;
+  --off-white: #DEDEDE;
+  --orange: #F25623; /* the one accent */
+  /* Bare channels of --orange, for the many rules that need the accent at
+     partial alpha (hairlines, glows, tint washes). Write
+     rgba(var(--orange-rgb), 0.35) rather than re-typing the literal — those
+     alpha variants are exactly where the PREVIOUS accent survived the last
+     palette change (rgba(252,80,0,…) is the old #FC5000) and left stale colour
+     behind. Keep in sync with --orange above. */
+  --orange-rgb: 242, 86, 35;
+  /* Pressed/hover shade of the accent (CTA buttons) — --orange darkened ~15%.
+     The previous literal (#D94600) was a darkening of the RETIRED #FC5000, so
+     it stayed on the old hue after the accent changed. Keep in sync too. */
+  --orange-deep: #CE491E;
 
   /* ── RESPONSIVE DESIGN SYSTEM — single source of truth ──
      Breakpoints, section rhythm and the display type ramp all live here so
@@ -34,8 +61,13 @@
      from 160/80 straight to 96/24 at a single breakpoint (no tablet midpoint).
      These clamps ramp continuously from a 375px phone to a 1440px desktop, so
      "tablet" is just a natural point on the same curve, never a bespoke tier. */
-  --section-pad-y: clamp(88px, 11vw, 160px);
-  --section-pad-x: clamp(24px, 6vw, 80px);
+  /* THE site's padding. Every section derives from these two — nothing
+     hardcodes its own — so changing them here re-paces the whole page.
+     Tightened from 160/80 (the type sat too far off the edge vs. the
+     reference): sections now breathe at 112px vertically and sit 56px from the
+     viewport edge at desktop, still ramping down to 20px on a phone. */
+  --section-pad-y: clamp(64px, 7.5vw, 112px);
+  --section-pad-x: clamp(20px, 4vw, 56px);
   --gap-lg: clamp(40px, 6vw, 80px);
   --gap-md: clamp(24px, 4vw, 64px);
   --gap-sm: clamp(16px, 3vw, 32px);
@@ -54,6 +86,16 @@
   --container-max: 1600px;
   --ultrawide: 2560px; /* documented; the media query uses the literal px */
 
+  /* ── NAVBAR HEIGHT ──
+     The nav is `position: fixed`, so it occupies NO layout space: anything that
+     must start below it has to reserve that space itself. Derived, not guessed:
+     the bar is `padding: 48px 72px` (39px vertical ≤768px) around a 36px-tall
+     row of links/logo, so its height is 2×padding + 36. Kept as a token so the
+     hero (the only section the nav overlaps) can clear it without hardcoding a
+     magic number that silently rots when the nav padding changes.
+     If you change .kloaq-nav-wrapper's vertical padding, change this too. */
+  --nav-h: 108px; /* 2 × 36 + 36 */
+
   /* Display type ramp — ONE fluid clamp for the big titles (hero nouns,
      project tile names, work-index titles). Replaces four divergent per-band
      formulas so a title scales on one continuous line 375→1440, no jumps at
@@ -64,6 +106,28 @@
      at 4.3rem locally (via min()) so the widest noun fits the shared-gutter
      column; other titles ride the full ramp. */
   --type-tile: clamp(1.75rem, 4.6vw, 4.8rem);
+
+  /* ── SECTION CHROME TYPE ──
+     Every section on the homepage is the same two-column pair: a small heading
+     on the left, a large body paragraph on the right. That inversion (copy
+     BIGGER than the heading it sits beside) is the whole editorial move, so the
+     two sizes are tokens rather than per-section values — a section that
+     invents its own pair breaks the rhythm down the page.
+
+     Both are Inter Tight REGULAR (400) — not the Boldonse display face, and not
+     a heavier weight. The heading and the copy differ in SIZE only; reaching for
+     600 on the heading is what makes it read as a different system.
+     Reference sizes are 36px heading / 48px copy at desktop; the clamps hold
+     those at the top of the ramp and scale down from there so a phone doesn't
+     get a 48px paragraph. */
+  --type-section-head: clamp(1.5rem, 2.5vw, 2.25rem); /* 24 → 36px */
+  --type-section-copy: clamp(1.5rem, 3.3vw, 3rem);    /* 24 → 48px */
+
+  /* Every bracketed [ LABEL ] — section eyebrows AND the hero's own
+     [ CREATIVE STUDIO ] / [ SERVICES ] / retainer line. ONE token so they can't
+     drift apart again (they were previously three different sizes: 0.82rem in
+     the hero, 0.78rem for services, 0.78rem for sections). */
+  --type-vlabel: 0.78rem;
 }
 
 /* Shared content container. One rule that produces the canonical content
@@ -108,8 +172,8 @@ html.lenis body {
 }
 
 body {
-  background: #050505;
-  color: #f9f9f9;
+  background: var(--black);
+  color: var(--off-white);
   /* Inter Tight is the site-wide body/UI face (Kloaq design system).
      var(--font-body) is set by next/font on <html>. */
   font-family: var(--font-body), sans-serif;
@@ -169,7 +233,7 @@ html.has-custom-cursor * {
   left: 0;
   width: 14px;
   height: 14px;
-  background: #FC5000;
+  background: var(--orange);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1600;
@@ -188,7 +252,7 @@ html.has-custom-cursor * {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #f9f9f9;
+  color: var(--off-white);
   white-space: nowrap;
   transition: opacity 0.2s;
 }
@@ -256,18 +320,18 @@ html.is-transitioning .work-hero-frame {
   transition: color 0.3s, padding-left 0.4s cubic-bezier(0.16,1,0.3,1);
 }
 .brief-option:hover {
-  color: #f9f9f9;
+  color: var(--off-white);
   padding-left: 12px;
 }
 .brief-option-arrow {
-  color: rgba(252,80,0,0.0);
+  color: rgba(var(--orange-rgb), 0.0);
   transition: color 0.3s;
 }
 .brief-option:hover .brief-option-arrow {
-  color: #FC5000;
+  color: var(--orange);
 }
 .brief-option:focus-visible {
-  outline: 1px solid rgba(252,80,0,0.6);
+  outline: 1px solid rgba(var(--orange-rgb), 0.6);
   outline-offset: 4px;
 }
 
@@ -278,30 +342,41 @@ html.is-transitioning .work-hero-frame {
    KloaqNavbar is the only navbar component; every page renders it. */
 .nav-link {
   position: relative;
-  color: #F5F0E8;
+  color: var(--off-white);
   transition: color 0.3s;
 }
 .nav-link:hover {
-  color: #FC5000;
+  color: var(--orange);
 }
 
 /* Light-bg variant: on pages where a cream section sits directly under the
    nav (e.g. /pricing), flip link ink to near-black at rest so it stays
    legible. Scrolled state removes the attribute in JS, restoring cream. */
 .kloaq-nav-wrapper[data-nav-theme="light-bg"] .nav-link {
-  color: #0A0A0A;
+  color: var(--black);
 }
 .kloaq-nav-wrapper[data-nav-theme="light-bg"] .nav-link:hover {
-  color: #FC5000;
+  color: var(--orange);
 }
 
-/* ── NAVBAR LAYOUT ── */
+/* ── NAVBAR LAYOUT ──
+   Three zones: [logo] [links] [CTA]. The grid (set on .kloaq-nav-wrapper in
+   KloaqNavbar) gives the two side tracks an equal 1fr, so the middle track —
+   the links — is centered on the viewport, not on whatever sits beside it. */
 .kloaq-nav-links { display: flex; }
-.kloaq-nav-wrapper { padding: 48px 72px; }
+/* Side padding matches --section-pad-x's desktop value (56px) so the logo lands
+   on the same left edge as every section's content. Keep --nav-h in lockstep:
+   2 × 36 + 36 = 108. */
+.kloaq-nav-wrapper { padding: 36px 56px; }
 
 @media (max-width: 768px) {
-  .kloaq-nav-wrapper { padding: 39px 24px; }
+  /* Keep --nav-h in lockstep with this padding: 2 × 30 + 36 = 96. */
+  :root { --nav-h: 96px; }
+  .kloaq-nav-wrapper { padding: 30px 20px; }
   .kloaq-nav-links { display: none; }
+  /* The CTA and the hamburger both want the right-hand zone — the hamburger
+     wins on mobile (the mobile menu carries its own CTA in its foot). */
+  .kloaq-nav-cta { display: none; }
   .kloaq-nav-hamburger { display: flex !important; }
 }
 
@@ -360,8 +435,8 @@ html.is-transitioning .work-hero-frame {
      yPercent on mount; this transform: none is just the resting base. */
   transform: none;
 }
-.mobile-menu-accent { background: #FC5000; }
-.mobile-menu-bg { background: #050505; }
+.mobile-menu-accent { background: var(--orange); }
+.mobile-menu-bg { background: var(--black); }
 .mobile-menu-content {
   position: absolute;
   inset: 0;
@@ -383,17 +458,17 @@ html.is-transitioning .work-hero-frame {
   font-size: clamp(1.5rem, 6.5vw, 2.2rem);
   line-height: 1.25;
   text-transform: uppercase;
-  color: #f9f9f9;
+  color: var(--off-white);
 }
 .mobile-menu-link:active .line {
-  color: #FC5000;
+  color: var(--orange);
 }
 .mobile-menu-num {
   font-family: var(--font-body), sans-serif;
   font-size: 0.62rem;
   font-weight: 500;
   letter-spacing: 0.16em;
-  color: rgba(252,80,0,0.7);
+  color: rgba(var(--orange-rgb), 0.7);
 }
 .mobile-menu-foot {
   display: flex;
@@ -418,19 +493,26 @@ html.is-transitioning .work-hero-frame {
   background: #4ade80;
   box-shadow: 0 0 8px rgba(74,222,128,0.6);
 }
+/* Same shape as every other CTA on the site (kloaq.css .btn.btn-accent) — only
+   width:100% is this button's own, since it fills the mobile menu column. */
 .mobile-menu-cta {
   font-family: var(--font-body), sans-serif;
-  font-weight: 600;
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #f9f9f9;
-  background: #FC5000;
-  border: none;
-  border-radius: 8px;
-  padding: 18px 0;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--off-white);
+  background: var(--orange);
+  border: 1px solid var(--orange);
+  border-radius: 6px;
+  padding: 16px 0;
   width: 100%;
   cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.mobile-menu-cta:hover,
+.mobile-menu-cta:focus-visible {
+  background: transparent;
+  color: var(--orange);
 }
 .mobile-menu-mail {
   font-family: var(--font-body), sans-serif;

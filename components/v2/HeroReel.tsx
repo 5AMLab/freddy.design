@@ -143,7 +143,7 @@ export default function HeroReel() {
               fontWeight: 500,
               letterSpacing: "0.16em",
               textTransform: "uppercase",
-              color: "#F5F0E8",
+              color: "var(--off-white)",
             }}
           >
             Watch the reel

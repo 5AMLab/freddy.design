@@ -296,7 +296,7 @@ function MetaItem({ label, value }: { label: string; value: string }) {
 
 export default function WorkDetail({ project, next }: { project: Project; next: Project }) {
   return (
-    <div style={{ background: "#050505", minHeight: "100vh" }}>
+    <div style={{ background: "var(--black)", minHeight: "100vh" }}>
       <KloaqNavbar />
 
       {/* Hero — the lead image full-bleed at the very top, with the client +

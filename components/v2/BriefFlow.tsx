@@ -125,7 +125,7 @@ export default function BriefFlow() {
         fontFamily: "var(--font-body), sans-serif",
         fontSize: "clamp(1.3rem, 2.2vw, 1.8rem)",
         fontWeight: 500,
-        color: "#f9f9f9",
+        color: "var(--off-white)",
       }}
     >
       {value}
@@ -179,7 +179,7 @@ export default function BriefFlow() {
               fontWeight: 500,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "#FC5000",
+              color: "var(--orange)",
             }}
           >
             Brief Me{" "}
@@ -192,7 +192,7 @@ export default function BriefFlow() {
             aria-label="Close"
             style={{
               background: "none",
-              border: "1px solid rgba(252,80,0,0.35)",
+              border: "1px solid rgba(var(--orange-rgb), 0.35)",
               borderRadius: "8px",
               color: "rgba(249,249,249,0.7)",
               fontFamily: "var(--font-body), sans-serif",
@@ -217,7 +217,7 @@ export default function BriefFlow() {
                 fontWeight: 400,
                 lineHeight: 1.2,
                 textTransform: "uppercase",
-                color: "#f9f9f9",
+                color: "var(--off-white)",
                 marginBottom: "clamp(28px, 5vh, 56px)",
               }}
             >
@@ -265,7 +265,7 @@ export default function BriefFlow() {
                   width: "100%",
                   background: "transparent",
                   border: "none",
-                  borderBottom: "1px solid rgba(252,80,0,0.35)",
+                  borderBottom: "1px solid rgba(var(--orange-rgb), 0.35)",
                   outline: "none",
                   resize: "vertical",
                   padding: "8px 0 16px",
@@ -273,7 +273,7 @@ export default function BriefFlow() {
                   fontSize: "clamp(1.15rem, 1.9vw, 1.5rem)",
                   fontWeight: 400,
                   lineHeight: 1.5,
-                  color: "#f9f9f9",
+                  color: "var(--off-white)",
                 }}
               />
               <input
@@ -304,8 +304,8 @@ export default function BriefFlow() {
                   fontSize: "0.8rem",
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
-                  color: "#f9f9f9",
-                  background: note.trim() ? "#FC5000" : "rgba(252,80,0,0.25)",
+                  color: "var(--off-white)",
+                  background: note.trim() ? "var(--orange)" : "rgba(var(--orange-rgb), 0.25)",
                   border: "none",
                   borderRadius: "8px",
                   padding: "16px 36px",
@@ -327,7 +327,7 @@ export default function BriefFlow() {
                   fontWeight: 500,
                   letterSpacing: "0.22em",
                   textTransform: "uppercase",
-                  color: "#FC5000",
+                  color: "var(--orange)",
                   marginBottom: "24px",
                 }}
               >
@@ -340,7 +340,7 @@ export default function BriefFlow() {
                   fontWeight: 400,
                   lineHeight: 1.6,
                   color: "rgba(249,249,249,0.85)",
-                  borderLeft: "1px solid rgba(252,80,0,0.4)",
+                  borderLeft: "1px solid rgba(var(--orange-rgb), 0.4)",
                   paddingLeft: "28px",
                   marginBottom: "40px",
                   whiteSpace: "pre-line",
@@ -358,8 +358,8 @@ export default function BriefFlow() {
                   fontSize: "0.8rem",
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
-                  color: "#f9f9f9",
-                  background: "#FC5000",
+                  color: "var(--off-white)",
+                  background: "var(--orange)",
                   padding: "18px 44px",
                   borderRadius: "8px",
                   textDecoration: "none",
@@ -381,7 +381,7 @@ export default function BriefFlow() {
               >
                 Prefer WhatsApp? Every retainer includes a direct line — speed
                 dial starts when we do.{" "}
-                <span style={{ color: "#FC5000" }}>
+                <span style={{ color: "var(--orange)" }}>
                   {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots
                   open for {RETAINER_SLOTS.month}.
                 </span>

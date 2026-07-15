@@ -46,6 +46,9 @@ next-env.d.ts
 # /public/3drender/hero-object.webp is shipped
 /public/3d render/
 *.psd
+# homepage redesign source files — raw PSDs/JPGs (~1.3GB), not referenced by
+# any code; the derived assets that ARE used live under /public
+/website design/
 
 # scratch
 /preview.html

@@ -20,18 +20,21 @@ import KloaqFooter from "@/components/v2/KloaqFooter";
  *  - fine pointers: a cursor-trailing preview (.kloaq-thumb, GSAP quickTo)
  *    fades in while a row is hovered; the hovered title flips to the
  *    orange-outline ghost treatment and sibling rows dim (CSS :has).
- *  - touch: first tap pins the preview at the tap point, a × button (or a
- *    second tap, which navigates) dismisses it — the same interaction
- *    KloaqCases/HeroCloudV3 established, including the activeRef race fix
- *    for fast Android taps and the coarse-gating on synthetic mouse events.
+ *  - touch: no preview. A row is a link — one tap opens the project. The
+ *    reveal is a hover affordance and simply doesn't exist on a touch device,
+ *    so nothing has to be tapped open or dismissed first.
  *
- * Entrance uses the site-wide .v2-fade vocabulary (MotionProvider), applied
- * to each row's INNER wrapper — GSAP leaves inline opacity:1 behind on
- * .v2-fade targets, which would permanently defeat the :has() sibling-dim
- * if it sat on the row element itself.
+ * Entrance is SELF-CONTAINED (see the effect below), not the shared
+ * MotionProvider .v2-fade batch: that batch is built once at the provider's
+ * mount and never sees rows mounted by a later client navigation, which left
+ * /work blank when entered via project → "All work". The reveal target is each
+ * row's INNER wrapper (.work-index-row-inner) — GSAP leaves inline opacity:1
+ * there on completion, which on the row element itself would defeat the :has()
+ * sibling-dim.
  */
 export default function WorkIndex({ projects }: { projects: Project[] }) {
   const router = useRouter();
+  const pageRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<string | null>(null);
   // Synchronous mirror of `active` — see KloaqCases on the Android
@@ -58,6 +61,50 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
     };
   }, []);
 
+  // Self-contained entrance for this page's header + rows.
+  //
+  // These used to carry the shared `.v2-fade` class, whose reveal lives in
+  // MotionProvider as a single ScrollTrigger.batch built ONCE at that provider's
+  // mount over the .v2-fade nodes present then. On a client navigation INTO
+  // /work (project → "All work"), these rows mount fresh and are never in that
+  // batch, so they stayed stuck at the CSS base state (opacity:0) forever — the
+  // text was invisible while the hover thumbnail still worked.
+  //
+  // Fix: drive the reveal locally and — crucially — make the content
+  // VISIBLE BY DEFAULT (the `work-index-fade` class carries no opacity:0). JS
+  // sets the hidden start state itself, then animates in. If this effect ever
+  // fails to run, the content simply shows without animation, which is the
+  // correct failure mode (the old class failed to invisible). Reduced motion:
+  // no hidden state is ever set, so it's visible with no tween.
+  useEffect(() => {
+    const root = pageRef.current;
+    if (!root) return;
+    const fades = gsap.utils.toArray<HTMLElement>(
+      root.querySelectorAll(".work-index-fade")
+    );
+    if (!fades.length || prefersReducedMotion()) return;
+
+    // Set the hidden start state from JS (not CSS), then reveal from it. Because
+    // the reveal is a `.fromTo`, it lands opacity:1 regardless of how many times
+    // React 18 StrictMode re-invokes this effect in dev.
+    const tween = gsap.fromTo(
+      fades,
+      { opacity: 0, y: 24 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        ease: "expo.out",
+        stagger: 0.08,
+        overwrite: true,
+      }
+    );
+    return () => {
+      tween.kill();
+      gsap.set(fades, { clearProps: "opacity,transform" });
+    };
+  }, []);
+
   // Fine-pointer only — touch browsers fire synthetic mousemoves mid-tap,
   // which would drag the pinned preview around (see KloaqCases).
   const move = (e: React.MouseEvent) => {
@@ -71,24 +118,12 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
     setActive(id);
   };
 
-  // Touch tap-to-reveal: first tap on an inactive row pins the preview at
-  // the tap point instead of navigating; tapping the active row navigates
-  // through. Same handler as the homepage cloud.
-  const tap = (e: React.MouseEvent, id: string) => {
-    if (!isCoarse()) return;
-    if (activeRef.current !== id) {
-      e.preventDefault();
-      // No quickTo setters on touch — pin via left/top, offset by half the
-      // frame so the preview centers under the tap point.
-      const el = thumbRef.current;
-      if (el) {
-        const { width, height } = el.getBoundingClientRect();
-        el.style.left = `${e.clientX - width / 2}px`;
-        el.style.top = `${e.clientY - height / 2}px`;
-      }
-      setActiveCase(id);
-    }
-  };
+  // Touch: no tap-to-reveal. A row is a link and behaves like one — a single
+  // tap follows the href straight to the project. The cursor-trailing preview
+  // is a POINTER-ONLY affordance, so on a touch device there is nothing to
+  // reveal and nothing to dismiss. Matches the homepage hero (HeroStatementV4)
+  // so both surfaces share one interaction model. `navigate()` below bails on
+  // coarse pointers, so the bare <Link> handles it.
 
   // Desktop click → shared-element flight, identical to HeroCloudV3's: the
   // hovered row's trailing preview thumb is the grab point, so its rect + the
@@ -130,16 +165,16 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
   const activeProject = projects.find((p) => p.id === active);
 
   return (
-    <div className="work-index-page">
+    <div className="work-index-page" ref={pageRef}>
       <KloaqNavbar />
 
       <header className="work-index-header">
-        <div className="work-index-header-top v2-fade">
+        <div className="work-index-header-top work-index-fade">
           <div className="kloaq-vlabel">Projects</div>
           <div className="work-index-count">[{projects.length} PROJECTS]</div>
         </div>
-        <h1 className="v2-fade">Selected Work</h1>
-        <p className="work-index-lead v2-fade">
+        <h1 className="work-index-fade">Selected Work</h1>
+        <p className="work-index-lead work-index-fade">
           Annual reports, investor decks, brand systems, campaigns and
           packaging — a cross-section of recent projects. Client names
           anonymised where confidentiality applies.
@@ -158,12 +193,9 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
             onMouseLeave={() => {
               if (!isCoarse() && activeRef.current === project.id) setActiveCase(null);
             }}
-            onClick={(e) => {
-              tap(e, project.id);
-              if (!e.defaultPrevented) navigate(e, project);
-            }}
+            onClick={(e) => navigate(e, project)}
           >
-            <span className="work-index-row-inner v2-fade">
+            <span className="work-index-row-inner work-index-fade">
               <span className="work-index-num" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </span>
@@ -178,29 +210,19 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
       </section>
 
       {/* Single floating preview shared across rows — trails the cursor on
-          desktop, pins at the tap point on touch. Reuses the homepage
-          cloud's .kloaq-thumb classes wholesale (incl. the touch-only close
-          button) so both pages share one preview language. */}
+          fine pointers only. No touch-pinned state any more, so the old
+          touch-only close button is gone with it: there is nothing a tap can
+          open here, hence nothing to dismiss. */}
       <div
         ref={thumbRef}
         className={`kloaq-thumb${active ? " is-visible" : ""}`}
         aria-hidden="true"
       >
         {activeProject && activeProject.images.length > 0 && (
-          <>
-            <span className="kloaq-thumb-frame">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={imageSrc(activeProject.images[0])} alt="" />
-            </span>
-            <button
-              type="button"
-              className="kloaq-thumb-close"
-              aria-label="Close preview"
-              onClick={() => setActiveCase(null)}
-            >
-              ×
-            </button>
-          </>
+          <span className="kloaq-thumb-frame">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imageSrc(activeProject.images[0])} alt="" />
+          </span>
         )}
       </div>
 

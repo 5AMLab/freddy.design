@@ -29,10 +29,16 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // Kloaq design system — single source of truth.
-        ink: "#050505",
-        cream: "#f9f9f9",
-        orange: "#FC5000", // Flameburst Orange — the one accent
+        // Brand palette. MIRRORS the CSS custom properties in globals.css :root
+        // — that block is the source of truth; keep these two in lockstep.
+        // (`ink`/`cream` are the long-standing semantic aliases for
+        // black/off-white and are kept so existing utilities don't churn.)
+        black: "#171717",
+        "off-white": "#DEDEDE",
+        orange: "#F25623", // the one accent
+
+        ink: "#171717",
+        cream: "#DEDEDE",
       },
       // Section rhythm as named tokens so paddings stop being per-section
       // magic numbers. These mirror the fluid --section-pad-* / --gap-*

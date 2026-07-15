@@ -47,22 +47,12 @@ export default function MotionProvider({
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
-    // fade-up vocabulary: batched, staggered, plays once
-    const fades = gsap.utils.toArray<HTMLElement>(".v2-fade");
-    gsap.set(fades, { opacity: 0, y: 24 });
-    ScrollTrigger.batch(fades, {
-      start: "top 88%",
-      once: true,
-      onEnter: (batch) =>
-        gsap.to(batch, {
-          opacity: 1,
-          y: 0,
-          duration: DUR_FADE,
-          ease: EASE_OUT_LUXE,
-          stagger: STAGGER_ITEM,
-          overwrite: true,
-        }),
-    });
+    // (The former `.v2-fade` batch was removed: it was a single batch built
+    // once at this provider's mount and never saw elements mounted by a later
+    // client navigation, so the /work index — the only .v2-fade user — was left
+    // blank when entered via project → "All work". WorkIndex now owns its own
+    // entrance with visible-by-default markup; see components/v2/WorkIndex.tsx.
+    // Don't reintroduce a mount-time batch for content that mounts per-route.)
 
     // line reveal vocabulary: section headlines rise from behind a mask
     const lines = gsap.utils.toArray<HTMLElement>(".reveal-line .line");
