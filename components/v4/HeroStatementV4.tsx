@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { imageSrc, getProject } from "@/lib/work";
-import { PRELOADER_DONE_EVENT } from "@/components/motion/Preloader";
+import { PRELOADER_DONE_EVENT, alreadyPreloaded } from "@/components/motion/Preloader";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 
 /**
@@ -106,12 +106,23 @@ export default function HeroStatementV4() {
 
   // Entrance: the headline lines rise + fade in a stagger as the preloader
   // wipes up; the chrome and services settle after. Only when the preloader is
-  // actually running this session (first paint) — on repeat client-nav the
-  // hero renders at rest, so nothing here ever hides content post-paint.
+  // actually running this session (first paint) — on repeat visits the hero
+  // renders at rest, so nothing here ever hides content post-paint.
+  //
+  // Gated on sessionStorage (via alreadyPreloaded()), NOT
+  // document.documentElement.dataset.preloaderDone — that DOM attribute isn't
+  // persisted across a navigation. Nav links here are bare <a href>, so every
+  // route change is a full document reload and the attribute resets even
+  // though the preloader already played this session. That let this effect
+  // treat every "back to /" as a first paint: it hid the headline/services
+  // (autoAlpha: 0) and waited on PRELOADER_DONE_EVENT, which never fires
+  // outside Preloader's own first mount — so the 6s failsafe timeout was
+  // often what finally revealed the hero. sessionStorage survives full
+  // reloads, which is the whole reason Preloader itself uses it.
   useEffect(() => {
     const section = sectionRef.current;
     if (!section || prefersReducedMotion()) return;
-    if (document.documentElement.dataset.preloaderDone === "1") return;
+    if (alreadyPreloaded()) return;
 
     let killed = false;
     let cleanup: (() => void) | undefined;

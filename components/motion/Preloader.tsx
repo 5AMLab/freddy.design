@@ -18,7 +18,17 @@ function finish() {
 // even renders the overlay — it can't get stuck waiting on an effect to clear.
 // Guarded for SSR (no window/sessionStorage on the server → render it, the
 // effect resolves it on the client).
-function alreadyPreloaded() {
+//
+// Exported so other first-paint-only entrances (e.g. HeroStatementV4) can gate
+// on the SAME signal. Those used to check `document.documentElement.dataset.
+// preloaderDone` instead — a plain DOM attribute, not persisted anywhere. On
+// this site nav links are bare <a href> (no next/link), so every route change
+// is a full document reload: the attribute resets even though the preloader
+// itself correctly skipped its replay via sessionStorage. Net effect: the
+// hero's entrance animation (headline fade+rise, 1s) replayed on every
+// navigation back to "/" instead of once per browser session — read as "the
+// hero takes a long time to load" after visiting another page and returning.
+export function alreadyPreloaded() {
   if (typeof window === "undefined") return false;
   try {
     return sessionStorage.getItem("fd-preloaded") === "1";

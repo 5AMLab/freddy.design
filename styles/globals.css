@@ -89,12 +89,31 @@
   /* ── NAVBAR HEIGHT ──
      The nav is `position: fixed`, so it occupies NO layout space: anything that
      must start below it has to reserve that space itself. Derived, not guessed:
-     the bar is `padding: 48px 72px` (39px vertical ≤768px) around a 36px-tall
-     row of links/logo, so its height is 2×padding + 36. Kept as a token so the
-     hero (the only section the nav overlaps) can clear it without hardcoding a
-     magic number that silently rots when the nav padding changes.
-     If you change .kloaq-nav-wrapper's vertical padding, change this too. */
-  --nav-h: 108px; /* 2 × 36 + 36 */
+     .kloaq-nav-wrapper is `padding: 36px 56px` (align-items: center) around
+     whichever zone is tallest. Above 768px that's the "Let's Talk" CTA
+     (.btn: 16px 40px padding + 24px line-height = 58px), NOT the 36px-tall
+     logo — this token used to assume the logo, which undercounted the real
+     rendered height by ~22px and let anything anchored on --nav-h sit a few
+     pixels under the nav. Kept as a token so the hero (and anything else that
+     clears the fixed nav) doesn't hardcode a magic number that silently rots
+     when the nav's padding or its tallest child change.
+     If you change .kloaq-nav-wrapper's vertical padding OR the CTA button's
+     padding/line-height, re-derive this. */
+  --nav-h: 130px; /* 2 × 36 + 58 */
+
+  /* ── PAGE HEAD TOP CLEARANCE ──
+     One shared offset for the first section on every standalone page (/work,
+     /about, /pricing) that sits directly under the fixed nav with nothing
+     else (like the hero's own flexible grid row) absorbing the nav's height.
+     Before this token each page reserved that space its own way — /work used
+     a flat 160px, /about and /pricing used calc(--nav-h + --section-pad-y)
+     (a much larger FLUID value, since --section-pad-y ranges up to 112px) —
+     so the [ LABEL ] eyebrow sat at a different distance from the nav on
+     every page. --section-pad-y is deliberately NOT part of this: that token
+     is sized for space BETWEEN two sections, not clearance under a fixed
+     nav, and using it here is what caused the drift. 30px is /work's own
+     gap, kept as the reference every page now matches. */
+  --page-head-pad-top: calc(var(--nav-h) + 30px);
 
   /* Display type ramp — ONE fluid clamp for the big titles (hero nouns,
      project tile names, work-index titles). Replaces four divergent per-band
@@ -122,6 +141,17 @@
      get a 48px paragraph. */
   --type-section-head: clamp(1.5rem, 2.5vw, 2.25rem); /* 24 → 36px */
   --type-section-copy: clamp(1.5rem, 3.3vw, 3rem);    /* 24 → 48px */
+
+  /* Third tier for the pair: --type-section-copy is a SLOGAN size — it works
+     for a one- or two-line punchy statement, but a section that runs several
+     sentences of actual prose at up to 48px reads as a wall of shouting, not
+     a paragraph (e.g. the About page's "How We Work" story, several
+     sentences long). --type-section-body is for that case: still bigger
+     than default body text elsewhere on the site, but scaled for reading
+     multiple lines rather than for a single declarative line. Opt in with a
+     `.body` class alongside `.lead` — the lead line stays on
+     --type-section-copy, the paragraphs after it drop to this. */
+  --type-section-body: clamp(1.125rem, 1.6vw, 1.375rem); /* 18 → 22px */
 
   /* Every bracketed [ LABEL ] — section eyebrows AND the hero's own
      [ CREATIVE STUDIO ] / [ SERVICES ] / retainer line. ONE token so they can't
@@ -366,11 +396,13 @@ html.is-transitioning .work-hero-frame {
 .kloaq-nav-links { display: flex; }
 /* Side padding matches --section-pad-x's desktop value (56px) so the logo lands
    on the same left edge as every section's content. Keep --nav-h in lockstep:
-   2 × 36 + 36 = 108. */
+   2 × 36 + 58 (the CTA button, the tallest zone here) = 130. */
 .kloaq-nav-wrapper { padding: 36px 56px; }
 
 @media (max-width: 768px) {
-  /* Keep --nav-h in lockstep with this padding: 2 × 30 + 36 = 96. */
+  /* The CTA and links both hide here (see KloaqNavbar's MENU_ITEMS/CTA
+     render), leaving the 36px logo as the tallest zone again. Keep --nav-h
+     in lockstep with this padding: 2 × 30 + 36 = 96. */
   :root { --nav-h: 96px; }
   .kloaq-nav-wrapper { padding: 30px 20px; }
   .kloaq-nav-links { display: none; }

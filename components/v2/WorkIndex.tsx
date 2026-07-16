@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import "@/styles/kloaq.css";
-import { type Project, imageSrc } from "@/lib/work";
+import { type Project, imageSrc, listTitle } from "@/lib/work";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { startTransition } from "@/lib/pageTransition";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
@@ -173,12 +174,20 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
           <div className="kloaq-vlabel">Projects</div>
           <div className="work-index-count">[{projects.length} PROJECTS]</div>
         </div>
-        <h1 className="work-index-fade">Selected Work</h1>
-        <p className="work-index-lead work-index-fade">
-          Annual reports, investor decks, brand systems, campaigns and
-          packaging — a cross-section of recent projects. Client names
-          anonymised where confidentiality applies.
-        </p>
+        {/* Small heading / large body, side by side — same 0.62fr/1.38fr
+            split as every other section pair on the site (homepage's
+            .kloaq-logos-intro, /about's .kloaq-about-page-head, /pricing's
+            .kloaq-pricing-head). This used to stack the heading and lead
+            paragraph in one column with only a font-size difference between
+            them — a different structure from the shared pattern, not just a
+            smaller version of it. */}
+        <div className="work-index-header-pair work-index-fade">
+          <h1>Selected Work</h1>
+          <p className="work-index-lead">
+            Annual reports, investor decks, brand systems, campaigns and
+            packaging — real client work, a few names kept off the record.
+          </p>
+        </div>
       </header>
 
       <section className="work-index-list" onMouseMove={move}>
@@ -196,14 +205,42 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
             onClick={(e) => navigate(e, project)}
           >
             <span className="work-index-row-inner work-index-fade">
-              <span className="work-index-num" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="work-index-title">{project.title}</span>
+              {/* Number + category tag share one line, above the title —
+                  thumbnail pinned right spanning the row. Tidier than the old
+                  num/thumb/title/meta stack, which read as disperse on mobile
+                  with nothing visually tying the number to its title. */}
               <span className="work-index-meta">
-                <span className="work-index-client">{project.client}</span>
+                <span className="work-index-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 <span className="work-index-tag">[{project.category.toUpperCase()}]</span>
               </span>
+              {/* Short "Client Category" form (e.g. "ANZ Annual Report") for
+                  this compact list — the case-study page keeps the full
+                  creative headline ("Renminbi Takes Centre Stage") as its
+                  hero, a context with room for it. Inter Tight Bold, not the
+                  Boldonse display face used elsewhere: at this row height the
+                  condensed display face read as visually loud/disperse next
+                  to the small tag and number. */}
+              <span className="work-index-title">{listTitle(project)}</span>
+              {/* Persistent thumbnail — same role as .kloaq-about-industry-thumb
+                  on the About page's Industries list. The floating .kloaq-thumb
+                  below is a HOVER-ONLY preview (fine pointers, cursor-trailing);
+                  on touch there is no hover, so a client browsing on mobile saw
+                  the row with no way to tell projects apart before tapping in.
+                  This thumb is always visible, on every pointer type, so the
+                  row identifies itself at a glance. */}
+              {project.images.length > 0 && (
+                <span className="work-index-thumb">
+                  <Image
+                    src={imageSrc(project.images[0])}
+                    alt=""
+                    fill
+                    sizes="(max-width: 820px) 96px, 120px"
+                    style={{ objectFit: "cover" }}
+                  />
+                </span>
+              )}
             </span>
           </Link>
         ))}

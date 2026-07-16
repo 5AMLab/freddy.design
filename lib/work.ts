@@ -80,6 +80,18 @@ export function imageLayout(image: ProjectImage): ImageLayout | undefined {
   return typeof image === "string" ? undefined : image.layout;
 }
 
+/**
+ * Short "Client Category" form for compact list rows (/work index) — e.g.
+ * "ANZ Annual Report" instead of the case study's own creative headline
+ * ("Renminbi Takes Centre Stage"). The creative title still owns the
+ * case-study hero and the page <title> (WorkDetail, app/work/[slug]/page.tsx)
+ * — that's a different context with room for it. Derived, not a separate
+ * data field, so it can't drift from client/category as those change.
+ */
+export function listTitle(project: Pick<Project, "client" | "category">): string {
+  return `${project.client} ${project.category}`;
+}
+
 export const projects: Project[] = [
   {
     id: "01",

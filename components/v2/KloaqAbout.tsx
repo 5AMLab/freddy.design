@@ -41,6 +41,32 @@ const STATS = [
   { value: "48HR", label: "Typical turnaround" },
 ];
 
+// The engagement, brief-to-delivery — the four steps of what actually happens
+// after you sign. Deliberately about PROCESS (the "How We Work" title), not
+// positioning: the Principles section below already carries the differentiators.
+const PROCESS = [
+  {
+    num: "01",
+    title: "You brief us",
+    desc: "Drop the ask in one message — Slack, email, a Loom, a rough scribble. No forms, no scoping calls, no account manager to brief first.",
+  },
+  {
+    num: "02",
+    title: "Same-day reply",
+    desc: "You hear back the same working day, usually within hours — with a plan, a question, or the first pass already underway.",
+  },
+  {
+    num: "03",
+    title: "Design in the open",
+    desc: "You see the work as it takes shape, not a single big reveal at the end. Course-corrections happen early, while they're cheap.",
+  },
+  {
+    num: "04",
+    title: "Ship & iterate",
+    desc: "Final files delivered in the formats you need. Tweaks and next requests are already covered — the retainer keeps the queue moving.",
+  },
+];
+
 // Industries — the six verticals the studio works across, rendered here as a
 // STATIC expanded list (thumbnail + name + short tag). Deliberately NOT the
 // homepage's auto-scrolling marquee (KloaqIndustries): the About page reads
@@ -94,46 +120,40 @@ export default function KloaqAbout() {
           </div>
         </section>
 
-        {/* Story — portrait placeholder + how the work actually runs, on the
-            shared cream light-section field (matches the homepage About
-            band's tone, doesn't repeat its copy). */}
+        {/* How We Work — the actual brief-to-shipped-file process as a
+            numbered step sequence, on the shared cream light field. This used
+            to be positioning copy + a placeholder portrait box, but that both
+            duplicated the Principles section below AND never delivered on the
+            section's "how we work" title (it explained WHY the studio is
+            different, not WHAT happens after you sign). The steps fill that
+            gap — nothing else on the site says what the engagement is actually
+            like — and the numbered/hairline row rhymes with Principles and the
+            Industries list without repeating their content. The lead line
+            keeps the studio's one-voice promise as the section's opening
+            statement. */}
         <section className="kloaq-about-story-section kloaq-light-section">
           <div className="kloaq-vlabel">How We Work</div>
-          <div className="kloaq-about-story-grid">
-            <div>
-              {/* Placeholder — swap for the studio mark or a real team
-                  portrait (next/image) when one's ready. Kept as a plain
-                  bordered box rather than a stock photo so nothing fake
-                  ships. */}
-              <div className="kloaq-about-portrait" role="img" aria-label="Studio mark placeholder">
-                <span>freddi.</span>
-              </div>
-              <p className="kloaq-about-portrait-caption">
-                Singapore-based · usually replies same day
-              </p>
-            </div>
-
-            <div>
-              <p className="lead">No account layer. No handoffs. Just the work.</p>
-              <p>
-                Most studios split a brief across a strategist, a designer
-                and an account manager before a single pixel gets made. Here,
-                the two people you brief are the two people who ship the file.
-              </p>
-              <p>
-                A small team, run as one voice. Ten years in-house and through
-                the studio — across brand identity, campaign key visuals,
-                editorial, web and event work — means a new brief lands on top
-                of a lot of finished ones. The shortcuts are already known.
-                The mistakes are already made, once.
-              </p>
-              <p className="kloaq-about-statement">
-                The goal isn&apos;t adding to the <em>noise</em> — it&apos;s
-                sharpening the signal: the work a brand actually gets
-                remembered for.
-              </p>
-            </div>
+          <div className="kloaq-about-process-head">
+            <h2 className="kloaq-whatido-heading kloaq-about-process-heading">
+              From brief to
+              <br />
+              shipped file.
+            </h2>
+            <p className="lead kloaq-about-process-lead">
+              No account layer. No handoffs. The two people you brief are the
+              two people who ship the file.
+            </p>
           </div>
+
+          <ol className="kloaq-about-process">
+            {PROCESS.map((step) => (
+              <li className="kloaq-about-step" key={step.num}>
+                <span className="kloaq-about-step-num">[{step.num}]</span>
+                <h3 className="kloaq-about-step-title">{step.title}</h3>
+                <p className="kloaq-about-step-desc">{step.desc}</p>
+              </li>
+            ))}
+          </ol>
 
           {/* Credential row — brands worked with, static (not the homepage
               marquee). The caption keeps the honest framing: worked with,

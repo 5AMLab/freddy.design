@@ -112,7 +112,7 @@ export default function KloaqPricing() {
                 <Magnetic strength={6}>
                   <button
                     type="button"
-                    className={`kloaq-plan-cta${plan.featured ? " is-featured" : ""}`}
+                    className={`btn kloaq-plan-cta${plan.featured ? " btn-accent" : ""}`}
                     onClick={openBrief}
                   >
                     Get started

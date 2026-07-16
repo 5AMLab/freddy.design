@@ -1131,6 +1131,13 @@
 .kloaq-footer-mark-row {
   position: relative;
 }
+/* A bare white arrow, not a bordered square button — the earlier treatment
+   (48px square, orange 1px border/fill on hover) was its own separate
+   graphic element competing with the ghost wordmark next to it. Sized off
+   --footer-mark-size (set on .kloaq-footer-mark-row above) so the arrow's
+   own height is always exactly half the wordmark's, at every breakpoint,
+   without hardcoding three separate pixel sizes to track the wordmark's
+   desktop clamp + two mobile vw overrides. */
 .back-to-top {
   position: absolute;
   right: 72px;
@@ -1139,19 +1146,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  border: 1px solid var(--orange);
+  width: calc(var(--footer-mark-size) / 2);
+  height: calc(var(--footer-mark-size) / 2);
+  border: none;
   background: transparent;
-  color: var(--orange);
+  color: var(--cream);
   cursor: pointer;
-  transition: background 0.25s, color 0.25s, transform 0.25s;
+  transition: color 0.25s, transform 0.25s;
+}
+.back-to-top svg {
+  width: 100%;
+  height: 100%;
 }
 .back-to-top:hover {
-  background: var(--orange);
-  color: var(--ink);
-  transform: translateY(-2px);
+  color: var(--orange);
+  transform: translateY(-4px);
 }
 
 .kloaq-footer-newsletter p {
@@ -1326,6 +1335,14 @@
    "y" descender reads as "cut off" against that edge even though nothing
    is technically clipped — this padding is what actually reads as clear
    air below the glyph once you're scrolled all the way down. */
+.kloaq-footer-mark-row {
+  /* Single source of truth for the wordmark's font-size — .back-to-top's
+     arrow reads --footer-mark-size / 2 so it always stands at exactly half
+     the wordmark's height, at every breakpoint, without duplicating each of
+     the three font-size values (desktop clamp + two mobile vw overrides)
+     on the arrow as well. */
+  --footer-mark-size: clamp(3.5rem, 13vw, 11rem);
+}
 .kloaq-footer-watermark {
   position: relative;
   z-index: 1;
@@ -1337,7 +1354,7 @@
   display: flex;
   align-items: center;
   font-family: var(--display);
-  font-size: clamp(3.5rem, 13vw, 11rem);
+  font-size: var(--footer-mark-size);
   line-height: 1.4;
   white-space: nowrap;
   pointer-events: none;
@@ -1374,7 +1391,8 @@
     grid-column: 1 / -1;
     max-width: 480px;
   }
-  .kloaq-footer-watermark { font-size: 20vw; margin-top: 40px; padding: 8px 40px 80px; }
+  .kloaq-footer-mark-row { --footer-mark-size: 20vw; }
+  .kloaq-footer-watermark { margin-top: 40px; padding: 8px 40px 80px; }
   .back-to-top { right: 40px; bottom: 80px; }
 }
 
@@ -1386,7 +1404,8 @@
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  .kloaq-footer-watermark { font-size: 20vw; margin-top: 32px; padding: 8px 24px 72px; }
+  .kloaq-footer-mark-row { --footer-mark-size: 20vw; }
+  .kloaq-footer-watermark { margin-top: 32px; padding: 8px 24px 72px; }
   .back-to-top { right: 24px; bottom: 72px; }
 
   /* Disable the sticky footer curtain here. Once the link groups stack into a
@@ -2018,13 +2037,20 @@
    tokens below resolve dark-on-cream automatically). Orange stays the accent.
    ══════════════════════════════════════════════════════════════════════════ */
 .kloaq-pricing-section {
-  padding: 220px 80px 180px;
+  padding: var(--page-head-pad-top) var(--section-pad-x) var(--section-pad-y);
 }
+/* Same split as the homepage's section pairs (.kloaq-logos-intro) and the
+   About page's head (.kloaq-about-page-head): small heading gets the narrow
+   track, copy gets the wide one, both top-aligned. This used to be
+   1.1fr/0.9fr with align-items: end — heading WIDER than the copy and
+   bottom-anchored, backwards from every other section pair on the site,
+   which sank the heading to the column's bottom with a large empty gap
+   above it while the copy stayed cramped into the narrower track. */
 .kloaq-pricing-head {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 80px;
-  align-items: end;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  gap: var(--gap-lg);
+  align-items: start;
   margin-bottom: 120px;
 }
 /* Reuses .kloaq-whatido-heading (Boldonse, uppercase); just clears its
@@ -2035,11 +2061,10 @@
 .kloaq-pricing-intro {
   margin: 0;
   font-family: var(--body);
-  font-size: 1.35rem;
+  font-size: var(--type-section-copy);
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.35;
   color: var(--cream);
-  max-width: 480px;
 }
 
 /* Three equal plan columns separated by hairlines (the old design's 1px-gap
@@ -2143,37 +2168,28 @@
   background: var(--orange);
   flex-shrink: 0;
 }
-/* Default CTA is outlined orange; the featured tier gets the solid orange
-   fill (the page's primary action), matching KloaqCTA's button. */
+/* .kloaq-plan-cta sizes the shared .btn shape to fill the card width; colour
+   still comes from .btn/.btn-accent (see the shared button system) so this
+   page doesn't carry its own third button shape. .btn's default fill
+   (var(--off-white)) is designed for dark fields — on this light section
+   (.kloaq-light-section) it's invisible against the card, so the bare
+   (non-accent) variant is repainted dark-on-light here. .btn-accent (the
+   Standard card) needs no override: orange-on-transparent reads on either
+   field. */
 .kloaq-plan-cta {
   display: block;
   width: 100%;
   text-align: center;
-  font-family: var(--body);
-  font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--orange);
+}
+.kloaq-light-section .kloaq-plan-cta:not(.btn-accent) {
+  color: var(--off-white);
+  background: var(--black);
+  border-color: var(--black);
+}
+.kloaq-light-section .kloaq-plan-cta:not(.btn-accent):hover,
+.kloaq-light-section .kloaq-plan-cta:not(.btn-accent):focus-visible {
   background: transparent;
-  border: 1px solid rgba(var(--orange-rgb), 0.45);
-  padding: 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-.kloaq-plan-cta:hover {
-  background: rgba(var(--orange-rgb), 0.12);
-  border-color: var(--orange);
-}
-.kloaq-plan-cta.is-featured {
   color: var(--black);
-  background: var(--orange);
-  border-color: var(--orange);
-}
-.kloaq-plan-cta.is-featured:hover {
-  background: var(--orange-deep);
-  border-color: var(--orange-deep);
 }
 .kloaq-pricing-note {
   margin: 56px 0 0;
@@ -2217,7 +2233,7 @@
 }
 @media (max-width: 600px) {
   .kloaq-pricing-section {
-    padding: 160px 24px 120px;
+    padding: var(--page-head-pad-top) 24px 120px;
   }
   .kloaq-plan {
     padding: 56px 32px;
@@ -2668,7 +2684,7 @@
 }
 
 .work-index-header {
-  padding: 160px 80px 72px;
+  padding: var(--page-head-pad-top) var(--section-pad-x) var(--section-pad-y);
   border-bottom: 1px solid rgba(249, 249, 249, 0.06);
 }
 .work-index-header-top {
@@ -2686,29 +2702,40 @@
   color: var(--orange);
   white-space: nowrap;
 }
-/* Archive-scale headline — between the legal pages' h1 and the hero cloud's
-   display names, same Boldonse voice. */
-.work-index-header h1 {
-  font-family: var(--display);
+/* Small heading / large body, SIDE BY SIDE — the same 0.62fr/1.38fr
+   section-pair grid every other page uses (.kloaq-logos-intro on the
+   homepage, .kloaq-about-page-head, .kloaq-pricing-head): the copy is the
+   BIG half of the pair in the wide track, the heading is the small
+   label-scale half in the narrow track. This used to stack the two in one
+   column — a different STRUCTURE from the shared pattern (a two-column grid),
+   not just a smaller version of the same layout. */
+.work-index-header-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  gap: var(--gap-lg);
+  align-items: start;
+}
+.work-index-header-pair h1 {
+  font-family: var(--body);
   font-weight: 400;
-  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  font-size: var(--type-section-head);
   text-transform: uppercase;
   letter-spacing: 0.005em;
-  line-height: 1.2;
+  line-height: 1.3;
   color: var(--cream);
-  margin: 0 0 24px;
+  margin: 0;
 }
 .work-index-lead {
   font-family: var(--body);
-  font-size: 1.2rem;
   font-weight: 400;
-  color: rgba(249, 249, 249, 0.7);
-  line-height: 1.7;
-  max-width: 600px;
+  font-size: var(--type-section-copy);
+  color: var(--cream);
+  line-height: 1.35;
+  margin: 0;
 }
 
 .work-index-list {
-  padding: 32px 80px 120px;
+  padding: 32px var(--section-pad-x) var(--section-pad-y);
 }
 /* Row = the whole link. The dim transition lives here; GSAP's .v2-fade
    entrance targets the INNER wrapper so its leftover inline opacity never
@@ -2724,30 +2751,64 @@
 .work-index-row:hover {
   border-bottom-color: rgba(var(--orange-rgb), 0.35);
 }
+/* num + tag share one line (.work-index-meta), title below it, thumbnail
+   pinned right spanning the row — same arrangement at every width (this used
+   to reflow into a different order on mobile vs desktop; one grid now, just
+   narrower columns/type on small screens, so the row reads the same
+   everywhere). */
 .work-index-row-inner {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) max-content;
-  grid-template-areas: "num title meta";
-  align-items: baseline;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "meta  thumb"
+    "title thumb";
+  align-items: center;
   column-gap: 40px;
-  padding: 34px 0;
+  row-gap: 6px;
+  padding: 28px 0;
+}
+.work-index-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
 }
 .work-index-num {
-  grid-area: num;
   font-family: var(--body);
   font-weight: 500;
   font-size: 0.82rem;
   letter-spacing: 0.06em;
   color: var(--orange);
 }
-/* Light gray at rest, solid accent on row hover. One hover vocabulary across
-   the site — the hero nouns do the same. (Both used to go to a transparent
-   fill with an orange -webkit-text-stroke; that outline-ghost is retired.) */
+/* Persistent thumbnail, pinned right and spanning both text rows — same
+   shape/role as .kloaq-about-industry-thumb (About page Industries list): a
+   small fixed rounded-rect so the row identifies its project at a glance on
+   every pointer type, not just on hover. */
+.work-index-thumb {
+  grid-area: thumb;
+  position: relative;
+  width: 120px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(249, 249, 249, 0.06);
+}
+/* Inter Tight Bold, not the Boldonse display face used for the site's
+   editorial headlines — at this row's compact height, the condensed display
+   face next to the small tag/number read as visually loud and disperse
+   rather than as one tidy block (see the redesign reference screenshots).
+   Light gray at rest, solid accent on row hover — one hover vocabulary
+   across the site, the hero nouns do the same. */
 .work-index-title {
   grid-area: title;
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: clamp(1.7rem, 3vw, 3rem);
+  font-family: var(--body);
+  font-weight: 700;
+  /* Inter Tight Bold at the old Boldonse-matched size (clamp(1.3rem, 2.2vw,
+     1.9rem)) read as noticeably lighter/smaller than the condensed display
+     face it replaced — Boldonse is a wide, heavy face that punches above its
+     literal font-size. Sized up to compensate for that lost visual weight. */
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
   text-transform: uppercase;
   letter-spacing: 0.005em;
   line-height: 1.15;
@@ -2762,20 +2823,6 @@
 .work-index-row.is-active .work-index-title {
   position: relative;
   z-index: 11;
-}
-.work-index-meta {
-  grid-area: meta;
-  display: flex;
-  align-items: baseline;
-  gap: 20px;
-}
-.work-index-client {
-  font-family: var(--body);
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(249, 249, 249, 0.55);
 }
 .work-index-tag {
   font-family: var(--body);
@@ -2801,29 +2848,33 @@
 
 @media (max-width: 820px) {
   .work-index-header {
-    padding: 120px 24px 48px;
+    padding: var(--page-head-pad-top) var(--section-pad-x) var(--section-pad-y);
+  }
+  /* Collapse to one column — same breakpoint behaviour as every other
+     section pair on the site (.kloaq-logos-intro, .kloaq-about-page-head,
+     .kloaq-pricing-head all drop to grid-template-columns: 1fr on mobile).
+     Without this override the desktop 0.62fr/1.38fr split just shrank in
+     place, squeezing "SELECTED WORK" into a narrow first column instead of
+     stacking above the body copy like everywhere else. */
+  .work-index-header-pair {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
   .work-index-list {
-    padding: 16px 24px 96px;
+    padding: 16px var(--section-pad-x) var(--section-pad-y);
   }
-  /* Stack num / title / meta, matching the mobile cloud's type-led rows —
-     the portfolio image stays on demand (tap-to-reveal .kloaq-thumb),
-     not a permanent inline decoration. */
   .work-index-row-inner {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "num"
-      "title"
-      "meta";
-    row-gap: 10px;
-    padding: 24px 0;
+    grid-template-columns: minmax(0, 1fr) 96px;
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 22px 0;
   }
   .work-index-title {
-    font-size: clamp(1.5rem, 6.4vw, 2.2rem);
-    line-height: 1.15;
+    font-size: clamp(1.4rem, 6.4vw, 1.9rem);
   }
-  .work-index-meta {
-    gap: 12px;
+  .work-index-thumb {
+    width: 96px;
+    height: 68px;
   }
 }
 
@@ -2858,22 +2909,30 @@
      lands on exactly the same left/right edges as every other section. */
   padding-left: 0;
   padding-right: 0;
-  /* Four rows. The TOP SPACER must clear the fixed navbar (which occupies NO
-     layout space) — that part is non-negotiable, so --nav-h is its floor. The
-     extra breathing room above [ CREATIVE STUDIO ] is a BONUS that only gets
-     taken when the viewport can afford it: `minmax(var(--nav-h), auto)` with a
-     1fr row above and below the body means leftover height is shared, and on a
-     short screen the spacer collapses toward the nav's own height instead of
-     shoving the last service noun below the fold.
+  /* Three rows: nav clearance, the body, then a 1fr tail that soaks up
+     leftover height. The TOP SPACER is now a FIXED --page-head-pad-top — the
+     same nav-clearance every other standalone page's first section uses (see
+     globals.css) — not a minmax(floor, auto) row. It used to be
+     minmax(var(--page-head-pad-top), auto): the `auto` half meant the row
+     still grew to absorb any leftover height on a normal-height screen, so
+     [ CREATIVE STUDIO ] sat much further from the nav than /about's or
+     /pricing's [ LABEL ] even though they shared the same floor — a floor
+     only sets a MINIMUM, it doesn't make two different sizing strategies
+     produce the same result. Pinning the top row exactly, and letting the
+     TAIL (1fr) row absorb the leftover height instead, gives every page an
+     identical, fixed gap under the nav while keeping the anti-overflow
+     property: on a short screen the tail just collapses toward 0 instead of
+     the top spacer growing past its floor.
 
-     This was a fixed `calc(var(--nav-h) + var(--section-pad-y))` (220px) — on a
-     laptop (~816px of usable height) that rigid band plus the content made the
-     hero overflow, so the last service noun ("Editorial") was cut off. A
-     min-height:100svh section CANNOT shrink a fixed row; it just overflows. */
-  /* Three rows: nav clearance, the body, then a 1fr tail that soaks up leftover
-     height. */
+     History: this was originally a fixed `calc(var(--nav-h) +
+     var(--section-pad-y))` (220px) — on a laptop (~816px of usable height)
+     that rigid band plus the content made the hero overflow, so the last
+     service noun ("Editorial") was cut off. The fix at the time was to make
+     the TOP row flexible (minmax), which was the wrong row to loosen — the
+     actual fix only needed the BODY row's own height to be respected, which
+     the auto row below already does; the top spacer never needed to flex. */
   grid-template-rows:
-    minmax(var(--nav-h), auto) auto 1fr;
+    var(--page-head-pad-top) auto 1fr;
   row-gap: 0;
   /* NO max-height here. It was tried and it CLIPS rather than compresses — it
      hid the last noun on a short screen instead of shrinking anything. The hero
@@ -2886,11 +2945,14 @@
    INSIDE the cap (the section itself is full-bleed, painting the backdrop, so
    the gutter lives here). This lands the hero type on exactly the same left edge
    as every other section.
-   The top padding is breathing room under the nav, scaled with VIEWPORT HEIGHT
-   (vh, not fixed px) so it gives way on a short laptop instead of pushing the
-   service nouns below the fold — it's the first gap that should collapse. */
+   No top padding of its own: the grid's own first row (--page-head-pad-top,
+   fixed) already gives the exact nav clearance every other page's [ LABEL ]
+   uses. This used to carry its own clamp(8px, 2vh, 48px) padding-top on TOP
+   of that row — a second, independent spacer solving the same short-screen
+   problem the grid row already handles — which is what pushed
+   [ CREATIVE STUDIO ] further from the nav than /about's or /pricing's own
+   label, breaking the site-wide match. */
 .v4-hero .v4-body {
-  padding-top: clamp(8px, 2vh, 48px);
   width: 100%;
   max-width: var(--container-max);
   margin-inline: auto;
@@ -2898,10 +2960,14 @@
   box-sizing: border-box;
 }
 /* Body spans rows 2–3 (the old top-strip row is now part of the body: the
-   [ CREATIVE STUDIO ] label leads the single stacked column). */
+   [ CREATIVE STUDIO ] label leads the single stacked column). align-self:
+   start (not center) so the label sits flush at the row's top edge instead
+   of centering within whatever leftover height rows 2–3 have — centering is
+   still what makes the WHOLE hero body feel vertically placed within the
+   viewport; only the label's own distance from the nav needed pinning. */
 .v4-hero .v4-body {
   grid-row: 2 / 4;
-  align-self: center;
+  align-self: start;
 }
 
 /* ── FULL-BLEED BACKDROP ──
@@ -3139,9 +3205,15 @@
     height: auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /* flex-start, not center: centering pushed the whole stack down from
+       padding-top by however much shorter the content was than 100svh, so
+       [ CREATIVE STUDIO ] sat lower here than on /about or /pricing even
+       though padding-top already matches --page-head-pad-top exactly. Extra
+       room below the last noun is fine — no page needs the hero vertically
+       centered (see the desktop grid's matching align-self: start). */
+    justify-content: flex-start;
     gap: clamp(28px, 5vw, 48px);
-    padding-top: calc(var(--nav-h) + var(--section-pad-y));
+    padding-top: var(--page-head-pad-top);
     padding-bottom: var(--section-pad-y);
     grid-template-rows: none;
   }
@@ -3287,79 +3359,123 @@
    above. Only the layout shells that don't already exist get new rules here:
    the page header, the portrait+story grid, the principles cards and the
    stats row. */
+/* This section sits directly under the fixed nav with nothing else absorbing
+   its height (unlike the hero, which reserves a full nav-height grid row) —
+   top padding needs var(--nav-h) added on top of the normal section rhythm,
+   same pattern as .v4-hero's stacked padding-top below. Plain --section-pad-y
+   alone (64px at ~800-900px) is shorter than the nav's real clearance there,
+   so the "[ ABOUT ]" label sat underneath the fixed wordmark/logo. */
 .kloaq-about-page-head-section {
-  padding: 220px 80px 180px;
+  padding: var(--page-head-pad-top) var(--section-pad-x) var(--section-pad-y);
 }
+/* Same split as the homepage's section pairs (.kloaq-logos-intro): small
+   heading gets the narrow track, copy gets the wide one, both top-aligned.
+   This used to be 1.1fr/0.9fr with align-items: end — heading WIDER than the
+   copy and bottom-anchored, backwards from every other section pair on the
+   site, which is why the heading sank to the column's bottom with a large
+   empty gap above it while the copy stayed cramped into the narrower track. */
 .kloaq-about-page-head {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 80px;
-  align-items: end;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  gap: var(--gap-lg);
+  align-items: start;
 }
 .kloaq-about-page-heading {
   margin: 0;
 }
+/* .kloaq-pricing-intro's 480px max-width fits /pricing's narrower 0.9fr copy
+   track; this page's copy track is the wide 1.38fr half of the pair (see
+   .kloaq-about-page-head above), so the cap only starved it into a tall,
+   cramped column. Let it fill the track instead, like .kloaq-logos-intro p. */
+.kloaq-about-page-head .kloaq-pricing-intro {
+  max-width: none;
+}
 
 .kloaq-about-story-section {
   padding: var(--section-pad-y) var(--section-pad-x);
-  display: grid;
-  grid-template-columns: 1fr;
 }
-.kloaq-about-story-grid {
+/* Section pair, same split/ratio as .kloaq-about-page-head and the homepage's
+   .kloaq-logos-intro: small heading left, the lead statement right. */
+.kloaq-about-process-head {
   display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: 80px;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  gap: var(--gap-lg);
   align-items: start;
+  margin-bottom: 72px;
 }
-/* Placeholder portrait — swap for next/image once a real headshot exists.
-   Dashed hairline + faint fill rather than a stock photo, so the empty slot
-   reads as "reserved" instead of pretending to be a finished asset. */
-.kloaq-about-portrait {
-  aspect-ratio: 4 / 5;
-  width: 100%;
-  border-radius: 14px;
-  border: 1px dashed var(--hairline);
-  background: rgba(5, 5, 5, 0.03);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.kloaq-about-process-heading {
+  margin: 0;
 }
-.kloaq-about-portrait span {
+/* The one-voice promise, kept as the section's opening statement. Reuses the
+   .lead scale (see .kloaq-about-page-head-heading pairing) but ink, not cream,
+   since this section is a light field. */
+.kloaq-about-process-lead {
+  margin: 0;
   font-family: var(--body);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.kloaq-about-portrait-caption {
-  margin: 20px 0 0;
-  font-family: var(--body);
-  font-size: 0.82rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-}
-/* Reuse the homepage About section's paragraph rules (lead/body/statement
-   sizing) inside this grid without inheriting its two-equal-column layout. */
-.kloaq-about-story-grid p {
-  font-family: var(--body);
-  font-size: 1.35rem;
-  line-height: 1.6;
-  color: var(--cream);
-  margin: 0 0 28px;
-}
-.kloaq-about-story-grid p.lead {
   font-weight: 300;
   font-size: clamp(1.7rem, 2.4vw, 2.3rem);
   line-height: 1.2;
   letter-spacing: -0.01em;
-  margin-bottom: 28px;
+  color: var(--cream);
+}
+/* The steps — numbered hairline rows, same [01]/orange/hairline language as
+   the Industries list and Principles grid. A four-column grid: number, title,
+   description, and a trailing rule cell that draws the connective line down
+   the sequence. On a light field, so ink text via --cream inversion. */
+.kloaq-about-process {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--hairline);
+  counter-reset: step;
+}
+/* Two explicit rows so the number can span both (title + desc) and sit at the
+   top of the row, while row-gap stays 0 — the title's own margin-bottom is the
+   only title→desc spacing. column-gap (not the `gap` shorthand) so the wide
+   --gap-lg never leaks into the vertical rhythm and blows the title away from
+   its description. */
+.kloaq-about-step {
+  display: grid;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  grid-template-rows: auto auto;
+  column-gap: var(--gap-lg);
+  row-gap: 0;
+  padding: 40px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.kloaq-about-step-num {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  font-family: var(--body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--orange);
+}
+/* Title + desc share the wide (1.38fr) track, stacked — the number hangs in
+   the narrow track so the row scans as "[ 0N ]  Title / description". */
+.kloaq-about-step-title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0 0 12px;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--cream);
+}
+.kloaq-about-step-desc {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0;
+  max-width: 56ch;
+  font-family: var(--body);
+  font-size: var(--type-section-body);
+  line-height: 1.6;
+  color: var(--muted);
 }
 
-.kloaq-principles-section {
-  padding-top: 0;
-}
 .kloaq-principles-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -3422,11 +3538,13 @@
    homepage marquee. The Story field is light, so the marks read as dark/ink
    at low opacity (the homepage wall recolors them orange on ink; here that
    would vanish on cream). A hairline separates the row from the copy above. */
+/* No top border/padding of its own: the process list's last-row hairline
+   already draws the divider directly above this, so a second border + the
+   40px it padded off it read as a doubled rule with dead space between. Just
+   space it off that existing line. */
 .kloaq-about-logos {
   grid-column: 1 / -1;
-  margin-top: 56px;
-  padding-top: 40px;
-  border-top: 1px solid var(--hairline);
+  margin-top: 64px;
 }
 .kloaq-about-logos-row {
   display: flex;
@@ -3462,6 +3580,9 @@
    with a hairline between each and a small thumbnail pinned right; mirrors the
    Principles grid's [01]/hairline language without any marquee/hover-preview.
    Because it sits on a light section, ink text (not cream). */
+.kloaq-about-industries-section {
+  padding: var(--section-pad-y) var(--section-pad-x);
+}
 .kloaq-about-industries-heading {
   margin-bottom: 56px;
 }
@@ -3517,13 +3638,30 @@
     gap: 32px;
     align-items: start;
   }
-  .kloaq-about-story-grid {
+  /* Collapse the process header pair and each step row to a single column;
+     the step number rides its own line above the title (grid-column reset). */
+  .kloaq-about-process-head {
     grid-template-columns: 1fr;
-    gap: 48px;
+    gap: 20px;
   }
-  .kloaq-about-portrait {
-    aspect-ratio: 16 / 9;
-    max-width: 420px;
+  /* One column: number → title → desc all stack. Reset the desktop row/column
+     spans so they flow in source order down a single track. */
+  .kloaq-about-step {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    row-gap: 10px;
+  }
+  .kloaq-about-step-num {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .kloaq-about-step-title,
+  .kloaq-about-step-desc {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .kloaq-about-step-title {
+    margin-bottom: 0;
   }
   .kloaq-principles-grid {
     grid-template-columns: 1fr;
@@ -3548,9 +3686,6 @@
 }
 
 @media (max-width: 768px) {
-  .kloaq-about-page-head-section {
-    padding: 160px 24px 120px;
-  }
   .kloaq-principle {
     padding: 32px 24px;
   }
