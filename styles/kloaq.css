@@ -3251,12 +3251,29 @@
 
 /* ── STACKED (≤lg 1024px) ── */
 @media (max-width: 1024px) {
-  /* Let the hero grow with its content instead of being trapped at 100svh —
-     the stacked content is taller than one screen on a phone. Natural auto flow
-     + real vertical padding makes section height = content height, so the
-     backdrop (inset:0) always covers the full hero. */
+  /* Let the hero grow with its content instead of being trapped at one
+     viewport height — the stacked content is taller than one screen on a
+     phone. Natural auto flow + real vertical padding makes section height =
+     content height, so the backdrop (inset:0) always covers the full hero.
+
+     min-height was `100svh` alone — reported on real touch tablets (iPad
+     Safari AND Android Chrome, so not engine-specific) as crowding "All
+     Projects" against the section's bottom edge with near-zero clearance,
+     while every desktop devtools/emulated check at the same CSS viewport
+     size showed the full, correct padding-bottom. Desktop responsive-mode
+     has no toolbar to simulate, so it can't surface a small-viewport-unit
+     miscalculation the way a real device's collapsing/expanding browser
+     chrome can. `100dvh` tracks the ACTUAL visible viewport as the toolbar
+     moves (svh assumes it's always fully expanded); kept as a fallback
+     chain since dvh support lags svh's on some engines. This value is only
+     ever a FLOOR here (content already exceeds it — see the comment on
+     justify-content below), so switching units can't change anything for
+     content-driven cases; it only helps if a device's min-height read WAS
+     the deciding factor. */
   .v4-hero {
+    min-height: 100vh;
     min-height: 100svh;
+    min-height: 100dvh;
     height: auto;
     display: flex;
     flex-direction: column;
@@ -3269,7 +3286,12 @@
     justify-content: flex-start;
     gap: clamp(28px, 5vw, 48px);
     padding-top: var(--page-head-pad-top);
-    padding-bottom: var(--section-pad-y);
+    /* Doubled from the standard --section-pad-y as a safety margin: on the
+       real devices reproducing this bug the single --section-pad-y value
+       visually read as near-zero, so the fix errs generous rather than
+       risk still reading tight on a device this session's tooling can't
+       test directly. */
+    padding-bottom: calc(var(--section-pad-y) * 2);
     grid-template-rows: none;
   }
   .v4-hero .v3-hero-top {

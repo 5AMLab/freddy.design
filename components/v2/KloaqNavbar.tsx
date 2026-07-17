@@ -29,25 +29,28 @@ export default function KloaqNavbar() {
     item.href ?? (onHome ? item.anchor! : `/${item.anchor}`);
 
   const [open, setOpen] = useState(false);
+  // Scroll-DIRECTION driven, not distance: true while the user is actively
+  // scrolling down past the top of the page, false at the top or while
+  // scrolling up. Drives everything about the bar's visible state — see the
+  // scroll handler below for the exact rule (kept in one place so the bar's
+  // background, the logo, and the links can't drift out of sync with each
+  // other on future edits).
   const [hidden, setHidden] = useState(false);
-  // Past this threshold the logo fades out (see the wordmark's
-  // opacity/pointerEvents below) and the CTA switches to its own floating
-  // pill treatment (background/shadow, no bar behind it — see kloaq-nav-cta
-  // below). The bar itself never gets a background either way.
+  // True once scrolled even slightly past the top — gates the bar's opaque
+  // background so it doesn't paint a solid plate over the still-visible
+  // hero at y≈0 while `!hidden` is otherwise already true there.
   const [scrolled, setScrolled] = useState(false);
   const lastY = useRef(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const mounted = useRef(false);
 
-  // Live sample of what's actually rendered behind the (always-transparent)
-  // nav — replaces the old per-page hardcoded guess (`pathname ===
-  // "/pricing"`), which only covered one flat-coloured section and couldn't
-  // handle a case-study hero photo whose brightness varies by scroll
-  // position. The bar never becomes an opaque plate, so this runs at every
-  // scroll position — the nav links can still be visible (not yet past the
-  // `hidden` scroll-direction threshold) over arbitrary page content while
-  // scrolled.
-  const bgTheme = useNavBgSample(true);
+  // Live sample of what's actually rendered behind the nav — replaces the
+  // old per-page hardcoded guess (`pathname === "/pricing"`), which only
+  // covered one flat-coloured section and couldn't handle a case-study hero
+  // photo whose brightness varies by scroll position. Only meaningful while
+  // the bar is transparent (at the very top, before its own opaque
+  // background takes over) — see `!scrolled` below.
+  const bgTheme = useNavBgSample(!scrolled);
   const onLightBg = bgTheme === "light";
 
   // Full-page mobile menu: gold accent slides in from the right first, the
@@ -107,7 +110,11 @@ export default function KloaqNavbar() {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 40);
-      setHidden(y > 200 && y > lastY.current);
+      // Direction-only past a small dead-zone (40px) so a tiny wobble right
+      // at the top can't flicker the bar in and out — not gated to y > 200
+      // any more, so scrolling down even a little now hides the bar exactly
+      // as scrolling up even a little reveals it.
+      setHidden(y > 40 && y > lastY.current);
       lastY.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -167,55 +174,56 @@ export default function KloaqNavbar() {
         display: "grid",
         gridTemplateColumns: "1fr auto 1fr",
         alignItems: "center",
-        // Always transparent, no blur, no border — the bar never becomes its
-        // own opaque surface. An opaque plate here would frame an almost-empty
-        // strip once scrolled (logo + links both faded, see below), reading as
-        // a lone floating button in a bar rather than a real nav — so instead
-        // the CTA gets its own floating-pill treatment (shadow, self-contained)
-        // once scrolled, independent of any bar chrome. See kloaq-nav-cta below.
-        background: "transparent",
+        // Opaque fill only once scrolled past the top AND not currently
+        // hiding (i.e. scrolling up, or paused after scrolling up) — at the
+        // very top it stays transparent over the hero; the instant the user
+        // scrolls down it fades back to transparent along with the logo and
+        // links (see below), leaving only the floating CTA.
+        background: scrolled && !hidden ? "rgba(5,5,5,0.96)" : "transparent",
+        backdropFilter: scrolled && !hidden ? "blur(12px)" : "none",
+        borderBottom: scrolled && !hidden ? "1px solid rgba(var(--orange-rgb), 0.20)" : "none",
         position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         zIndex: 100,
-        // The bar spans the full viewport width and is ~100–120px tall and is
-        // always transparent, yet as a z-index:100 element with default
-        // pointer-events it would silently swallow every click landing in its
-        // empty area — which is exactly where the case-study "← All work"
-        // link sits (top:120px). The bar itself never captures clicks; its
+        // The bar spans the full viewport width and is ~100–120px tall.
+        // While transparent (top of page, or hidden-on-scroll-down) it lets
+        // clicks fall through to the page beneath — which is exactly where
+        // the case-study "← All work" link sits (top:120px); once it's a
+        // real opaque surface it blocks clicks like a solid bar should. Its
         // own controls opt back in via pointerEvents:"auto" individually.
-        pointerEvents: "none",
-        // The bar itself no longer slides away on scroll-down — only the
-        // centered link list (Zone 2, below) does. Logo and CTA fade/stay per
-        // their own rules (see below); nothing about the bar's own background
-        // changes with scroll any more.
+        pointerEvents: scrolled && !hidden ? "auto" : "none",
+        transition: "background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease",
       }}
       className="kloaq-nav-wrapper"
-      data-nav-theme={onLightBg ? "light-bg" : undefined}
+      data-nav-theme={onLightBg && !scrolled ? "light-bg" : undefined}
     >
 
-      {/* Fades out once scrolled — a wordmark pinned atop the now-opaque bar
-          read as a distracting fixed watermark rather than a nav element.
-          Same opacity/pointer-events gate as the centered links (below), so
-          logo and links appear/disappear together at the scroll threshold;
-          only the CTA (Zone 3) stays visible at every scroll position. */}
+      {/* Same hidden/open gate as the centered links (below) — logo and
+          links appear/disappear together, in lockstep with the bar's own
+          background: scrolling up (or at the top) shows bg + logo + links +
+          CTA; scrolling down hides everything but the CTA. */}
       <a
         href="/"
         style={{
           fontFamily: "'Boldonse', 'Anton', 'Sohne Breit', sans-serif",
           fontSize: "1.5rem",
           fontWeight: 400,
-          color: onLightBg ? "var(--black)" : "var(--off-white)",
+          // onLightBg only matters at the very top (bar transparent, sampling
+          // active — see useNavBgSample(!scrolled) above); once the bar has
+          // its own opaque dark fill the logo is always cream on it.
+          color: scrolled ? "var(--off-white)" : onLightBg ? "var(--black)" : "var(--off-white)",
           textDecoration: "none",
           letterSpacing: "0.02em",
           textTransform: "none",
-          opacity: scrolled ? 0 : 1,
-          transition: "opacity 0.35s ease",
+          opacity: hidden && !open ? 0 : 1,
+          transform: hidden && !open ? "translateY(-12px)" : "translateY(0)",
+          transition: "opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1), color 0.3s ease",
           // Re-enable hit-testing: the bar sets pointer-events:none. Once
-          // faded out, opt back OUT so a scrolled-but-still-fading logo can't
+          // faded out, opt back OUT so a hidden-but-still-fading logo can't
           // steal clicks meant for whatever's now underneath it.
-          pointerEvents: scrolled ? "none" : "auto",
+          pointerEvents: hidden && !open ? "none" : "auto",
         }}
       >
         freddi<span style={{ color: "var(--orange)" }}>.</span>
@@ -306,19 +314,19 @@ export default function KloaqNavbar() {
         style={{ display: "none", flexDirection: "column", gap: "6px", cursor: "pointer", position: "relative", width: "22px", height: "16px", pointerEvents: "auto", justifySelf: "end", gridColumn: 3, gridRow: 1 }}
       >
         <span style={{
-          width: "22px", height: "1px", background: onLightBg ? "var(--black)" : "var(--off-white)", display: "block",
+          width: "22px", height: "1px", background: scrolled ? "var(--off-white)" : onLightBg ? "var(--black)" : "var(--off-white)", display: "block",
           position: "absolute", top: open ? "7px" : "0px",
           transform: open ? "rotate(45deg)" : "rotate(0deg)",
           transition: "top 0.25s, transform 0.25s",
         }} />
         <span style={{
-          width: "14px", height: "1px", background: onLightBg ? "var(--black)" : "var(--off-white)", display: "block",
+          width: "14px", height: "1px", background: scrolled ? "var(--off-white)" : onLightBg ? "var(--black)" : "var(--off-white)", display: "block",
           position: "absolute", top: "7px",
           opacity: open ? 0 : 1,
           transition: "opacity 0.2s",
         }} />
         <span style={{
-          width: "22px", height: "1px", background: onLightBg ? "var(--black)" : "var(--off-white)", display: "block",
+          width: "22px", height: "1px", background: scrolled ? "var(--off-white)" : onLightBg ? "var(--black)" : "var(--off-white)", display: "block",
           position: "absolute", top: open ? "7px" : "14px",
           transform: open ? "rotate(-45deg)" : "rotate(0deg)",
           transition: "top 0.25s, transform 0.25s",
