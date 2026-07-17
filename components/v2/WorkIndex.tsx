@@ -10,6 +10,7 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { startTransition } from "@/lib/pageTransition";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
+import BriefFlow from "@/components/v2/BriefFlow";
 
 /**
  * /work index — the hero's typographic cloud "unpacked" into an ordered
@@ -264,6 +265,7 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
       </div>
 
       <KloaqFooter />
+      <BriefFlow />
     </div>
   );
 }

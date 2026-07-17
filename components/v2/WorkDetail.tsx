@@ -16,6 +16,7 @@ import {
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
+import BriefFlow from "@/components/v2/BriefFlow";
 
 /**
  * Turn a flat image list into an editorial rhythm. Each slot resolves to a
@@ -467,6 +468,7 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
       </Link>
 
       <KloaqFooter />
+      <BriefFlow />
     </div>
   );
 }

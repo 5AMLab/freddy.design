@@ -1,6 +1,7 @@
 "use client";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
+import BriefFlow from "@/components/v2/BriefFlow";
 
 interface Section {
   heading: string;
@@ -107,6 +108,7 @@ export default function LegalLayout({ title, subtitle, lastUpdated, sections }: 
 
       {/* Footer — shared site-wide footer */}
       <KloaqFooter />
+      <BriefFlow />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
+import BriefFlow from "@/components/v2/BriefFlow";
 import { useEffect, useState } from "react";
 
 export default function NotFound() {
@@ -186,6 +187,7 @@ export default function NotFound() {
       </main>
 
       <KloaqFooter />
+      <BriefFlow />
 
       <style>{`
         @media (max-width: 768px) {
