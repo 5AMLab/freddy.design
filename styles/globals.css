@@ -99,7 +99,7 @@
      when the nav's padding or its tallest child change.
      If you change .kloaq-nav-wrapper's vertical padding OR the CTA button's
      padding/line-height, re-derive this. */
-  --nav-h: 130px; /* 2 × 36 + 58 */
+  --nav-h: 118px; /* 2 × 30 + 58 */
 
   /* ── PAGE HEAD TOP CLEARANCE ──
      One shared offset for the first section on every standalone page (/work,
@@ -397,7 +397,7 @@ html.is-transitioning .work-hero-frame {
 /* Side padding matches --section-pad-x's desktop value (56px) so the logo lands
    on the same left edge as every section's content. Keep --nav-h in lockstep:
    2 × 36 + 58 (the CTA button, the tallest zone here) = 130. */
-.kloaq-nav-wrapper { padding: 36px 56px; }
+.kloaq-nav-wrapper { padding: 30px 56px; }
 
 @media (max-width: 768px) {
   /* The CTA and links both hide here (see KloaqNavbar's MENU_ITEMS/CTA
@@ -460,11 +460,11 @@ html.is-transitioning .work-hero-frame {
 .mobile-menu-bg {
   position: absolute;
   inset: 0;
-  /* Off-screen start is owned entirely by GSAP (yPercent: -100) so its
-     transform can't compose on top of a stale CSS translateY(-100%).
-     That double-translation pushed the panel ~2 viewports up and hid the
-     background on taller phones (iPhone 13 etc). JS sets the initial
-     yPercent on mount; this transform: none is just the resting base. */
+  /* Off-screen start is owned entirely by GSAP (xPercent: 100 — panels slide
+     in from the right) so its transform can't compose on top of a stale CSS
+     translateX. That kind of double-translation previously pushed the panel
+     off-axis and hid the background on some viewports. JS sets the initial
+     xPercent on mount; this transform: none is just the resting base. */
   transform: none;
 }
 .mobile-menu-accent { background: var(--orange); }
@@ -484,11 +484,16 @@ html.is-transitioning .work-hero-frame {
   padding: 14px 0;
   text-decoration: none;
   border-bottom: 1px solid rgba(249,249,249,0.08);
-  /* Boldonse display face — uppercase, tighter leading for its tall glyphs */
+  /* Boldonse display face. line-height was 1.25 — tighter than this face's
+     documented safe floor (1.34, see HeroStatementV4's voice-line comment):
+     Boldonse's caps carry real ink outside the standard line box, and the
+     .line-mask wrapper below clips to that box (overflow: hidden, for the
+     reveal-line animation), so the tight leading was cropping the very tops
+     of "A"/"P"/"O" caps against the mask's own edge. */
   font-family: var(--font-display), sans-serif;
   font-weight: 400;
   font-size: clamp(1.5rem, 6.5vw, 2.2rem);
-  line-height: 1.25;
+  line-height: 1.34;
   text-transform: uppercase;
   color: var(--off-white);
 }
@@ -528,10 +533,17 @@ html.is-transitioning .work-hero-frame {
 /* Same shape as every other CTA on the site (kloaq.css .btn.btn-accent) — only
    width:100% is this button's own, since it fills the mobile menu column. */
 .mobile-menu-cta {
-  font-family: var(--font-body), sans-serif;
-  font-weight: 500;
-  font-size: 1rem;
-  letter-spacing: 0.02em;
+  /* Boldonse (the display face used for the nav links above it) instead of
+     the shared .btn system's Inter Tight — a deliberate one-off, not a change
+     to .btn/.btn-accent elsewhere on the site. Boldonse is single-weight and
+     naturally heavy, so no font-weight override needed; sized down and
+     tracked out a touch since the display face reads larger than body type
+     at the same font-size. */
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   color: var(--off-white);
   background: var(--orange);
   border: 1px solid var(--orange);
@@ -552,6 +564,22 @@ html.is-transitioning .work-hero-frame {
   font-size: 0.95rem;
   color: rgba(249,249,249,0.5);
   text-decoration: none;
+}
+
+/* Desktop nav "Let's Talk" (KloaqNavbar) — same Boldonse swap as the mobile
+   menu's identical CTA above, scoped to this one button via the additional
+   class so .btn/.btn-accent's shared Inter Tight everywhere else (plan
+   cards, Manifesto CTA, "View All Works") is untouched.
+   Selector is `.btn.kloaq-nav-cta-btn`, not just `.kloaq-nav-cta-btn`: this
+   file (globals.css) loads via the root layout, before kloaq.css (imported
+   inside KloaqNavbar itself) — at equal single-class specificity, kloaq.css's
+   later `.btn { font-family: var(--body) }` was winning the cascade tie and
+   silently overriding this rule. The compound selector out-specifies it. */
+.btn.kloaq-nav-cta-btn {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 /* Logos (KloaqLogos wall) */

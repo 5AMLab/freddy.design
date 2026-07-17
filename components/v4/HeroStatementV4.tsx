@@ -52,13 +52,16 @@ interface Noun {
 // Six real cases, in reading order down the services column. Each noun swaps
 // its project's hero image in as the backdrop on hover. Slugs map to lib/work.ts
 // (they identify the project whose image to show — they are not links).
+// "Design Deck" and "Website" have no dedicated case yet — they borrow the
+// nearest existing project's imagery (Akuos deck, Maison Freddy) as a
+// backdrop filler until real cases exist for them.
 const NOUNS: Noun[] = [
   { label: "Annual Reports", slug: "anz-annual-report" },
-  { label: "Investor Decks", slug: "akuos-investor-deck" },
   { label: "Brand Identity", slug: "cognitiv-ai-brand" },
   { label: "Campaigns", slug: "hermes-terre-campaign" },
-  { label: "Packaging", slug: "maison-freddy-cold-brew" },
+  { label: "Design Deck", slug: "akuos-investor-deck" },
   { label: "Editorial", slug: "dad-intern-times" },
+  { label: "Website", slug: "maison-freddy-cold-brew" },
 ];
 
 // The rest-state backdrop: a static grain field, not a project photo. Preloaded
@@ -264,6 +267,21 @@ export default function HeroStatementV4() {
         <div className="v4-services">
           <span className="v4-services-label">[ Services ]</span>
           {NOUNS.map(renderNoun)}
+          <a href="/work" className="v4-see-all">
+            All Projects
+            <span className="v4-see-all-arrow" aria-hidden="true">
+              <svg viewBox="0 0 16 16">
+                <path
+                  d="M4 4h8v8M12 4L4 12"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </a>
         </div>
       </div>
 

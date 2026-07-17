@@ -2,7 +2,6 @@
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
-import KloaqCTA from "@/components/v2/KloaqCTA";
 import BriefFlow, { openBrief } from "@/components/v2/BriefFlow";
 import Magnetic from "@/components/motion/Magnetic";
 import { RETAINER_SLOTS } from "@/lib/site";
@@ -19,44 +18,49 @@ import { RETAINER_SLOTS } from "@/lib/site";
 const plans = [
   {
     name: "Starter",
+    tagline: "Keep the brand moving",
     hours: "10 hrs / month",
     price: "$1,200",
     period: "SGD per month",
     features: [
-      "Up to 10 design hours",
       "48hr turnaround",
-      "Direct WhatsApp line",
-      "Shared brand asset folder",
-      "All service types included",
+      "1 active request at a time",
+      "Direct WhatsApp",
+      "Production & adaptation",
     ],
+    cta: "Get started",
     featured: false,
   },
   {
     name: "Standard",
+    tagline: "Your outsourced design team",
     hours: "20 hrs / month",
     price: "$2,000",
     period: "SGD per month",
     features: [
-      "Up to 20 design hours",
       "48hr turnaround",
-      "Priority WhatsApp line",
-      "Shared brand asset folder",
-      "Top-up at $120/hr",
+      "2 requests in parallel",
+      "WhatsApp + monthly planning call",
+      "All service types",
+      "5hrs rollover · Top-up $120/hr",
     ],
+    cta: "Get started",
     featured: true,
   },
   {
     name: "Priority",
-    hours: "30 hrs / month",
-    price: "$2,800",
-    period: "SGD per month",
+    tagline: "Built around how you work",
+    hours: "Scoped to your needs",
+    price: "Custom",
+    period: "",
     features: [
-      "Up to 30 design hours",
-      "24hr turnaround",
-      "Dedicated hotline",
-      "Shared brand asset folder",
-      "Top-up at $100/hr",
+      "24hr, same-day for small tasks",
+      "Unlimited queue",
+      "WhatsApp + weekly check-in",
+      "All service types + art direction & brand guardianship",
+      "Quarterly brand audit · Pause anytime",
     ],
+    cta: "Let's discuss →",
     featured: false,
   },
 ];
@@ -96,9 +100,12 @@ export default function KloaqPricing() {
 
                 <div className="kloaq-plan-hours">{plan.hours}</div>
                 <div className="kloaq-plan-name">{plan.name}</div>
+                <div className="kloaq-plan-tagline">&ldquo;{plan.tagline}&rdquo;</div>
 
                 <div className="kloaq-plan-price">{plan.price}</div>
-                <div className="kloaq-plan-period">{plan.period}</div>
+                {plan.period && (
+                  <div className="kloaq-plan-period">{plan.period}</div>
+                )}
 
                 <ul className="kloaq-plan-features">
                   {plan.features.map((feature) => (
@@ -115,7 +122,7 @@ export default function KloaqPricing() {
                     className={`btn kloaq-plan-cta${plan.featured ? " btn-accent" : ""}`}
                     onClick={openBrief}
                   >
-                    Get started
+                    {plan.cta}
                   </button>
                 </Magnetic>
               </div>
@@ -133,8 +140,6 @@ export default function KloaqPricing() {
             for {RETAINER_SLOTS.month}.
           </p>
         </section>
-
-        <KloaqCTA />
       </main>
       <KloaqFooter />
       <BriefFlow />

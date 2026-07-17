@@ -12,29 +12,12 @@ import { RETAINER_SLOTS } from "@/lib/site";
 // "one small team, one voice, start to finish". The differentiator is the
 // single voice / no account layer, NOT a headcount, so nothing here should
 // claim "one person" or count the team.
-const PRINCIPLES = [
-  {
-    num: "01",
-    title: "One voice, start to finish",
-    desc: "You brief the studio directly and the same two hands stay on it — no relay, no account layer between the idea and the file that ships.",
-  },
-  {
-    num: "02",
-    title: "Fast without sloppy",
-    desc: "A flat retainer means nothing gets re-scoped from scratch. Most requests turn around in 48 hours, priority in 24.",
-  },
-  {
-    num: "03",
-    title: "Systems, not one-offs",
-    desc: "Every deck, key visual and guideline doc is built to hold up next to the last one — not just to look good alone.",
-  },
-  {
-    num: "04",
-    title: "One flat rate",
-    desc: "A single monthly retainer covers the queue — no per-project quotes, no surprise scope, no clock running on every email.",
-  },
-];
-
+//
+// The old standalone Principles section (four numbered cards restating the
+// same "one voice / fast / systems / flat rate" positioning the process
+// steps below already carry) was removed — it read as a near-duplicate of
+// How We Work, just abstracted instead of concrete. Its STATS row survives,
+// folded in as How We Work's closing strip.
 const STATS = [
   { value: "10", label: "Years in the trade" },
   { value: "0", label: "Account managers" },
@@ -123,14 +106,19 @@ export default function KloaqAbout() {
         {/* How We Work — the actual brief-to-shipped-file process as a
             numbered step sequence, on the shared cream light field. This used
             to be positioning copy + a placeholder portrait box, but that both
-            duplicated the Principles section below AND never delivered on the
-            section's "how we work" title (it explained WHY the studio is
-            different, not WHAT happens after you sign). The steps fill that
-            gap — nothing else on the site says what the engagement is actually
-            like — and the numbered/hairline row rhymes with Principles and the
-            Industries list without repeating their content. The lead line
-            keeps the studio's one-voice promise as the section's opening
-            statement. */}
+            duplicated the (now-removed) Principles section AND never
+            delivered on the section's "how we work" title (it explained WHY
+            the studio is different, not WHAT happens after you sign). The
+            steps fill that gap — nothing else on the site says what the
+            engagement is actually like — and the numbered/hairline row
+            rhymes with the Industries list without repeating its content.
+            The lead line keeps the studio's one-voice promise as the
+            section's opening statement. The stats row and retainer-slots
+            line at the bottom used to live in the standalone Principles
+            section; that section was cut for being a near-duplicate of this
+            one (same numbered-card shape, same positioning restated in the
+            abstract), but the stats themselves are real content worth
+            keeping — they close this section instead. */}
         <section className="kloaq-about-story-section kloaq-light-section">
           <div className="kloaq-vlabel">How We Work</div>
           <div className="kloaq-about-process-head">
@@ -177,27 +165,6 @@ export default function KloaqAbout() {
               studio. Not a current client roster.
             </p>
           </div>
-        </section>
-
-        {/* Principles — static numbered grid, rhymes with the homepage's
-            "What I Do" rows (same [01]-style numbering, hairline rules)
-            without borrowing its hover/preview interaction. */}
-        <section className="kloaq-whatido-section kloaq-principles-section">
-          <div className="kloaq-vlabel">Principles</div>
-          <h2 className="kloaq-whatido-heading">
-            How the work
-            <br />
-            actually runs.
-          </h2>
-          <div className="kloaq-principles-grid">
-            {PRINCIPLES.map((p) => (
-              <div key={p.num} className="kloaq-principle">
-                <span className="kloaq-principle-num">[{p.num}]</span>
-                <h3 className="kloaq-principle-title">{p.title}</h3>
-                <p className="kloaq-principle-desc">{p.desc}</p>
-              </div>
-            ))}
-          </div>
 
           <div className="kloaq-stats-row">
             {STATS.map((s) => (
@@ -215,9 +182,12 @@ export default function KloaqAbout() {
         </section>
 
         {/* Industries — static expanded list of the six verticals, on the
-            cream light field. Mirrors the Principles grid's numbered/hairline
-            look; each row carries a thumbnail so the range reads as real work,
-            not a word list. No marquee/hover-preview (that's the homepage). */}
+            cream light field. Row layout now mirrors /work's index rows
+            (WorkIndex.tsx: num + [TAG] on one line, bold title below,
+            thumbnail pinned right spanning both lines) instead of the old
+            single-line num/name/tag/thumb arrangement — same component
+            pattern, re-themed for the light section (ink text, not cream).
+            No marquee/hover-preview (that's the homepage). */}
         <section className="kloaq-about-industries-section kloaq-light-section">
           <div className="kloaq-vlabel">Industries</div>
           <h2 className="kloaq-whatido-heading kloaq-about-industries-heading">
@@ -228,20 +198,26 @@ export default function KloaqAbout() {
           <ul className="kloaq-about-industries-list">
             {INDUSTRIES.map((ind, i) => (
               <li className="kloaq-about-industry" key={ind.name}>
-                <span className="kloaq-about-industry-num">
-                  [{String(i + 1).padStart(2, "0")}]
+                <span className="kloaq-about-industry-inner">
+                  <span className="kloaq-about-industry-meta">
+                    <span className="kloaq-about-industry-num">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className="kloaq-about-industry-tag">
+                      [{ind.short.toUpperCase()}]
+                    </span>
+                  </span>
+                  <span className="kloaq-about-industry-name">{ind.name}</span>
+                  <span className="kloaq-about-industry-thumb">
+                    <Image
+                      src={ind.img}
+                      alt={ind.name}
+                      fill
+                      sizes="(max-width: 820px) 96px, 120px"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </span>
                 </span>
-                <span className="kloaq-about-industry-name">{ind.name}</span>
-                <span className="kloaq-about-industry-tag">{ind.short}</span>
-                <div className="kloaq-about-industry-thumb">
-                  <Image
-                    src={ind.img}
-                    alt={ind.name}
-                    fill
-                    sizes="120px"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
               </li>
             ))}
           </ul>

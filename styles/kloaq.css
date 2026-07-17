@@ -2124,6 +2124,14 @@
   text-transform: uppercase;
   letter-spacing: 0.01em;
   color: var(--cream);
+  margin-bottom: 10px;
+}
+.kloaq-plan-tagline {
+  font-family: var(--body);
+  font-style: italic;
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: var(--muted);
   margin-bottom: 40px;
 }
 .kloaq-plan-price {
@@ -2133,6 +2141,12 @@
   line-height: 1.15;
   color: var(--cream);
   margin-bottom: 10px;
+}
+/* Custom-priced plans (Priority) render no .kloaq-plan-period sibling — give
+   the price its full 48px clearance itself so the features list doesn't
+   crowd up against it the way it would with only the 10px price margin. */
+.kloaq-plan-price:last-of-type {
+  margin-bottom: 48px;
 }
 .kloaq-plan-period {
   font-family: var(--body);
@@ -3185,6 +3199,47 @@
   transform: translateY(0);
 }
 
+/* A real link (unlike the nouns above) — takes you to /work. Sits as the
+   seventh row of the noun list, flush against "Website" with no extra gap —
+   same line-height/rhythm as .v4-noun, just with an underline affordance
+   instead of a backdrop-swap one. */
+.v4-see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--body);
+  font-weight: 600; /* matches .v4-noun-label's Semibold */
+  /* Same ramp as the service nouns above — the link is styled as one more
+     row in that list, just with an underline affordance instead of a
+     backdrop-swap one. */
+  font-size: clamp(2.25rem, 3.2vw, 3rem);
+  line-height: 1.05; /* matches .v4-noun — keeps the row flush, no extra gap */
+  letter-spacing: 0.005em;
+  color: var(--cream);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: color 0.25s ease, text-decoration-color 0.25s ease;
+}
+.v4-see-all:hover {
+  color: var(--orange);
+  text-decoration-color: currentColor;
+}
+/* Arrow treatment matches .kloaq-service-taphint (the "What We Do" mobile
+   tap-hint): a fixed SVG box, not a text glyph, so it never inherits the
+   text's underline and stays crisp at the noun-matched font size. */
+.v4-see-all-arrow {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.v4-see-all-arrow svg {
+  width: 0.6em;
+  height: 0.6em;
+  display: block;
+  color: currentColor;
+}
+
 /* The hero's two foot paragraphs are GONE — the hero is the voice, the nouns
    and the slots line, nothing else. (The copy they carried lives on in the
    Manifesto section and /about; it was duplicated here.) */
@@ -3295,6 +3350,9 @@
   }
   .v4-services {
     gap: 6px;
+  }
+  .v4-see-all {
+    font-size: clamp(2rem, calc((100vw - 40px) * 0.115), 2.9rem);
   }
 
   /* Bracketed labels shrink on a phone — but via the TOKEN, so the hero's
@@ -3476,41 +3534,6 @@
   color: var(--muted);
 }
 
-.kloaq-principles-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--hairline);
-  border: 1px solid var(--hairline);
-  margin-bottom: 100px;
-}
-.kloaq-principle {
-  background: var(--ink);
-  padding: 40px;
-}
-.kloaq-principle-num {
-  font-family: var(--body);
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  color: var(--orange);
-}
-.kloaq-principle-title {
-  margin: 20px 0 12px;
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 1.15rem;
-  text-transform: uppercase;
-  color: var(--cream);
-}
-.kloaq-principle-desc {
-  margin: 0;
-  font-family: var(--body);
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--muted);
-}
-
 .kloaq-stats-row {
   display: flex;
   gap: 64px;
@@ -3576,10 +3599,12 @@
   max-width: 44ch;
 }
 
-/* Industries — static expanded list on the cream light field. Numbered rows
-   with a hairline between each and a small thumbnail pinned right; mirrors the
-   Principles grid's [01]/hairline language without any marquee/hover-preview.
-   Because it sits on a light section, ink text (not cream). */
+/* Industries — static expanded list on the cream light field. Row layout
+   mirrors /work's index rows exactly (.work-index-row in kloaq.css — num +
+   [TAG] on one line, bold title below, thumbnail pinned right spanning both
+   text rows, same 120×72 / 96×68 thumbnail sizes so the aspect ratio matches
+   at every width), re-themed for the light section: ink text instead of
+   cream, orange num unchanged. */
 .kloaq-about-industries-section {
   padding: var(--section-pad-y) var(--section-pad-x);
 }
@@ -3593,37 +3618,54 @@
   border-top: 1px solid var(--hairline);
 }
 .kloaq-about-industry {
-  display: grid;
-  grid-template-columns: auto 1fr auto 120px;
-  align-items: center;
-  gap: 32px;
-  padding: 22px 0;
   border-bottom: 1px solid var(--hairline);
+}
+.kloaq-about-industry-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "meta  thumb"
+    "name  thumb";
+  align-items: center;
+  column-gap: 40px;
+  row-gap: 6px;
+  padding: 28px 0;
+}
+.kloaq-about-industry-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
 }
 .kloaq-about-industry-num {
   font-family: var(--body);
-  font-size: 0.82rem;
   font-weight: 500;
-  letter-spacing: 0.05em;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
   color: var(--orange);
-}
-.kloaq-about-industry-name {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
-  text-transform: uppercase;
-  line-height: 1;
-  color: var(--ink);
 }
 .kloaq-about-industry-tag {
   font-family: var(--body);
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: rgba(var(--orange-rgb), 0.7);
+  white-space: nowrap;
+}
+.kloaq-about-industry-name {
+  grid-area: name;
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.15;
+  color: var(--ink);
 }
 .kloaq-about-industry-thumb {
+  grid-area: thumb;
   position: relative;
   width: 120px;
   height: 72px;
@@ -3663,37 +3705,33 @@
   .kloaq-about-step-title {
     margin-bottom: 0;
   }
-  .kloaq-principles-grid {
-    grid-template-columns: 1fr;
-  }
   .kloaq-about-logos-row {
     gap: 28px 40px;
   }
-  /* Industry rows: name pushed to its own line above num+tag+thumb so the
-     display type never collides with the thumbnail on narrow widths. */
-  .kloaq-about-industry {
-    grid-template-columns: auto 1fr 96px;
-    grid-template-areas:
-      "name name thumb"
-      "num  tag  thumb";
-    gap: 10px 24px;
-    row-gap: 12px;
+  /* Industry rows below 820px — same breakpoint/values as .work-index-row
+     (kloaq.css), so the thumbnail aspect ratio and row rhythm match /work
+     exactly at every width, not just desktop. */
+}
+
+@media (max-width: 820px) {
+  .kloaq-about-industry-inner {
+    grid-template-columns: minmax(0, 1fr) 96px;
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 22px 0;
   }
-  .kloaq-about-industry-num { grid-area: num; }
-  .kloaq-about-industry-name { grid-area: name; }
-  .kloaq-about-industry-tag { grid-area: tag; justify-self: start; }
-  .kloaq-about-industry-thumb { grid-area: thumb; width: 96px; height: 88px; }
+  .kloaq-about-industry-name {
+    font-size: clamp(1.4rem, 6.4vw, 1.9rem);
+  }
+  .kloaq-about-industry-thumb {
+    width: 96px;
+    height: 68px;
+  }
 }
 
 @media (max-width: 768px) {
-  .kloaq-principle {
-    padding: 32px 24px;
-  }
   .kloaq-stats-row {
     gap: 40px;
-  }
-  .kloaq-about-industry-name {
-    font-size: clamp(1.3rem, 5.5vw, 1.7rem);
   }
 }
 
