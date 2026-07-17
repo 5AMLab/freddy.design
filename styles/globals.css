@@ -394,17 +394,24 @@ html.is-transitioning .work-hero-frame {
    KloaqNavbar) gives the two side tracks an equal 1fr, so the middle track —
    the links — is centered on the viewport, not on whatever sits beside it. */
 .kloaq-nav-links { display: flex; }
-/* Side padding matches --section-pad-x's desktop value (56px) so the logo lands
-   on the same left edge as every section's content. Keep --nav-h in lockstep:
-   2 × 36 + 58 (the CTA button, the tallest zone here) = 130. */
-.kloaq-nav-wrapper { padding: 30px 56px; }
+/* Side padding uses the actual --section-pad-x TOKEN, not a hardcoded
+   snapshot of its desktop ceiling (56px) — this used to be a flat `56px`
+   that only matched section content at the widest end of the clamp, so on
+   tablet widths (where 4vw sits below 56px) every section's left edge
+   tracked the fluid value while the nav stayed pinned at 56px, drifting the
+   logo out of alignment with the page content beneath it. Keep --nav-h in
+   lockstep: 2 × 30 + 58 (the CTA button, the tallest zone here) = 118 at the
+   token's ceiling. */
+.kloaq-nav-wrapper { padding: 30px var(--section-pad-x); }
 
 @media (max-width: 768px) {
   /* The CTA and links both hide here (see KloaqNavbar's MENU_ITEMS/CTA
      render), leaving the 36px logo as the tallest zone again. Keep --nav-h
-     in lockstep with this padding: 2 × 30 + 36 = 96. */
+     in lockstep with this padding: 2 × 30 + 36 = 96. Side padding still
+     rides --section-pad-x (already ~20px in this range), so no override
+     needed beyond the vertical value. */
   :root { --nav-h: 96px; }
-  .kloaq-nav-wrapper { padding: 30px 20px; }
+  .kloaq-nav-wrapper { padding: 30px var(--section-pad-x); }
   .kloaq-nav-links { display: none; }
   /* The CTA and the hamburger both want the right-hand zone — the hamburger
      wins on mobile (the mobile menu carries its own CTA in its foot). */

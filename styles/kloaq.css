@@ -3256,24 +3256,18 @@
      phone. Natural auto flow + real vertical padding makes section height =
      content height, so the backdrop (inset:0) always covers the full hero.
 
-     min-height was `100svh` alone — reported on real touch tablets (iPad
-     Safari AND Android Chrome, so not engine-specific) as crowding "All
-     Projects" against the section's bottom edge with near-zero clearance,
-     while every desktop devtools/emulated check at the same CSS viewport
-     size showed the full, correct padding-bottom. Desktop responsive-mode
-     has no toolbar to simulate, so it can't surface a small-viewport-unit
-     miscalculation the way a real device's collapsing/expanding browser
-     chrome can. `100dvh` tracks the ACTUAL visible viewport as the toolbar
-     moves (svh assumes it's always fully expanded); kept as a fallback
-     chain since dvh support lags svh's on some engines. This value is only
-     ever a FLOOR here (content already exceeds it — see the comment on
-     justify-content below), so switching units can't change anything for
-     content-driven cases; it only helps if a device's min-height read WAS
-     the deciding factor. */
+     min-height is plain `100svh`, NOT `100dvh`. `dvh` was tried here to chase
+     a real-device bug (see the padding-bottom note below) but it backfired
+     badly: dvh is the LIVE/dynamic viewport height, which grows as a mobile
+     browser's address bar collapses mid-scroll — so with min-height:100dvh
+     the hero's own floor kept recalculating and growing WHILE the user
+     scrolled, reading as the image visibly stretching to chase the cursor
+     instead of settling at a fixed height. svh (the SMALLEST the chrome-
+     collapsed viewport can be) is the correct choice for a section that
+     should size once and hold still — it's meant for exactly this "avoid a
+     layout jump when the toolbar hides" case, unlike dvh's live-tracking. */
   .v4-hero {
-    min-height: 100vh;
     min-height: 100svh;
-    min-height: 100dvh;
     height: auto;
     display: flex;
     flex-direction: column;
@@ -3286,11 +3280,14 @@
     justify-content: flex-start;
     gap: clamp(28px, 5vw, 48px);
     padding-top: var(--page-head-pad-top);
-    /* Doubled from the standard --section-pad-y as a safety margin: on the
-       real devices reproducing this bug the single --section-pad-y value
-       visually read as near-zero, so the fix errs generous rather than
-       risk still reading tight on a device this session's tooling can't
-       test directly. */
+    /* Doubled from the standard --section-pad-y as a safety margin: on real
+       touch tablets (iPad Safari AND Android Chrome, so not engine-specific)
+       the single --section-pad-y value visually read as near-zero clearance
+       below "All Projects", while every desktop devtools/emulated check at
+       the same CSS viewport size showed the full, correct padding. This is a
+       flat, static value (unlike the min-height experiment above) — it
+       can't cause a mid-scroll resize, only a fixed amount of extra
+       clearance once layout settles. */
     padding-bottom: calc(var(--section-pad-y) * 2);
     grid-template-rows: none;
   }
