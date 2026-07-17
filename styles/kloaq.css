@@ -2116,6 +2116,104 @@
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── HOURS INFO (i) ──
+   Answers "what does that many hours actually get me?" without spending
+   permanent layout space on a breakdown that's only useful once. The
+   trigger is a plain small circle, not styled as a link/button — it reads
+   as a quiet affordance, not another CTA competing with "Get started". */
+.kloaq-hours-info {
+  position: relative;
+  display: inline-flex;
+}
+.kloaq-hours-info-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--muted);
+  background: none;
+  padding: 0;
+  font-family: var(--body);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.kloaq-hours-info:hover .kloaq-hours-info-trigger,
+.kloaq-hours-info.is-open .kloaq-hours-info-trigger {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+/* Panel: hidden via opacity/visibility (not display:none) so it can
+   transition, and so its own presence never affects the trigger's layout —
+   toggling display would reflow the plan card's hours row on open/close. */
+.kloaq-hours-info-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  /* Centered ON the trigger (left:50% + translateX(-50%)), NOT left-anchored
+     to it. left:0 anchoring pushed the panel further right the further
+     right the icon itself sat — on a narrow phone the Standard card's icon
+     already sits well into the viewport, so a 280px-wide panel growing
+     rightward from THERE overflowed past the right edge and got clipped by
+     the card's own overflow. Centering keeps the panel balanced around the
+     icon regardless of where the icon lands, and the viewport-relative
+     max-width below keeps the balanced panel itself from ever exceeding
+     the screen even when the icon sits near an edge. */
+  left: 50%;
+  transform: translate(-50%, -4px);
+  z-index: 20;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 48px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: var(--black);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  /* Panel content is NOT uppercase/letter-spaced like the hours line it
+     hangs off — it's prose, not a label, and needs to read easily. */
+  text-transform: none;
+  letter-spacing: normal;
+}
+.kloaq-hours-info:hover .kloaq-hours-info-panel,
+.kloaq-hours-info.is-open .kloaq-hours-info-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+.kloaq-hours-info-label {
+  font-family: var(--body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+.kloaq-hours-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kloaq-hours-info-item {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--off-white);
 }
 .kloaq-plan-name {
   font-family: var(--display);

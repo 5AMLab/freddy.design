@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
@@ -20,6 +21,15 @@ const plans = [
     name: "Starter",
     tagline: "Keep the brand moving",
     hours: "10 hrs / month",
+    // A first-time visitor has no intuition for what an hour figure buys —
+    // this is the rough, editable answer, shown via the (i) icon next to
+    // the hours line (see HoursInfo below). Priority has none: its scope is
+    // deliberately open-ended, not a fixed example.
+    hoursInfo: [
+      "1 pitch deck (15–20 slides)",
+      "or 4–5 social/campaign assets",
+      "or 1 one-pager + revisions",
+    ],
     price: "$1,200",
     period: "SGD per month",
     features: [
@@ -35,6 +45,11 @@ const plans = [
     name: "Standard",
     tagline: "Your outsourced design team",
     hours: "20 hrs / month",
+    hoursInfo: [
+      "1 deck + 5–6 social assets",
+      "or a small brand refresh (logo tweaks + 3–4 templates)",
+      "or 2 landing page sections",
+    ],
     price: "$2,000",
     period: "SGD per month",
     features: [
@@ -51,6 +66,7 @@ const plans = [
     name: "Priority",
     tagline: "Built around how you work",
     hours: "Scoped to your needs",
+    hoursInfo: null,
     price: "Custom",
     period: "",
     features: [
@@ -64,6 +80,87 @@ const plans = [
     featured: false,
   },
 ];
+
+/**
+ * The (i) icon + popover next to a plan's hours line. A raw hour figure
+ * ("10 hrs / month") means nothing to a first-time visitor — this answers
+ * "okay, but what does that actually get me?" without permanently spending
+ * layout space on it (the breakdown is useful once, then noise on every
+ * later visit).
+ *
+ * Fine pointers get hover (open on mouseenter/focus, close on
+ * mouseleave/blur) — the desktop-native "glance and move on" pattern.
+ * Coarse pointers (touch — no hover concept) get tap-to-toggle instead,
+ * matching the site's existing touch-affordance pattern elsewhere
+ * (KloaqServices' taphint, HeroStatementV4's noun tap-toggle): first tap
+ * opens, tapping the icon again OR anywhere outside closes it. A document
+ * click/touch listener handles the "outside" case since the popover isn't
+ * a native <dialog> with backdrop dismissal built in.
+ */
+function HoursInfo({ items }: { items: string[] }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLSpanElement>(null);
+
+  const isCoarse = () =>
+    typeof window !== "undefined" && !window.matchMedia("(pointer: fine)").matches;
+
+  useEffect(() => {
+    if (!open) return;
+    const onOutside = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", onOutside);
+    return () => document.removeEventListener("pointerdown", onOutside);
+  }, [open]);
+
+  return (
+    <span
+      ref={rootRef}
+      className={`kloaq-hours-info${open ? " is-open" : ""}`}
+      onMouseEnter={() => {
+        if (!isCoarse()) setOpen(true);
+      }}
+      onMouseLeave={() => {
+        if (!isCoarse()) setOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        className="kloaq-hours-info-trigger"
+        aria-label="What can these hours get you?"
+        aria-expanded={open}
+        onClick={() => {
+          // Fine pointers already got this on hover; a click there would
+          // just re-toggle an already-open popover shut on the same
+          // gesture that opened it. Coarse pointers have no hover, so the
+          // tap IS the open/close action.
+          if (!isCoarse()) return;
+          setOpen((o) => !o);
+        }}
+        onFocus={() => {
+          if (!isCoarse()) setOpen(true);
+        }}
+        onBlur={() => {
+          if (!isCoarse()) setOpen(false);
+        }}
+      >
+        i
+      </button>
+      <span className="kloaq-hours-info-panel" role="tooltip">
+        <span className="kloaq-hours-info-label">Roughly, that&apos;s:</span>
+        <span className="kloaq-hours-info-list">
+          {items.map((item) => (
+            <span key={item} className="kloaq-hours-info-item">
+              {item}
+            </span>
+          ))}
+        </span>
+      </span>
+    </span>
+  );
+}
 
 export default function KloaqPricing() {
   return (
@@ -98,7 +195,10 @@ export default function KloaqPricing() {
                   <span className="kloaq-plan-badge">Most popular</span>
                 )}
 
-                <div className="kloaq-plan-hours">{plan.hours}</div>
+                <div className="kloaq-plan-hours">
+                  {plan.hours}
+                  {plan.hoursInfo && <HoursInfo items={plan.hoursInfo} />}
+                </div>
                 <div className="kloaq-plan-name">{plan.name}</div>
                 <div className="kloaq-plan-tagline">&ldquo;{plan.tagline}&rdquo;</div>
 
