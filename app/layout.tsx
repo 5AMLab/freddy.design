@@ -5,6 +5,7 @@ import MotionProvider from "@/components/motion/MotionProvider";
 import Preloader from "@/components/motion/Preloader";
 import SharedElementOverlay from "@/components/motion/SharedElementOverlay";
 import KloaqCursor from "@/components/v2/KloaqCursor";
+import KloaqMobileTabbar from "@/components/v2/KloaqMobileTabbar";
 import "../styles/globals.css";
 
 // Site-wide type system (source of truth: the Kloaq design study).
@@ -64,6 +65,7 @@ export default function RootLayout({
           <Preloader />
           <SharedElementOverlay />
           <KloaqCursor suppressOnKloaq />
+          <KloaqMobileTabbar />
           <div className="grain-overlay" aria-hidden />
         </MotionProvider>
         <Analytics />

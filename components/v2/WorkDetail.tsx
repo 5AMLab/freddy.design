@@ -304,8 +304,12 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
           title overlaid on it. This is where the shared-element flight lands
           (SharedElementOverlay targets .work-hero-frame), so the image being
           the top section makes the transition honest — nothing drops in after
-          text. The `← All work` back link sits top-left over the image; the
-          title block anchors bottom-left over a scrim for legibility. */}
+          text. The title block anchors bottom-left over a scrim for
+          legibility. No back-to-work link here any more — it sat top-left as
+          plain text with no scrim of its own, so it went illegible on bright
+          hero photos; "All Work" nav now lives in the top navbar (desktop)
+          and the bottom tab bar (mobile), both of which have real
+          backgrounds and don't depend on the photo underneath being dark. */}
       <section className="work-hero">
         <div className="work-hero-frame">
           {/* No mask-scale here: the hero's "entrance" is the shared-element
@@ -326,10 +330,6 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
           </div>
           <div className="work-hero-scrim" aria-hidden="true" />
         </div>
-
-        <Link href="/work" className="work-hero-back">
-          ← All work
-        </Link>
 
         <div className="work-hero-caption">
           <div className="kloaq-vlabel">{project.client}</div>
