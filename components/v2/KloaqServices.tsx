@@ -59,7 +59,7 @@ function ServiceRow({
 
   return (
     <div
-      className={`kloaq-service-row${hovered ? " is-active" : ""}`}
+      className={`kloaq-service-row fade-up${hovered ? " is-active" : ""}`}
       onMouseEnter={() => {
         if (isFine()) onHoverChange(true);
       }}
@@ -265,13 +265,16 @@ export default function KloaqServices() {
       </div>
       )}
 
-      <div className="kloaq-vlabel">What We Do</div>
+      <div className="kloaq-vlabel fade-up">What We Do</div>
 
       <div>
-        <h2 className="kloaq-whatido-heading">
-          Design for every brief,
-          <br />
-          <span className="kloaq-heading-accent">every industry.</span>
+        <h2 className="kloaq-whatido-heading reveal-line">
+          <span className="line-mask">
+            <span className="line">Design for every brief,</span>
+          </span>
+          <span className="line-mask">
+            <span className="line kloaq-heading-accent">every industry.</span>
+          </span>
         </h2>
 
         <div className="kloaq-whatido-list">
@@ -287,7 +290,7 @@ export default function KloaqServices() {
         </div>
 
         {/* Pricing now lives on the standalone /pricing route (KloaqPricing). */}
-        <a href="/pricing" className="kloaq-whatido-link">
+        <a href="/pricing" className="kloaq-whatido-link fade-up">
           See pricing &amp; plans →
         </a>
       </div>

@@ -219,10 +219,18 @@ body {
 
 /* ── MOTION VOCABULARY (see MOTION.md; driven by GSAP in MotionProvider) ──
    .v2-fade      fade-up: opacity + 24px rise, batched stagger
+   .fade-up      fade-up, visible-by-default: no CSS hiding — GSAP animates
+                 FROM hidden inside the batch's onEnter, so no-JS/slow-JS
+                 always shows content (unlike .v2-fade, which hides up front)
    .reveal-line  masked line reveal: wrap each line in .line-mask > .line */
 .v2-fade {
   opacity: 0;
   transform: translateY(24px);
+}
+/* Transforms don't apply to inline boxes, and fade-up rides on translateY —
+   inline-block keeps anchors in inline flow while making the rise real. */
+a.fade-up {
+  display: inline-block;
 }
 .line-mask {
   display: block;
@@ -462,6 +470,66 @@ html.is-transitioning .work-hero-frame {
 }
 @media (max-width: 768px) {
   .mobile-menu { display: block; }
+}
+
+/* ── BOTTOM MOBILE TAB BAR ──
+   Same "unscoped display:none, revealed under 768px" shape as .mobile-menu
+   above — this bar and the full-page menu are NOT alternatives, they're two
+   different jobs (quick in-flow nav vs. the exhaustive site list) and both
+   need to survive on every page layout, wrapped in .kloaq-root or not.
+
+   Deliberately NOT a solid docked bar — freddi's button language (.btn /
+   .btn-accent, kloaq.css) is discrete rectangular buttons, not a filled
+   toolbar strip, so this renders as a floating row of separate buttons over
+   the page rather than a single full-width panel. */
+.kloaq-tabbar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 98; /* under the navbar (100) and mobile menu (99) */
+  gap: 8px;
+  padding: 0 max(12px, env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom));
+}
+@media (max-width: 768px) {
+  .kloaq-tabbar { display: flex; }
+}
+/* Same shape as .btn (kloaq.css): off-white fill, black text, 1px border,
+   6px radius — just resized for a 4-across row and set in Boldonse/uppercase
+   like .kloaq-nav-cta-btn, so this reads as the SAME button family as
+   "Let's Talk" in the top nav rather than a one-off mobile-only style. */
+.kloaq-tabbar-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Tall enough to be a proper thumb target (~52px), comfortably past the
+     44px accessibility minimum — this bar doesn't need to stay compact, so
+     tap comfort wins over minimizing footprint. */
+  padding: 16px 4px;
+  color: var(--black);
+  background: var(--off-white);
+  border: 1px solid var(--off-white);
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.kloaq-tabbar-item:active {
+  transform: scale(0.96);
+}
+/* Talk — the accent button, same orange-fill/hover-to-outline swap as
+   .btn-accent so it's unmistakably the CTA of the row, not a fourth peer. */
+.kloaq-tabbar-cta {
+  color: var(--off-white);
+  background: var(--orange);
+  border-color: var(--orange);
 }
 .mobile-menu-accent,
 .mobile-menu-bg {

@@ -114,7 +114,9 @@ export default function KloaqCTA() {
               radius), the fourth divergent button shape on the site. */}
           <Magnetic>
           <button className="kloaq-cta-btn" onClick={openBrief}>
-            Brief Me in 20 Seconds
+            <span className="kloaq-btn-roll" data-text="Brief Me in 20 Seconds">
+              <span>Brief Me in 20 Seconds</span>
+            </span>
           </button>
           </Magnetic>
           {/* The "N of M retainer slots open" scarcity line was removed here:

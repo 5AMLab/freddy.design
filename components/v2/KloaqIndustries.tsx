@@ -103,14 +103,80 @@ export default function KloaqIndustries({
   const isManifesto = variant === "manifesto";
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
-  const [paused, setPaused] = useState(false);
+  // Read every frame by the rAF drive below — a ref, not state, so hovering
+  // a row never re-renders the whole marquee.
+  const pausedRef = useRef(false);
 
+  // Scroll-velocity marquee: JS takes over from the CSS keyframe loop (which
+  // stays in the stylesheet as the no-JS fallback) and advances the track at
+  // the same base drift PLUS the scroll delta, so scrolling makes the marquee
+  // hurry and letting go eases it back to its idle pace — the same physics the
+  // logo wall already has. Hover eases the drift to zero instead of hard-
+  // pausing playState. The loop only runs while the track is near the viewport
+  // (IntersectionObserver), and all layout reads are cached (ResizeObserver)
+  // so the per-frame work is float math + one transform write.
   useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.style.animationPlayState =
-      paused || prefersReducedMotion() ? "paused" : "running";
-  }, [paused]);
+    const track = trackRef.current;
+    if (!track || prefersReducedMotion()) return;
+
+    track.style.animation = "none";
+
+    let half = track.scrollWidth / 2;
+    const ro = new ResizeObserver(() => {
+      half = track.scrollWidth / 2;
+    });
+    ro.observe(track);
+
+    let offset = 0;
+    let speed = 0; // current px/s, eased toward the base drift
+    let lastY = window.scrollY;
+    let lastT = 0;
+    let rafId = 0;
+    let running = false;
+
+    const tick = (now: number) => {
+      const dt = Math.min((now - lastT) / 1000, 0.1); // clamp tab-away jumps
+      lastT = now;
+      const y = window.scrollY;
+      const dy = y - lastY;
+      lastY = y;
+
+      if (half > 0) {
+        // Base drift matches the old CSS loop (half width per 34s); hover
+        // eases it — and the scroll boost — down to a stop.
+        const target = pausedRef.current ? 0 : half / 34;
+        speed += (target - speed) * Math.min(1, dt * 8);
+        const boost = pausedRef.current ? 0 : Math.abs(dy) * 0.35;
+        offset = (((offset + speed * dt + boost) % half) + half) % half;
+        track.style.transform = `translateX(${-offset}px)`;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !running) {
+          running = true;
+          lastT = performance.now();
+          lastY = window.scrollY;
+          rafId = requestAnimationFrame(tick);
+        } else if (!entry.isIntersecting && running) {
+          running = false;
+          cancelAnimationFrame(rafId);
+        }
+      },
+      { rootMargin: "100px 0px" }
+    );
+    io.observe(track);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      io.disconnect();
+      ro.disconnect();
+      track.style.animation = "";
+      track.style.transform = "";
+    };
+  }, []);
 
   // Two identical sequences back to back, translated by -50% on loop — the
   // standard seamless-marquee trick.
@@ -123,7 +189,7 @@ export default function KloaqIndustries({
           index={i}
           hovered={active === i}
           onHoverChange={(h) => {
-            setPaused(h);
+            pausedRef.current = h;
             setActive(h ? i : null);
           }}
         />
@@ -177,7 +243,7 @@ export default function KloaqIndustries({
       }`}
     >
       {/* Bare words — .kloaq-vlabel adds the [ brackets ] itself. */}
-      <div className="kloaq-vlabel">
+      <div className="kloaq-vlabel fade-up">
         {isManifesto ? "Manifesto" : "Industries"}
       </div>
 
@@ -188,12 +254,17 @@ export default function KloaqIndustries({
       >
         {isManifesto ? (
           <div className="kloaq-manifesto-copy">
-            <h2 className="kloaq-whatido-heading kloaq-industries-heading">
-              Your dedicated
-              <br />
-              <span className="kloaq-heading-accent">design partner.</span>
+            <h2 className="kloaq-whatido-heading kloaq-industries-heading reveal-line">
+              <span className="line-mask">
+                <span className="line">Your dedicated</span>
+              </span>
+              <span className="line-mask">
+                <span className="line kloaq-heading-accent">
+                  design partner.
+                </span>
+              </span>
             </h2>
-            <p className="kloaq-manifesto-statement">
+            <p className="kloaq-manifesto-statement fade-up">
               You brief one small team and that team stays with it — no account
               layer, no handoffs between departments, no telephone game between
               the idea and the file that ships. The thinking and the making are
@@ -201,16 +272,19 @@ export default function KloaqIndustries({
             </p>
           </div>
         ) : (
-          <h2 className="kloaq-whatido-heading kloaq-industries-heading">
-            Deep experience,
-            <br />
-            six verticals.
+          <h2 className="kloaq-whatido-heading kloaq-industries-heading reveal-line">
+            <span className="line-mask">
+              <span className="line">Deep experience,</span>
+            </span>
+            <span className="line-mask">
+              <span className="line">six verticals.</span>
+            </span>
           </h2>
         )}
         {preview}
       </div>
 
-      <div className="kloaq-industries-marquee-wrap">
+      <div className="kloaq-industries-marquee-wrap fade-up">
         <div ref={trackRef} className="kloaq-industries-track">
           {sequence("a")}
           {sequence("b")}
@@ -221,15 +295,17 @@ export default function KloaqIndustries({
         /* The homepage's primary CTA — the same button KloaqCTA renders, with
            the same Magnetic wrapper + openBrief() handler as the nav and the
            mobile menu, so every CTA on the site opens the one brief flow. */
-        <div className="kloaq-manifesto-action">
+        <div className="kloaq-manifesto-action fade-up">
           <Magnetic>
             <button className="kloaq-cta-btn" onClick={openBrief}>
-              Let&apos;s work together
+              <span className="kloaq-btn-roll" data-text="Let's work together">
+                <span>Let&apos;s work together</span>
+              </span>
             </button>
           </Magnetic>
         </div>
       ) : (
-        <a href="/work" className="kloaq-whatido-link">
+        <a href="/work" className="kloaq-whatido-link fade-up">
           See our work across these verticals →
         </a>
       )}

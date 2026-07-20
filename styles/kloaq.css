@@ -451,13 +451,14 @@
 /* ── LOGO WALL (reference: LogosV2 on the live site) ──
    Same brands, sized up 1.5x (28px → 42px). Unlike the live site's static
    centered row, this scrolls edge-to-edge as a continuous marquee — full
-   bleed, no section padding. Marks sit as quiet dim-grey ghosts at rest and
-   light up to the page's orange accent on hover, so the wall reads as
-   intentional rather than a flat template row. brightness(0) + invert(1)
-   flattens any source SVG to solid white regardless of its native colors,
-   then a low opacity dims it to grey; the hover state layers a
-   sepia/hue-rotate chain tuned to land on the accent (--orange) from that
-   white base, so every logo recolors identically. */
+   bleed, no section padding. Marks sit fully legible (solid white) at rest —
+   this is a trust signal, so it can't depend on hover (mobile has none, and
+   a two-step "grey until you hover" reveal just hides the brands it's meant
+   to prove). Hover adds the orange accent as a bonus flourish on top.
+   brightness(0) + invert(1) flattens any source SVG to solid white
+   regardless of its native colors; the hover state layers a sepia/hue-rotate
+   chain tuned to land on the accent (--orange) from that white base, so
+   every logo recolors identically. */
 .kloaq-logos-section {
   padding: 56px 0 120px;
   overflow: hidden;
@@ -483,10 +484,7 @@
 }
 .kloaq-logo-item img {
   filter: brightness(0) invert(1);
-  /* Dim grey at rest so the wall recedes as a quiet trust signal — the
-     orange hover then reads as a real "lights up" moment rather than a
-     subtle brighten. */
-  opacity: 0.38;
+  opacity: 0.9;
   transition: filter 0.35s ease, opacity 0.35s ease;
 }
 .kloaq-logo-item:hover img {
@@ -1588,7 +1586,13 @@
   .kloaq-logos-intro-section { grid-template-columns: 1fr; gap: var(--gap-sm); }
   .kloaq-logos-intro { grid-template-columns: 1fr; gap: 24px; }
   .kloaq-logos-section { padding: 40px 0 72px; }
-  .kloaq-logos-set { gap: 40px; padding-right: 40px; }
+  .kloaq-logos-set { gap: 32px; padding-right: 32px; }
+}
+@media (max-width: 480px) {
+  /* Narrow phones: shrink the marks themselves (not just the gap) so more
+     land fully on-screen at once instead of 2 logos plus two cropped halves. */
+  .kloaq-logo-item img { height: 28px !important; }
+  .kloaq-logos-set { gap: 24px; padding-right: 24px; }
   .kloaq-whatido-section { grid-template-columns: 1fr; gap: var(--gap-sm); }
   /* Desktop's 9-col row (num/title/marks/gap/desc) uses line-based
      grid-column placement (e.g. "6 / span 4") on its children — those line
@@ -2389,23 +2393,6 @@
   );
   pointer-events: none;
 }
-.work-hero-back {
-  position: absolute;
-  top: 120px;
-  left: 80px;
-  z-index: 2;
-  font-family: var(--body);
-  font-size: 0.72rem;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(249, 249, 249, 0.75);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.work-hero-back:hover {
-  color: var(--orange);
-}
 .work-hero-caption {
   position: absolute;
   left: 80px;
@@ -2451,10 +2438,6 @@
   .work-hero-frame {
     /* Taller crop on narrow screens so the overlaid title has room. */
     aspect-ratio: 3 / 4;
-  }
-  .work-hero-back {
-    top: 92px;
-    left: 24px;
   }
   .work-hero-caption {
     left: 24px;
@@ -3909,6 +3892,24 @@
   border-radius: 14px; /* the site-wide image radius (--image / rounded-image) */
   background: rgba(255, 255, 255, 0.04);
 }
+/* Media wrapper inside the frame: the mask-scale entrance (MotionProvider,
+   1.12→1) and the residual scroll parallax (KloaqPortfolio's own scrub tween)
+   both target THIS element, while the hover zoom stays on the <img> below —
+   three transforms, three elements, no fighting. Over-tall + top-anchored
+   (same recipe as .work-frame-media.is-parallax) so the yPercent -10 drift
+   (≈11.4% of the frame) never exposes an unpainted edge. */
+.kloaq-portfolio-media {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 114%;
+}
+/* Reduced motion: no parallax tween runs, so the headroom would just crop the
+   photo — let the media fill the frame exactly instead. */
+.reduced-motion .kloaq-portfolio-media {
+  height: 100%;
+}
 .kloaq-portfolio-img {
   transform: scale(1);
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -4048,6 +4049,43 @@
 .btn-accent:focus-visible {
   background: transparent;
   color: var(--orange);
+}
+/* Text-roll hover for the shared button: the label slides up and out of a
+   clipped line box while its ::after duplicate (fed by data-text, so the
+   markup stays single-source) slides in from below. Pure transform, ≤300ms
+   per MOTION.md's hover rule. Markup: the button label wrapped as
+   <span class="kloaq-btn-roll" data-text="Label"><span>Label</span></span>. */
+.kloaq-btn-roll {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.kloaq-btn-roll > span {
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.kloaq-btn-roll::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  text-align: center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+:is(.btn, .kloaq-cta-btn, .kloaq-portfolio-btn):is(:hover, :focus-visible)
+  .kloaq-btn-roll
+  > span,
+:is(.btn, .kloaq-cta-btn, .kloaq-portfolio-btn):is(:hover, :focus-visible)
+  .kloaq-btn-roll::after {
+  transform: translateY(-100%);
+}
+/* Reduced motion: the label just stays put (the duplicate stays clipped
+   below); the button's colour swap remains the hover feedback. */
+.reduced-motion .kloaq-btn-roll > span,
+.reduced-motion .kloaq-btn-roll::after {
+  transition: none;
+  transform: none !important;
 }
 /* Kept as an alias so nothing that already references .kloaq-portfolio-btn in
    markup breaks — it's just .btn under another name now. */

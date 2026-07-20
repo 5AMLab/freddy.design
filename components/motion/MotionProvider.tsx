@@ -54,6 +54,28 @@ export default function MotionProvider({
     // entrance with visible-by-default markup; see components/v2/WorkIndex.tsx.
     // Don't reintroduce a mount-time batch for content that mounts per-route.)
 
+    // fade-up vocabulary: labels, copy, rows and actions rise 24px + fade,
+    // staggered per batch. Animated via gsap.from inside onEnter — the markup
+    // is visible by default, so slow/absent JS never leaves a blank section
+    // (the lesson from the removed `.v2-fade`, whose CSS hid content up
+    // front). Like every batch here this is built once at provider mount and
+    // only sees elements present then — fine while all navigation is full
+    // document loads (bare <a href>); content mounted by a client-side route
+    // change must own its entrance locally (see WorkIndex).
+    ScrollTrigger.batch(".fade-up", {
+      start: "top 88%",
+      once: true,
+      onEnter: (batch) =>
+        gsap.from(batch, {
+          autoAlpha: 0,
+          y: 24,
+          duration: DUR_FADE,
+          ease: EASE_OUT_LUXE,
+          stagger: STAGGER_ITEM,
+          clearProps: "opacity,visibility,transform",
+        }),
+    });
+
     // line reveal vocabulary: section headlines rise from behind a mask
     const lines = gsap.utils.toArray<HTMLElement>(".reveal-line .line");
     lines.forEach((line) => {

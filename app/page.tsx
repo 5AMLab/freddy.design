@@ -30,14 +30,19 @@ export default function Home() {
         {/* 2. Inside Freddi — intro + the logo wall (KloaqLogos is already a
             seamless auto-scrolling marquee). */}
         <section className="kloaq-logos-intro-section">
-          <div className="kloaq-vlabel">Inside Freddi</div>
+          <div className="kloaq-vlabel fade-up">Inside Freddi</div>
           <div className="kloaq-logos-intro">
-            <h2>
-              Brands we&apos;ve
-              <br />
-              <span className="kloaq-heading-accent">worked with</span>
+            {/* .line-mask is display:block, so it owns the line break the
+                <br /> used to make. */}
+            <h2 className="reveal-line">
+              <span className="line-mask">
+                <span className="line">Brands we&apos;ve</span>
+              </span>
+              <span className="line-mask">
+                <span className="line kloaq-heading-accent">worked with</span>
+              </span>
             </h2>
-            <p>
+            <p className="fade-up">
               From global names to regional challengers — ten years of work
               across campaign key visuals, editorial, event identity and brand
               guidelines, in-house and through the studio.

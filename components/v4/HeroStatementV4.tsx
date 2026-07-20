@@ -178,6 +178,46 @@ export default function HeroStatementV4() {
     };
   }, []);
 
+  // Scroll-out drift: as the hero scrolls away, the voice block lags the
+  // scroll (y at ~18% of the viewport travel) and fades — the headline stays
+  // "behind" the page instead of being clipped off like static content.
+  // Scrubbed, so stopping the scroll rests it (MOTION.md: the scroll is the
+  // timeline). Scrub-linked and once-per-page, so no standing cost; skipped
+  // under reduced motion. Lazy imports for the same reason as the entrance.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || prefersReducedMotion()) return;
+
+    let killed = false;
+    let tween: gsap.core.Tween | undefined;
+
+    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
+      ([{ default: gsap }, { ScrollTrigger }]) => {
+        if (killed || !sectionRef.current) return;
+        gsap.registerPlugin(ScrollTrigger);
+        const body = sectionRef.current.querySelector<HTMLElement>(".v4-body");
+        if (!body) return;
+        tween = gsap.to(body, {
+          y: () => window.innerHeight * 0.18,
+          autoAlpha: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+    );
+
+    return () => {
+      killed = true;
+      tween?.scrollTrigger?.kill();
+      tween?.kill();
+    };
+  }, []);
+
   // A noun is a hover target, not a link: a <div>, no href, nothing to
   // navigate. Fine pointers get hover (approach-to-reveal); coarse pointers
   // get tap-to-toggle. Both drive the same `active` state and the same
