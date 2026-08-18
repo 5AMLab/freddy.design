@@ -85,6 +85,11 @@ export default function HeroStatementV4() {
   // render behind, so a fast pointer crossing two nouns could otherwise reset
   // the backdrop the SECOND noun just set.
   const activeRef = useRef<string | null>(NONE);
+  // Set by renderNoun's handlers the moment a real hover/tap picks a noun.
+  // The autoplay effect below clears its own interval synchronously when
+  // this flips, so a hover mid-cycle can never be overwritten by the next
+  // tick — autoplay stops for good, it never resumes to fight the visitor.
+  const stopAutoplayRef = useRef<() => void>(() => {});
 
   const isCoarse = () => !window.matchMedia("(pointer: fine)").matches;
 
@@ -105,6 +110,26 @@ export default function HeroStatementV4() {
     };
     document.addEventListener("pointerdown", onDocPointerDown);
     return () => document.removeEventListener("pointerdown", onDocPointerDown);
+  }, []);
+
+  // Autoplay: cycles the backdrop through each noun on a fixed interval so
+  // the hero shows real work even before anyone touches it. Killed for
+  // good — not paused — the instant the visitor hovers/taps a noun
+  // themselves: renderNoun's handlers call stopAutoplayRef.current()
+  // synchronously, so a hover mid-cycle can't be overwritten by the next
+  // tick. Their choice always wins and autoplay never resumes to fight it.
+  // Skipped under reduced motion, same as the other hero motion here.
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+
+    let index = -1;
+    const id = window.setInterval(() => {
+      index = (index + 1) % NOUNS.length;
+      setActiveCase(NOUNS[index].slug);
+    }, 4000);
+    stopAutoplayRef.current = () => window.clearInterval(id);
+
+    return () => window.clearInterval(id);
   }, []);
 
   // Entrance: the headline lines rise + fade in a stagger as the preloader
@@ -178,46 +203,6 @@ export default function HeroStatementV4() {
     };
   }, []);
 
-  // Scroll-out drift: as the hero scrolls away, the voice block lags the
-  // scroll (y at ~18% of the viewport travel) and fades — the headline stays
-  // "behind" the page instead of being clipped off like static content.
-  // Scrubbed, so stopping the scroll rests it (MOTION.md: the scroll is the
-  // timeline). Scrub-linked and once-per-page, so no standing cost; skipped
-  // under reduced motion. Lazy imports for the same reason as the entrance.
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section || prefersReducedMotion()) return;
-
-    let killed = false;
-    let tween: gsap.core.Tween | undefined;
-
-    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
-      ([{ default: gsap }, { ScrollTrigger }]) => {
-        if (killed || !sectionRef.current) return;
-        gsap.registerPlugin(ScrollTrigger);
-        const body = sectionRef.current.querySelector<HTMLElement>(".v4-body");
-        if (!body) return;
-        tween = gsap.to(body, {
-          y: () => window.innerHeight * 0.18,
-          autoAlpha: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-      }
-    );
-
-    return () => {
-      killed = true;
-      tween?.scrollTrigger?.kill();
-      tween?.kill();
-    };
-  }, []);
-
   // A noun is a hover target, not a link: a <div>, no href, nothing to
   // navigate. Fine pointers get hover (approach-to-reveal); coarse pointers
   // get tap-to-toggle. Both drive the same `active` state and the same
@@ -231,7 +216,9 @@ export default function HeroStatementV4() {
         key={noun.slug}
         className={`v4-noun${isActive ? " is-active" : ""}`}
         onMouseEnter={() => {
-          if (!isCoarse()) setActiveCase(noun.slug);
+          if (isCoarse()) return;
+          stopAutoplayRef.current();
+          setActiveCase(noun.slug);
         }}
         onMouseLeave={() => {
           // Back to the grain field, guarding against a fast crossing where a
@@ -242,6 +229,7 @@ export default function HeroStatementV4() {
         }}
         onClick={() => {
           if (!isCoarse()) return; // fine pointers already got this on hover
+          stopAutoplayRef.current();
           // Toggle: tapping the already-active noun releases it; tapping a
           // different one switches straight to it.
           setActiveCase(activeRef.current === noun.slug ? NONE : noun.slug);

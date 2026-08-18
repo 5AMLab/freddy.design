@@ -207,26 +207,27 @@ export default function KloaqNavbar() {
       <a
         href="/"
         style={{
-          fontFamily: "'Boldonse', 'Anton', 'Sohne Breit', sans-serif",
-          fontSize: "1.5rem",
-          fontWeight: 400,
-          // onLightBg only matters at the very top (bar transparent, sampling
-          // active — see useNavBgSample(!scrolled) above); once the bar has
-          // its own opaque dark fill the logo is always cream on it.
-          color: scrolled ? "var(--off-white)" : onLightBg ? "var(--black)" : "var(--off-white)",
+          display: "inline-flex",
+          alignItems: "center",
+          height: "36px",
           textDecoration: "none",
-          letterSpacing: "0.02em",
-          textTransform: "none",
           opacity: hidden && !open ? 0 : 1,
           transform: hidden && !open ? "translateY(-12px)" : "translateY(0)",
-          transition: "opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1), color 0.3s ease",
+          transition: "opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)",
           // Re-enable hit-testing: the bar sets pointer-events:none. Once
           // faded out, opt back OUT so a hidden-but-still-fading logo can't
           // steal clicks meant for whatever's now underneath it.
           pointerEvents: hidden && !open ? "none" : "auto",
         }}
       >
-        freddi<span style={{ color: "var(--orange)" }}>.</span>
+        {/* onLightBg only matters at the very top (bar transparent, sampling
+            active — see useNavBgSample(!scrolled) above); once the bar has
+            its own opaque dark fill the logo is always the white mark on it. */}
+        <img
+          src={`/studio logo/kavea-${scrolled ? "white" : onLightBg ? "black" : "white"}.svg`}
+          alt="Kavea"
+          style={{ height: "36px", width: "auto", transition: "opacity 0.3s ease" }}
+        />
       </a>
 
       {/* Zone 2 — the centered link group. The CTA is NOT in here anymore: it

@@ -76,24 +76,35 @@ export default function MotionProvider({
         }),
     });
 
-    // line reveal vocabulary: section headlines rise from behind a mask
+    // line reveal vocabulary: section headlines rise from behind a mask.
+    // clearProps matters here beyond the usual "don't leave inline styles
+    // around" reason: in dev, StrictMode mounts this effect, tears it down,
+    // then mounts it again. gsap.from() renders its FROM state (yPercent:110)
+    // synchronously the instant it's created — before the discarded mount's
+    // ScrollTrigger ever gets a chance to run and reverse it — so without
+    // clearProps that render is the last thing to touch the element's inline
+    // transform. The real (second) mount then creates an identical tween on
+    // top of that same stale inline style and the line never visibly moves.
     const lines = gsap.utils.toArray<HTMLElement>(".reveal-line .line");
     lines.forEach((line) => {
       gsap.from(line, {
         yPercent: 110,
         duration: DUR_REVEAL,
         ease: EASE_OUT_LUXE,
+        clearProps: "transform",
         scrollTrigger: { trigger: line, start: "top 88%", once: true },
       });
     });
 
-    // mask-scale vocabulary: media settles from 1.12 inside its clipped frame
+    // mask-scale vocabulary: media settles from 1.12 inside its clipped frame.
+    // Same StrictMode double-mount reasoning as .reveal-line above.
     const media = gsap.utils.toArray<HTMLElement>(".mask-scale-media");
     media.forEach((el) => {
       gsap.from(el, {
         scale: 1.12,
         duration: 1.4,
         ease: EASE_OUT_LUXE,
+        clearProps: "transform",
         scrollTrigger: { trigger: el, start: "top 92%", once: true },
       });
     });
@@ -105,6 +116,10 @@ export default function MotionProvider({
       lenis.destroy();
       activeLenis = null;
       ScrollTrigger.getAll().forEach((st) => st.kill());
+      // Undo the synchronous FROM-state render above so a StrictMode-
+      // discarded mount never leaves lines/media stuck mid-animation for
+      // the real mount to inherit (see the .reveal-line comment above).
+      gsap.set([...lines, ...media], { clearProps: "all" });
     };
   }, []);
 

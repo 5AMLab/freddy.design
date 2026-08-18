@@ -8,10 +8,10 @@ import { RETAINER_SLOTS } from "@/lib/site";
 
 // Standalone /about page — the long version of the studio pitch, linked from
 // the primary nav (About · Portfolio · Pricing) and the footer "Pages" column.
-// Positioning: freddi.design is a two-person studio run as ONE VOICE —
-// "one small team, one voice, start to finish". The differentiator is the
-// single voice / no account layer, NOT a headcount, so nothing here should
-// claim "one person" or count the team.
+// Positioning: Studio Kavea runs as ONE VOICE — "one small team, one voice,
+// start to finish". The differentiator is the single voice / no account
+// layer, NOT a headcount, so nothing here should state or imply team size
+// (no "two-person", "one person", or team counts).
 //
 // The old standalone Principles section (four numbered cards restating the
 // same "one voice / fast / systems / flat rate" positioning the process
@@ -66,7 +66,7 @@ const INDUSTRIES = [
 ];
 
 // Logo wall — brands WORKED WITH (in-house / through the studio), NOT direct
-// freddi.design clients; the credential line below the row says so honestly
+// Studio Kavea clients; the credential line below the row says so honestly
 // (same framing as the reworded homepage logo wall). Static credited row, not
 // the homepage marquee. Marks mirror KloaqLogos' `logos` array.
 const LOGOS = [
@@ -96,9 +96,9 @@ export default function KloaqAbout() {
               One voice.
             </h1>
             <p className="kloaq-pricing-intro">
-              freddi.design is a two-person studio — ten years of brand,
-              campaign and web work for names from SK-II to ANZ, run the same
-              way every time: one small team, one voice, start to finish.
+              Studio Kavea is a small studio — ten years of brand, campaign
+              and web work for names from SK-II to ANZ, run the same way
+              every time: one small team, one voice, start to finish.
             </p>
           </div>
         </section>
@@ -128,8 +128,8 @@ export default function KloaqAbout() {
               shipped file.
             </h2>
             <p className="lead kloaq-about-process-lead">
-              No account layer. No handoffs. The two people you brief are the
-              two people who ship the file.
+              No account layer. No handoffs. The people you brief are the
+              people who ship the file.
             </p>
           </div>
 

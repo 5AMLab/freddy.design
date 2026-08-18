@@ -3,7 +3,7 @@
 // line is a retainer perk (it's listed as a plan feature in pricing), and
 // publishing the number invites scrapers and spam. Pre-sale contact is email.
 
-export const CONTACT_EMAIL = "hello@freddi.design"; // TODO: replace with the real inbox
+export const CONTACT_EMAIL = "hello@kavea.studio"; // TODO: replace with the real inbox
 
 // Edit the counts by hand as slots fill — shown in the hero, the CTA and the
 // brief flow. The month is always the current one so the scarcity line can

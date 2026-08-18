@@ -9,9 +9,9 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const project = getProject(params.slug);
-  if (!project) return { title: "Work — freddi.design" };
+  if (!project) return { title: "Work — Studio Kavea" };
   return {
-    title: `${project.title} — ${project.client} · freddi.design`,
+    title: `${project.title} — ${project.client} · Studio Kavea`,
     description: project.summary,
   };
 }

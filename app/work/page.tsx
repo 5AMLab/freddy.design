@@ -3,7 +3,7 @@ import { projects } from "@/lib/work";
 import WorkIndex from "@/components/v2/WorkIndex";
 
 export const metadata: Metadata = {
-  title: "Work — freddi.design",
+  title: "Work — Studio Kavea",
   description:
     "Selected design work — annual reports, investor decks, brand systems, campaigns and packaging.",
 };

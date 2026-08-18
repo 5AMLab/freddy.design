@@ -1,23 +1,23 @@
 import LegalLayout from "@/components/v2/LegalLayout";
 
 export const metadata = {
-  title: "Terms & Conditions — freddi.design",
+  title: "Terms & Conditions — Studio Kavea",
 };
 
 export default function TermsPage() {
   return (
     <LegalLayout
       title="Terms & Conditions"
-      subtitle="The terms that govern your use of freddi.design and our design services."
+      subtitle="The terms that govern your use of kavea.studio and our design services."
       lastUpdated="June 2025"
       sections={[
         {
           heading: "Agreement",
-          body: "By accessing this website or engaging freddi.design for services, you agree to these terms. If you do not agree, please do not use this site or our services. These terms are governed by the laws of Singapore.",
+          body: "By accessing this website or engaging Studio Kavea for services, you agree to these terms. If you do not agree, please do not use this site or our services. These terms are governed by the laws of Singapore.",
         },
         {
           heading: "Services",
-          body: "freddi.design provides graphic design services on a retainer or project basis, including but not limited to presentation decks, brand assets, campaign materials, print collateral, and marketplace graphics. The specific scope of work is agreed upon in writing prior to commencement.",
+          body: "Studio Kavea provides graphic design services on a retainer or project basis, including but not limited to presentation decks, brand assets, campaign materials, print collateral, and marketplace graphics. The specific scope of work is agreed upon in writing prior to commencement.",
         },
         {
           heading: "Retainer Plans",
@@ -43,7 +43,7 @@ export default function TermsPage() {
         },
         {
           heading: "Intellectual Property",
-          body: "Upon receipt of full payment, you own the final deliverables. freddi.design retains the right to display completed work in our portfolio unless you request otherwise in writing. All preliminary concepts, unused drafts, and working files remain the property of freddi.design.",
+          body: "Upon receipt of full payment, you own the final deliverables. Studio Kavea retains the right to display completed work in our portfolio unless you request otherwise in writing. All preliminary concepts, unused drafts, and working files remain the property of Studio Kavea.",
         },
         {
           heading: "Client Responsibilities",
@@ -55,7 +55,7 @@ export default function TermsPage() {
         },
         {
           heading: "Limitation of Liability",
-          body: "freddi.design's total liability for any claim arising from our services shall not exceed the total fees paid in the three months preceding the claim. We are not liable for indirect, consequential, or incidental damages including loss of revenue or business opportunity.",
+          body: "Studio Kavea's total liability for any claim arising from our services shall not exceed the total fees paid in the three months preceding the claim. We are not liable for indirect, consequential, or incidental damages including loss of revenue or business opportunity.",
         },
         {
           heading: "Confidentiality",

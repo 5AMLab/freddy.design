@@ -478,7 +478,7 @@ html.is-transitioning .work-hero-frame {
    different jobs (quick in-flow nav vs. the exhaustive site list) and both
    need to survive on every page layout, wrapped in .kloaq-root or not.
 
-   Deliberately NOT a solid docked bar — freddi's button language (.btn /
+   Deliberately NOT a solid docked bar — Kavea's button language (.btn /
    .btn-accent, kloaq.css) is discrete rectangular buttons, not a filled
    toolbar strip, so this renders as a floating row of separate buttons over
    the page rather than a single full-width panel. */

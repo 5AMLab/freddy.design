@@ -1,7 +1,7 @@
 import LegalLayout from "@/components/v2/LegalLayout";
 
 export const metadata = {
-  title: "Cookie Policy — freddi.design",
+  title: "Cookie Policy — Studio Kavea",
 };
 
 export default function CookiesPage() {
@@ -13,7 +13,7 @@ export default function CookiesPage() {
       sections={[
         {
           heading: "The Short Version",
-          body: "freddi.design does not use tracking, advertising, or marketing cookies. This website is intentionally minimal — no third-party tracking scripts, no ad networks, no retargeting pixels. We measure basic, anonymous traffic with a privacy-first, cookieless analytics tool, so there is no consent banner to click through.",
+          body: "Studio Kavea does not use tracking, advertising, or marketing cookies. This website is intentionally minimal — no third-party tracking scripts, no ad networks, no retargeting pixels. We measure basic, anonymous traffic with a privacy-first, cookieless analytics tool, so there is no consent banner to click through.",
         },
         {
           heading: "What Are Cookies",
@@ -42,7 +42,7 @@ export default function CookiesPage() {
         },
         {
           heading: "Contact",
-          body: "If you have any questions about our use of cookies, please contact us at hello@freddi.design.",
+          body: "If you have any questions about our use of cookies, please contact us at hello@kavea.studio.",
         },
       ]}
     />

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 /**
  * Original design study: kloaq.com's loud, brash structure (case cloud,
  * heavy condensed type, rotated labels, pill tags, slash-separated client run)
- * reskinned in freddi.design's dark + Flameburst-orange brand. This design
+ * reskinned in Studio Kavea's dark + Flameburst-orange brand. This design
  * language is now also the homepage (app/page.tsx uses the same components);
  * this route stays as the original reference/staging version, noindexed.
  */
@@ -33,7 +33,7 @@ export default function KloaqReview() {
         {/* Intro — mirrors the About section's grid (label column + 2-col
             content) so both sections align identically down the page */}
         <section className="kloaq-logos-intro-section">
-          <div className="kloaq-vlabel">Inside Freddi</div>
+          <div className="kloaq-vlabel">Inside Kavea</div>
           <div className="kloaq-logos-intro">
             <h2>Brands that trust the process</h2>
             <p>
@@ -54,7 +54,7 @@ export default function KloaqReview() {
             <div className="kloaq-about-grid">
               <div>
                 <p className="lead">
-                  We are freddi.design — your dedicated design partner.
+                  We are Studio Kavea — your dedicated design partner.
                 </p>
                 <p>
                   One small team on speed dial, not an agency layer cake. Identity,

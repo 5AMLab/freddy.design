@@ -161,7 +161,7 @@ export default function Preloader() {
               lineHeight: 1.3,
             }}
           >
-            freddi<span style={{ color: "var(--orange)" }}>.</span>
+            Kavea<span style={{ color: "var(--orange)" }}>.</span>
           </span>
         </span>
       </span>

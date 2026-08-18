@@ -142,6 +142,7 @@ export default function KloaqFooter() {
                     <Link href={href}>{label}</Link>
                   </li>
                 ))}
+                <li className="kloaq-footer-uen">UEN 53529765C</li>
               </ul>
             </div>
           </div>

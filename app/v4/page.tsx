@@ -17,7 +17,7 @@ import BriefFlow from "@/components/v2/BriefFlow";
  * swapping the hero import in app/page.tsx and deleting this route.
  */
 export const metadata: Metadata = {
-  title: "freddi.design — hero v4 mockup",
+  title: "Studio Kavea — hero v4 mockup",
   robots: { index: false, follow: false },
 };
 
@@ -36,7 +36,7 @@ export default function HeroV4Review() {
         <KloaqServices />
 
         <section className="kloaq-logos-intro-section">
-          <div className="kloaq-vlabel">Inside Freddi</div>
+          <div className="kloaq-vlabel">Inside Kavea</div>
           <div className="kloaq-logos-intro">
             <h2>Brands I&apos;ve worked with</h2>
             <p>
@@ -57,7 +57,7 @@ export default function HeroV4Review() {
             <div className="kloaq-about-grid">
               <div>
                 <p className="lead">
-                  We are freddi.design — your dedicated design partner.
+                  We are Studio Kavea — your dedicated design partner.
                 </p>
                 <p>
                   You brief one small team and that team stays with it — no account
