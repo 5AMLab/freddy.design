@@ -4660,6 +4660,37 @@
      Change --type-vlabel and all of them follow. */
   margin-bottom: clamp(16px, 2vw, 30px);
 }
+/* ── HERO EYEBROW: name over discipline, NO brackets ──
+   .kloaq-vlabel adds "[ " / " ]" via ::before/::after and sets
+   white-space: nowrap on every other label on the site. Both are suppressed
+   HERE ONLY — brackets drawn around a two-line block read as a container, not
+   as the site's label punctuation, and nowrap would stop the second line from
+   ever breaking onto its own row. Every other [ LABEL ] on the site keeps its
+   brackets; this selector is scoped to .v6-label specifically. */
+.v6-label::before,
+.v6-label::after {
+  content: none;
+}
+.v6-label {
+  white-space: normal;
+}
+.v6-label-name,
+.v6-label-discipline {
+  display: block;
+}
+/* The discipline line is the quieter half — it names the category, where the
+   line above names the studio. Same size and tracking as the name (this is
+   ONE label, not two different ones), separated by weight and opacity
+   instead.
+   opacity, not an rgba() literal: --cream is #DEDEDE on dark sections but
+   INVERTS to black inside .kloaq-light-section, so a hardcoded light-colour
+   rgba would turn invisible if this label ever sat on a light field. Opacity
+   steps down whatever the current foreground colour is. */
+.v6-label-discipline {
+  font-weight: 500;
+  opacity: 0.62;
+  margin-top: 0.28em;
+}
 
 /* ── VOICE ──
    One <h1> whose inline flow contains the cards. line-height carries the
@@ -4884,8 +4915,32 @@
    shrinks with the headline. Only the type ramp needs adjusting. */
 @media (max-width: 1024px) {
   .v6-hero {
-    min-height: auto;
-    align-items: flex-start;
+    /* Fill the viewport here too, same as desktop. This was `min-height:
+       auto`, which collapsed the hero to its content height — 398px inside
+       an 812px phone viewport, so the background video covered only the top
+       ~49% of the screen and the next section pushed up into the fold.
+       100svh, not 100vh: mobile browsers resolve 100vh against the LARGEST
+       viewport (toolbars retracted), so a 100vh hero overshoots what is
+       actually visible while the address bar is showing — the bottom of the
+       hero would sit below the fold on first load. svh is the SMALL
+       viewport height (toolbars visible), so the hero matches the screen the
+       visitor actually sees, with room to spare once the bar retracts. */
+    min-height: 100svh;
+    /* Messaging sits in the LOWER THIRD, not top-aligned. The video gets a
+       clean upper two-thirds to actually be seen instead of the copy sitting
+       over the busiest part of the frame, and "See Projects" — the only tap
+       target in the hero here — lands somewhere easier to reach one-handed.
+       Safe to go this low because .kloaq-tabbar returns null on the homepage
+       (see KloaqMobileTabbar) — nothing is docked at the bottom to collide
+       with. If that ever changes, this needs to clear it.
+       flex-end + padding-bottom, not a percentage top offset: the block is
+       positioned from the bottom edge, so it cannot drift upward on a
+       taller screen the way a top-anchored percentage would. */
+    align-items: flex-end;
+    /* ~18svh puts the block's vertical midpoint around 0.78 of the viewport
+       height — inside the lower third without touching the bottom edge.
+       env(safe-area-inset-bottom) adds clearance on notched phones. */
+    padding-bottom: calc(18svh + env(safe-area-inset-bottom));
   }
   .v6-voice {
     font-size: clamp(1.8rem, 6.6vw, 3.6rem);
@@ -4902,75 +4957,73 @@
     letter-spacing: 0.04em;
   }
 }
-/* ── SMALL SCREENS: cards become inline TEXT LINKS ──
-   Below 560px the card stops being an image and becomes an underlined phrase
-   in the sentence. Three reasons the image version does not survive here:
-   the hover stretch (the card's whole interaction) does not exist on touch;
-   a card scaled to fit a ~1.38em line box on a 375px screen is roughly
-   50x26px, too small to read as a photograph at all; and the caption has
-   nowhere to go — absolutely positioned under the card it lands on the next
-   line of type.
-   So the composition degrades to what it fundamentally is: a sentence with
-   two links in it. The inline-card idea is a POINTER-SCREEN flourish, and it
-   is allowed to simply not be there on a phone. */
+/* ── MOBILE AFTER-CARD (default state: hidden) ──
+   The second, mobile-only render of "See Projects" that HeroInlineV6 places
+   after the <h1>. Hidden by default — shown only below 560px, where it
+   replaces the inline copy instead of sitting alongside it. Kept as its own
+   rule (not folded into the media query below) so the "hidden above 560px"
+   default is visible at a glance rather than implied by absence. */
+.v6-after-card-mobile {
+  display: none;
+}
+
+/* ── SMALL SCREENS: the inline card disappears; the after-card takes over ──
+   Below 560px the sentence stops carrying "See Projects" as an inline image —
+   the .v6-card em-sizing tracks the headline's font-size, and at this
+   breakpoint's ~2rem headline that card would render at roughly 50x26px, too
+   small to read as a photograph. Rather than degrade it to underlined text
+   (the earlier approach here), it is replaced by the real card rendered
+   AFTER the messaging — same reel, same hover, sized in fixed units instead
+   of em so it is legible regardless of the headline's size at this width. */
 @media (max-width: 560px) {
   .v6-voice {
     font-size: clamp(1.6rem, 8.6vw, 2.5rem);
     line-height: 1.18;
   }
-  .v6-card {
-    /* Back to normal inline text flow — no fixed box, no em sizing. */
-    display: inline;
-    width: auto;
+  /* The INLINE copy (both Discover Us and See Projects) is removed from the
+     sentence entirely here — not just Discover Us as before. See Projects
+     used to degrade to underlined text in place; now it has a dedicated
+     replacement below the headline instead, so the inline slot has nothing
+     left to do at this width. The WRAPPER goes, not just the anchor, so its
+     trailing space goes with it and the sentence has no stray double gap. */
+  .v6-card-slot {
+    display: none;
+  }
+  /* This wrapper needs to be THE SAME WIDTH as the headline so the card below
+     can be a genuine 50% of it — a sibling cannot size itself as a % of
+     another sibling's rendered width in CSS, so matching the box is the only
+     route.
+     Mirroring .v6-voice's `max-width: 17ch` was tried first and is WRONG here:
+     `ch` is a font-metric unit, and this wrapper does not share the <h1>'s
+     font-size/family, so the two `ch` values resolved completely differently
+     — 157px here against the headline's actual 335px, not a match at all.
+     The fix is to not rely on `ch` matching across elements at all: at this
+     breakpoint .v6-voice's 17ch cap (~330px at its ~32px font-size) is wider
+     than the column it sits in anyway, so the headline's real width already
+     comes from wrapping inside .v6-inner, not from hitting that cap. Matching
+     .v6-inner's own width directly is what actually reproduces the headline's
+     box, with no unit-inheritance assumption to get wrong later. */
+  .v6-after-card-mobile {
+    display: block;
+    width: 100%;
+    margin-top: clamp(20px, 4vh, 36px);
+  }
+  /* Half the width of the messaging, per the wrapper above. Height follows
+     from width to hold the ~2:1 landscape crop the desktop card also uses,
+     rather than being set independently and risking a stretched or squashed
+     photo. */
+  .v6-after-card-mobile .v6-card {
+    display: block;
+    width: 50%;
+    aspect-ratio: 2 / 1;
     height: auto;
     margin: 0;
-    color: var(--orange);
-    border-bottom: 2px solid rgba(var(--orange-rgb), 0.5);
   }
-  /* Discover Us is removed from the sentence entirely here — see the
-     hideOnMobile note in HeroInlineV6. The wrapper (not the anchor) is what
-     goes, so its trailing space goes with it and the headline starts cleanly
-     on "Brands" instead of leaving a stray gap. */
-  .v6-card-slot.is-mobile-hidden {
-    display: none;
-  }
-  /* The art is what does not fit; the words do. The frame can NOT be
-     display:none any more — the label is nested inside it now (so it can
-     re-centre on the stretched box at pointer sizes), and hiding the frame
-     would hide the link text with it, rendering two empty links. Unwind the
-     frame to a plain inline box and hide only the picture. */
-  .v6-card-inner {
-    position: static;
-    display: inline;
-    width: auto;
-    border-radius: 0;
-    overflow: visible;
-    background: none;
-    transition: none;
-  }
-  .v6-card-media {
-    display: none;
-  }
-  /* The label stops being an overlay and becomes the link text itself —
-     static, inline, in the sentence's own flow. Everything that made it an
-     overlay (positioning, plate, transform, caps) is unwound here. */
-  .v6-card-label {
-    position: static;
-    display: inline;
-    transform: none;
-    transition: none;
-    background: none;
-    text-shadow: none;
-    padding: 0;
-    border-radius: 0;
-    max-width: none;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    text-transform: none;
-    color: inherit;
-    white-space: normal;
-    pointer-events: auto;
+  /* The label sat at 0.95rem on the desktop card, which is legible against a
+     199x94 frame; against this much larger 320x160 frame the same absolute
+     size reads small relative to the art, so it steps up here to match. */
+  .v6-after-card-mobile .v6-card-label {
+    font-size: 1.05rem;
   }
 }
 

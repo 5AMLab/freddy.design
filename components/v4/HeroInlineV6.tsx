@@ -327,13 +327,25 @@ export default function HeroInlineV6() {
       </div>
 
       <div className="v6-inner">
-        {/* Bare words — .kloaq-vlabel adds the [ brackets ] itself.
+        {/* Studio name over discipline, two lines, NO brackets.
             Carries the studio NAME now, not the category: the headline used to
             open with "Studio Kavea" and the eyebrow said "Creative Studio",
             which put the name twice in the same block (three times counting
             the wordmark). The name is the standing identity, so it belongs
-            here; the headline says the thing worth saying. */}
-        <div className="kloaq-vlabel v6-label">Studio Kavea</div>
+            here; the headline says the thing worth saying.
+            Two spans, not one string with a <br>: the CSS controls the break
+            (see .v6-label-name / .v6-label-discipline in kloaq.css), so the
+            two halves can be recombined onto one line at a wider breakpoint
+            without touching this markup.
+            .kloaq-vlabel normally wraps its content in [ brackets ] via
+            ::before/::after — suppressed for this label only (see .v6-label
+            in kloaq.css); brackets around a two-line block read as a
+            container, not as the site's label punctuation. Every other
+            [ LABEL ] on the site is unaffected. */}
+        <div className="kloaq-vlabel v6-label">
+          <span className="v6-label-name">Studio Kavea</span>
+          <span className="v6-label-discipline">Brand &amp; Creative Direction</span>
+        </div>
 
         {/* The headline is ONE <h1> whose inline flow contains the cards. The
             cards are real anchors inside the sentence, so they are reachable
@@ -364,6 +376,26 @@ export default function HeroInlineV6() {
             )
           )}
         </h1>
+
+        {/* MOBILE-ONLY second render of the "See Projects" card, placed AFTER
+            the messaging rather than inside the sentence. Below 560px the
+            inline copy inside the <h1> above is what disappears (see
+            .v6-card in the ≤560px block in kloaq.css) — the underlined-text
+            fallback that used to replace it is gone. This is what replaces it
+            instead: the same card, same reel, just positioned below the
+            headline and hidden above 560px (.v6-after-card-mobile).
+            Rendered as a SECOND InlineCard rather than moved with CSS: the
+            desktop copy lives inside the <h1>'s inline flow, and nothing can
+            relocate an inline element out of its text flow to "after the
+            paragraph" without literally being a different element in the
+            DOM. Two renders, one visible at a time — same pattern the
+            hideOnMobile flag already uses for Discover Us. */}
+        <div className="v6-after-card-mobile">
+          <InlineCard segment={SEGMENTS.find(
+            (s): s is Extract<Segment, { kind: "card" }> =>
+              s.kind === "card" && s.label === "See Projects"
+          )!} />
+        </div>
       </div>
     </section>
   );
