@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       sections={[
         {
           heading: "Who We Are",
-          body: "Studio Kavea is a freelance design studio based in Singapore, operated by Freddy Balian. We provide on-demand graphic design services including presentation decks, brand assets, campaign materials, and more. You can contact us at hello@kavea.studio.",
+          body: "Studio Kavea (UEN 53529765C) is a design studio based in Singapore. We provide on-demand graphic design services including presentation decks, brand assets, campaign materials, and more. You can contact us at hello@kavea.studio.",
         },
         {
           heading: "What Information We Collect",

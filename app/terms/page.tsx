@@ -13,7 +13,7 @@ export default function TermsPage() {
       sections={[
         {
           heading: "Agreement",
-          body: "By accessing this website or engaging Studio Kavea for services, you agree to these terms. If you do not agree, please do not use this site or our services. These terms are governed by the laws of Singapore.",
+          body: "By accessing this website or engaging Studio Kavea (UEN 53529765C) for services, you agree to these terms. If you do not agree, please do not use this site or our services. These terms are governed by the laws of Singapore.",
         },
         {
           heading: "Services",
