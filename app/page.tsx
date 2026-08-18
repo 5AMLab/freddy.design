@@ -1,6 +1,6 @@
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
-import HeroStatementV4 from "@/components/v4/HeroStatementV4";
+import HeroInlineV6 from "@/components/v4/HeroInlineV6";
 import KloaqLogos from "@/components/v2/KloaqLogos";
 import KloaqPortfolio from "@/components/v2/KloaqPortfolio";
 import KloaqServices from "@/components/v2/KloaqServices";
@@ -12,7 +12,13 @@ import BriefFlow from "@/components/v2/BriefFlow";
  * Homepage — the Kloaq design language is the site default: Boldonse +
  * Inter Tight typography, orange accent, 14px image rectangles.
  *
- * Section sequence: hero → inside freddi (logo wall) → portfolio → what we do
+ * NOTE ON TYPE: the hero is the one exception to the Boldonse display rule.
+ * HeroInlineV6's headline is Inter Tight, because Boldonse is too wide to
+ * hold a full sentence at hero scale with two cards set inline in it. The
+ * seam is visible scrolling from the hero into the first h2 below. That is a
+ * known, deliberate trade — see the component docblock — not an oversight.
+ *
+ * Section sequence: hero → inside kavea (logo wall) → portfolio → what we do
  * → manifesto → footer. Say it, prove who trusts it, show it, explain it, then
  * ask for the meeting.
  */
@@ -21,16 +27,18 @@ export default function Home() {
     <div className="kloaq-root" style={{ minHeight: "100vh", width: "100%" }}>
       <KloaqNavbar />
       <main>
-        {/* 1. Hero — the voice-dominant statement hero. The six service nouns
-            swap the full-bleed backdrop on hover; they do NOT navigate (the
-            portfolio section below is how you get into a case). At rest the
-            backdrop is the static grain field, never a client's photo. */}
-        <HeroStatementV4 />
+        {/* 1. Hero — the inline-card hero. The work sits INSIDE the
+            headline's text flow as two image cards rather than behind it:
+            "Discover Us" is static, "See Projects" cycles a cross-project
+            reel, and hovering either stretches it and pushes the following
+            words along. Ambient video behind, no scrim (the footage is dark
+            enough — measured). See HeroInlineV6 for the full rationale. */}
+        <HeroInlineV6 />
 
-        {/* 2. Inside Freddi — intro + the logo wall (KloaqLogos is already a
+        {/* 2. Inside Kavea — intro + the logo wall (KloaqLogos is already a
             seamless auto-scrolling marquee). */}
         <section className="kloaq-logos-intro-section">
-          <div className="kloaq-vlabel fade-up">Inside Freddi</div>
+          <div className="kloaq-vlabel fade-up">Inside Kavea</div>
           <div className="kloaq-logos-intro">
             {/* .line-mask is display:block, so it owns the line break the
                 <br /> used to make. */}

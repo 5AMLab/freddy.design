@@ -16,14 +16,18 @@ import "../styles/globals.css";
 // style on <html>, which hydration-mismatches against MotionProvider mutating
 // the root element).
 const interTight = Inter_Tight({
-  weight: ["300", "400", "500", "600", "700", "800"],
+  // 900 (Black) is used by the v6 hero's inline card labels. next/font only
+  // ships the weights listed here — omitting one does NOT fall back to the
+  // nearest real weight, it lets the browser SYNTHESISE a fake bold, which
+  // renders as smeared outlines rather than the true Black cut.
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
   display: "swap",
   variable: "--font-body",
 });
 
 export const metadata: Metadata = {
-  title: "freddi.design — Design on Demand, Singapore",
+  title: "Studio Kavea — Design on Demand, Singapore",
   description:
     "Skip the overhead of a full-time hire. Get a dedicated design team on speed dial — fast turnarounds, direct line, always on brand.",
 };
@@ -54,10 +58,15 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="preconnect" href="https://va.vercel-scripts.com" />
-        {/* The homepage hero's rest-state backdrop (HeroStatementV4). It is the
-            first thing the hero paints, so preload it — discovered late it
-            flashes in after first paint. */}
-        <link rel="preload" as="image" href="/bg/bg-orange-grain.jpg" />
+        {/* NO hero preload. This used to preload /bg/bg-orange-grain.jpg —
+            the old HeroStatementV4 hero's rest-state backdrop — but the
+            homepage now runs HeroInlineV6 and never paints that image, so the
+            preload was fetching an asset the page does not use. (The grain
+            field is still used by /v4 and /kloaq, which load it normally.)
+            Deliberately NOT replaced with a preload of the hero video:
+            `as="video"` is poorly supported and would pull the full ~3.1MB up
+            front, competing with the headline's own first paint. The <video>
+            element carries preload="metadata" and starts itself. */}
       </head>
       <body>
         <MotionProvider>

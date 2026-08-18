@@ -2,10 +2,10 @@
    KLOAQ-INSPIRED REVIEW LAYOUT  —  "Kloaq energy, freddy palette"
    A design study that takes kloaq.com's loud, brash structure — the packed
    typographic case "cloud", heavy condensed caps, rotated sidebar labels,
-   pill-shaped service tags — and reskins it in freddi.design's dark + gold
+   pill-shaped service tags — and reskins it in Studio Kavea's dark + gold
    brand instead of Kloaq's orange.
 
-   Kloaq → freddi translation:
+   Kloaq → Kavea translation:
    - orange field            →  var(--black) ink canvas
    - near-black type          →  var(--off-white) cream type
    - hover word flips black   →  hover word flips to gold #C9A96E
@@ -160,7 +160,7 @@
 /* Section eyebrow. The [ brackets ] are drawn by the pseudo-elements below,
    NOT typed into each label's text — every section gets them automatically and
    a new one can't forget. Do not write "[ … ]" into the JSX; pass the bare
-   words ("Inside Freddi") and this rule brackets and uppercases them. */
+   words ("Inside Kavea") and this rule brackets and uppercases them. */
 .kloaq-vlabel {
   font-family: var(--body);
   font-style: normal;
@@ -1296,8 +1296,9 @@
   flex-wrap: wrap;
 }
 /* "Privacy | Terms & Conditions | Cookies" — the rules are drawn between the
-   items rather than typed as characters, so the last one has none. */
-.kloaq-footer-legal li + li::before {
+   items rather than typed as characters, so the last one has none. The UEN
+   item sits after its own gap instead, so it doesn't get a rule either. */
+.kloaq-footer-legal li + li:not(.kloaq-footer-uen)::before {
   content: "|";
   margin-right: 14px;
   color: var(--muted);
@@ -1312,6 +1313,12 @@
 }
 .kloaq-footer-legal a:hover {
   color: var(--orange);
+}
+.kloaq-footer-uen {
+  font-family: var(--body);
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--muted);
 }
 
 /* Huge ghost wordmark, anchoring the footer as the page's true final
@@ -1351,25 +1358,19 @@
   padding: 8px var(--section-pad-x) 96px;
   display: flex;
   align-items: center;
-  font-family: var(--display);
-  font-size: var(--footer-mark-size);
-  line-height: 1.4;
-  white-space: nowrap;
   pointer-events: none;
   user-select: none;
 }
-/* OUTLINE, not a fill — hollow letterforms drawn with a stroke, no opacity.
-   (The old treatment clipped an animated per-character sunset gradient to the
-   text; that's gone, along with the --gold token that was its only consumer.
-   A flat low-opacity fill replaced it and is now gone too.) The mark reads as a
-   drawn contour: fully opaque stroke, transparent centre, so the footer's dark
-   field shows through the letters. */
-.kloaq-footer-watermark-char {
-  display: inline-block;
-  white-space: pre;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1.5px var(--cream);
+/* The logotype's outline variant (hollow letterforms, transparent fill) — the
+   footer's dark field shows through the letters exactly as the old CSS
+   text-stroke treatment did. Height keyed off the same clamp the text used to
+   size itself with (--footer-mark-size), scaled down since that was a
+   font-size/line-height figure and this is a direct glyph height; width
+   follows from the SVG's own aspect ratio. */
+.kloaq-footer-watermark-img {
+  height: calc(var(--footer-mark-size) * 0.62);
+  width: auto;
+  display: block;
 }
 
 /* Tablet (600–900px): the desktop 4-across row doesn't fit, but collapsing
@@ -4244,4 +4245,769 @@
     grid-template-columns: 1fr;
     gap: var(--gap-sm);
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   V5 HERO — the "bounded panel" statement hero (review route /v5).
+
+   The v4 hero above paints the work FULL-BLEED behind the headline under a
+   40% scrim. That is the thing this block exists to stop doing: the assets
+   are design work, so they carry their own typography, and a scrim can only
+   lower luminance — it cannot stop STRUCTURE from competing with the h1.
+
+   So the split here is territorial. The voice sits on flat ink with nothing
+   behind it (full contrast, NO SCRIM ANYWHERE in this block — if you find
+   yourself adding one, the layout has regressed to v4's problem). The work
+   gets one bounded panel with hard edges and the site's 14px image radius,
+   and runs undimmed inside it.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Unlike .v4-hero this section is NOT full-bleed — there is no edge-to-edge
+   backdrop to paint, so it rides the shared content column like every other
+   text section and inherits the standard cap/gutter from
+   `.kloaq-root main > section`. No overflow-x: clip needed either: nothing
+   bleeds past the section box. */
+.v5-hero {
+  position: relative;
+  background: var(--ink);
+  /* The shared `.kloaq-root main > section` rule supplies the cap, centring
+     and gutter — but it does so via the `padding` SHORTHAND, so declaring
+     padding-top/-bottom here alone reset padding-inline to 0 and the copy
+     column went flush to x=0. Restate the gutter explicitly rather than
+     relying on inheriting half a shorthand. */
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--section-pad-x);
+  /* Same nav clearance every other page's first section uses, so the
+     [ CREATIVE STUDIO ] label lands on the site-wide line. Fixed, not a
+     minmax floor — see the v4 block's history note for why a flexible top
+     row is the wrong knob. */
+  padding-top: var(--page-head-pad-top);
+  padding-bottom: var(--section-pad-y);
+  /* min-height, not height: on a short window the hero grows and scrolls
+     rather than clipping content. Paired with the panel's max-height below,
+     which is what actually keeps the whole thing inside one screen — the
+     4/5 frame at full column width alone overran 100svh by ~215px. */
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+/* Two columns: voice left, panel right. The copy column is capped so the
+   headline has a real measure and can never run to the panel's edge — v4's
+   62% cap was being overridden by the shared section rule and the headline
+   ran the full 1425px. This is a grid track, so it holds. */
+.v5-inner {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 88px);
+}
+
+.v5-copy {
+  min-width: 0;
+}
+.v5-hero .kloaq-vlabel,
+.v5-services-label {
+  color: var(--cream);
+  font-family: var(--body);
+  font-weight: 600;
+  /* Do NOT set a font-size here — every bracketed [ LABEL ] on the site is
+     one size. Change --type-vlabel and all of them follow. */
+  font-size: var(--type-vlabel);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.v5-copy > .kloaq-vlabel {
+  margin-bottom: clamp(14px, 1.8vw, 28px);
+}
+
+/* ── VOICE ──
+   The biggest thing on the page, and it stays that way: the noun list below
+   is deliberately set at a fraction of this scale. */
+.v5-voice {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.v5-voice-line {
+  font-family: var(--display);
+  font-weight: 400; /* Boldonse is single-weight, natively heavy */
+  /* Boldonse is extremely wide. No `white-space: nowrap` here — v4 pinned
+     nowrap so a line could only ever SHRINK, which is why its headline ran
+     edge-to-edge at 375 with no gutter, the type doing the layout's job.
+     Wrapping is allowed; the grid track sets the measure. */
+  font-size: clamp(2rem, 3.6vw, 3.9rem);
+  /* Boldonse carries real ascender/descender ink outside the line box, so
+     flush-stacked lines collide. Opened up to clear. */
+  line-height: 1.3;
+  letter-spacing: 0.004em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.v5-voice-line.is-accent {
+  color: var(--orange);
+}
+
+/* ── SERVICES ──
+   Four nouns, set at BODY scale rather than headline scale. This is the
+   ratio fix: in v4 the six-noun list rendered 390px tall against a 266px
+   headline, so the menu out-weighed the voice it was meant to support. */
+.v5-services {
+  padding-top: clamp(20px, 3.2vh, 44px);
+}
+.v5-services-label {
+  display: block;
+  margin-bottom: clamp(10px, 1.4vw, 18px);
+}
+.v5-noun-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+/* A noun = one hover target. It swaps the panel and nothing else — no href,
+   no navigation, so no pointer cursor and no link affordance. v4 set these
+   at 36px semibold turning orange on hover, which reads as a link in every
+   other context on this site; a bordered chip reads as a filter/toggle,
+   which is what it actually is. */
+.v5-noun {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: clamp(0.9rem, 1.05vw, 1.05rem);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+.v5-noun.is-active {
+  color: var(--ink);
+  background: var(--orange);
+  border-color: var(--orange);
+}
+/* Hover only on fine pointers — on touch the tap already sets .is-active,
+   and a sticky :hover would leave a second chip lit after the tap moves on. */
+@media (hover: hover) and (pointer: fine) {
+  .v5-noun:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+  .v5-noun.is-active:hover {
+    color: var(--ink); /* active chip keeps its filled treatment */
+  }
+}
+
+/* The one real link in the block, so it DOES carry a link affordance. */
+.v5-see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: clamp(18px, 2.4vh, 30px);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: clamp(0.9rem, 1.05vw, 1.05rem);
+  color: var(--cream);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  padding-bottom: 3px;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.v5-see-all:hover {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+.v5-see-all-arrow svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+/* ── PANEL ──
+   The work's own territory. Hard edges, the site's 14px image radius, and
+   NO overlay of any kind: the photo runs at full strength because nothing
+   is set on top of it. */
+.v5-panel {
+  min-width: 0;
+}
+.v5-panel-frame {
+  position: relative;
+  width: 100%;
+  /* A fixed ratio keeps the panel from resizing as images of different
+     native aspect ratios cycle through — a jumping frame would undo the
+     "bounded" idea the whole direction rests on. */
+  aspect-ratio: 4 / 5;
+  /* Ratio alone let the frame grow to whatever the column width implied,
+     which on a 1440x900 window made the hero 1115px tall — 215px past the
+     fold. The fix has to constrain WIDTH, not height: `max-height` on an
+     aspect-ratio box wins over the ratio and squashes it (it rendered 1.037
+     instead of 0.8), which would defeat the point of a fixed frame. Capping
+     the width to the height the viewport can spare, times the ratio, keeps
+     4/5 exact while still fitting one screen. margin-inline centres the
+     frame when this cap (not the column) is the binding constraint, so it
+     never sits lopsided in its track. */
+  max-width: calc(
+    (100svh - var(--page-head-pad-top) - var(--section-pad-y) - 60px) * 4 / 5
+  );
+  margin-inline: auto;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+}
+/* 0.7s here MUST stay in sync with FADE_MS in HeroPanelV5.tsx — the caption's
+   swap is timed to this fade's midpoint. */
+.v5-panel-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.v5-panel-img.is-active {
+  opacity: 1;
+}
+/* Caption sits UNDER the frame, never over the photo — so the client tag
+   never has to fight the image it names (and needs no scrim to be legible). */
+.v5-panel-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 16px;
+  font-family: var(--body);
+  font-size: var(--type-vlabel);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.v5-panel-client {
+  font-weight: 600;
+  color: var(--cream);
+}
+.v5-panel-category {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ── STACKED (≤1024px) ──
+   One column: label → headline → nouns → panel. The panel keeps its bounded
+   frame, it just becomes a band under the copy. It stays BELOW the nouns so
+   the chips remain adjacent to the thing they drive. */
+@media (max-width: 1024px) {
+  .v5-hero {
+    min-height: auto;
+    align-items: flex-start;
+  }
+  .v5-inner {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 5vh, 48px);
+  }
+  .v5-voice-line {
+    font-size: clamp(1.9rem, 6.4vw, 3.2rem);
+  }
+  .v5-panel-frame {
+    /* Landscape on stacked layouts — a 4/5 portrait panel at full column
+       width would push the fold down hard on a phone. */
+    aspect-ratio: 3 / 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .v5-voice-line {
+    font-size: clamp(1.6rem, 8.2vw, 2.4rem);
+    line-height: 1.26;
+  }
+  .v5-noun {
+    font-size: 0.85rem;
+    padding: 9px 14px;
+  }
+  .v5-panel-frame {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* Reduced motion: autoplay is already skipped in the component; kill the
+   cross-fade too so the panel swaps instantly on hover/tap. */
+@media (prefers-reduced-motion: reduce) {
+  .v5-panel-img {
+    transition: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   V6 HERO — the "inline card" statement hero (review route /v6).
+
+   The work sits INSIDE the headline's text flow: two image cards are inline
+   runs in the sentence. Type and art share a line but never share pixels, so
+   — unlike the v4 full-bleed hero — there is NO SCRIM anywhere in this block
+   and none is needed. If a scrim ever appears here, the layout has regressed.
+
+   Headline is INTER TIGHT (--body), not Boldonse. See the component docblock:
+   Boldonse is too wide to hold a full sentence at hero scale with two cards
+   inline. Consequence, accepted deliberately: the hero headline no longer
+   matches the Boldonse h2s further down the page.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.v6-hero {
+  position: relative;
+  background: var(--ink);
+  /* The shared `.kloaq-root main > section` rule supplies cap/centring/gutter
+     via the padding SHORTHAND, so setting padding-top here alone would reset
+     padding-inline to 0 (this bit me on v5 — the copy went flush to x=0).
+     Restate the gutter explicitly. */
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--section-pad-x);
+  padding-top: var(--page-head-pad-top);
+  padding-bottom: var(--section-pad-y);
+  /* min-height, not height: on a short window the hero grows and scrolls
+     rather than clipping the headline. */
+  min-height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  /* Cards scale past their inline slot on hover; clip that growth to the
+     section so it can never widen the document. `clip` not `hidden` — hidden
+     creates a scroll container and re-breaks sticky site-wide. */
+  overflow-x: clip;
+}
+/* ── BACKGROUND VIDEO ──
+   Ambient abstract footage behind the whole hero.
+
+   FULL-BLEED out of a CAPPED section. .v6-hero is max-width: --container-max
+   and centred (it rides the shared content column), so a child at inset:0
+   would stop at 1600px and leave the page's ink background showing as bars on
+   any wider viewport. The negative-margin breakout below re-widens just this
+   layer to the viewport. It cannot use the usual pseudo-element trick because
+   the hero needs `overflow: clip` for the card stretch, which would clip it.
+
+   z-index 0 with the content lifted above it — see .v6-inner. */
+.v6-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.v6-bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* NO SCRIM. Measured rather than assumed: sampled across six timestamps in
+   the exact region the headline occupies, the raw footage runs 16–29 mean
+   luminance (14.6:1 to 16.5:1 against cream) and its BRIGHTEST single pixel
+   reaches only 102–104 (4.83:1) — so even the worst case clears 4.5:1 with
+   nothing on top of it.
+   This element is kept as an empty hook rather than deleted so a scrim can be
+   reinstated in one place if the footage is ever swapped for something
+   lighter. If you do swap the video, re-measure before assuming it is still
+   dark enough; do not just re-add an opacity by eye. */
+.v6-bg-scrim {
+  position: absolute;
+  inset: 0;
+}
+/* Content sits above the video. Without this the hero's own children share a
+   stacking context with .v6-bg and the video paints over the headline. */
+.v6-inner {
+  position: relative;
+  z-index: 1;
+}
+/* MOTION.md: reduced motion means no ambient movement. An autoplaying loop is
+   the most conspicuous possible violation, so the video is hidden outright and
+   the hero falls back to its flat ink background — the scrim colour it was
+   already sitting on, so nothing else needs to change. */
+@media (prefers-reduced-motion: reduce) {
+  .v6-bg {
+    display: none;
+  }
+}
+
+.v6-inner {
+  width: 100%;
+}
+/* MEASURE. The headline is capped below the full content column so the
+   sentence breaks to five lines instead of four — at full width the type had
+   to stay smaller to fit the same number of lines, and the hero read
+   half-empty (41% of the content box before this pass). Narrowing the measure
+   and raising the size together is what fills the space: same words, taller
+   block.
+   Set to hold the headline at THREE lines with the current copy — a chosen
+   composition, not a fill target. Note this deliberately does NOT maximise
+   vertical fill: three lines of this copy occupy ~51% of the content box,
+   where a tighter measure would reach ~75% at four lines. The wider measure
+   won because the line reads better broken this way, and because the extra
+   horizontal room is what gives the See Projects card slack to push "in a"
+   on hover without forcing a wrap.
+   THIS VALUE IS COPY-DEPENDENT and has moved every time the words did: 15ch,
+   17ch, 14ch, 13ch. If the headline text changes again, re-check the
+   resulting line count rather than assuming this number still holds. Also gives the line a sane reading measure at 100px+ type, where a
+   full 1313px line would run far past comfortable. */
+.v6-voice {
+  max-width: 17ch;
+}
+.v6-hero .kloaq-vlabel {
+  color: var(--cream);
+  /* No font-size here — every bracketed [ LABEL ] on the site is one size.
+     Change --type-vlabel and all of them follow. */
+  margin-bottom: clamp(16px, 2vw, 30px);
+}
+
+/* ── VOICE ──
+   One <h1> whose inline flow contains the cards. line-height carries the
+   cards' height, so it is set generously — the cards sit ON the text baseline
+   grid rather than punching out of it. */
+.v6-voice {
+  margin: 0;
+  font-family: var(--body);
+  font-weight: 700;
+  /* Sentence case, not uppercase: this is a sentence with a real clause in
+     it, and caps at this length becomes a wall.
+     Sized to FILL the hero: at the old 4.6vw/4.1rem ceiling the headline
+     occupied only ~41% of the content box (264px of 644px at 1440x900) and
+     the hero read half-empty. The ramp is now driven by vw with a much
+     higher ceiling so the type actually holds the space it is given.
+     line-height tightens as the type grows — at this size 1.32 wasted
+     vertical room between lines and pushed the block past the fold. */
+  font-size: clamp(2.1rem, 7.1vw, 7.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: var(--cream);
+}
+/* Each text run is its own inline block so the entrance can stagger them.
+   inline (not inline-block) so runs still break across lines naturally —
+   inline-block would make each run an unbreakable brick. */
+.v6-run {
+  display: inline;
+}
+/* Space between a run and an adjacent card. Margin on the card (below) owns
+   the horizontal rhythm; this keeps the runs themselves unpadded. */
+.v6-run + .v6-card,
+.v6-card + .v6-run {
+  margin-left: 0;
+}
+
+/* ── INLINE CARD ──
+   The card is an inline-block slot in the sentence. Its WIDTH never changes:
+   the hover stretch is a transform, so the sentence never reflows.
+
+   Composition: the project image fills the card at rest, with the label
+   overlaid on top of it. Hovering stretches the card horizontally, revealing
+   more of the photo — the image is the payoff, the label is the standing
+   identity. */
+/* Pure wrapper — inline so it adds nothing to the line box; it exists only so
+   the card and its trailing space can be dropped as one unit on mobile. */
+.v6-card-slot {
+  display: inline;
+}
+.v6-card {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  /* Sized off the font, so the card scales with the headline at every
+     breakpoint instead of needing its own media queries.
+     HEIGHT IS CAPPED TO THE LINE BOX — the card must always be SMALLER than
+     line-height (currently 1.06) or it overhangs into the line above and
+     collides with its descenders. This bit twice: at 1.62em against a 1.32
+     line-height, and again at 1.2em when line-height tightened to 1.06.
+     If either value is retuned, re-check this relationship first.
+     WIDTH is a landscape crop for the image. It no longer has to hold the
+     longest label on one line — the label wraps to two lines now (see
+     .v6-card-label), so the card only has to clear the longest WORD. That
+     decoupling is what lets this stay em-based and track the headline
+     cleanly at every breakpoint. */
+  height: 0.92em;
+  width: 1.95em;
+  margin: 0 0.16em;
+  text-decoration: none;
+}
+/* The stretching layer. It animates WIDTH, and it is IN FLOW — deliberately.
+   This is a reversal of the earlier build, where the layer was
+   `position: absolute` specifically so its width could never move the
+   sentence. The requirement changed: the words after the card should now be
+   PUSHED along as it opens, rather than the card growing over a static line.
+   In-flow width is the only way to get that — a transform or an out-of-flow
+   box cannot displace text by definition.
+   MOTION.md's "no layout properties" rule is knowingly broken here. It exists
+   to stop layout thrash, and the cost is real: this reflows the card's line on
+   hover. It is contained to ONE line (only "in a" follows the card before the
+   wrap) and the measure carries ~104px of slack against the ~84px the stretch
+   needs, so nothing wraps to a new line mid-interaction. If the copy or the
+   measure changes, re-check that slack — losing it means the headline gains a
+   line on hover, which is a far worse artefact than the reflow itself.
+   scaleX remains the wrong tool regardless: scaling a frame scales its
+   contents, so the image had to be counter-scaled back, which pinned the
+   photo to its original width and left the newly opened space empty. */
+.v6-card-inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  /* dur-micro (0.3s) is the token for hover feedback, but this is a large
+     travel — 0.45s at ease-out-luxe reads as "settling" rather than snapping,
+     which is the MOTION.md personality. */
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* The SLOT is what the sentence sees. Animating its width is what pushes the
+   following words; the frame inside simply fills it. Both animate on the same
+   easing so the photo edge and the type move as one gesture rather than the
+   card appearing to drag the words late. */
+.v6-card {
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.v6-card:hover,
+.v6-card:focus-visible {
+  width: 2.77em; /* 1.95em x 1.42 — the stretch ratio, applied to the slot */
+}
+/* Media layer. It does NOT counter-scale.
+   An earlier version scaled this to 0.704 (the inverse of the frame's 1.42)
+   to keep the photo from smearing — but that pinned the image to its ORIGINAL
+   width, so the 84px the stretch opened up stayed empty and the card revealed
+   a blank strip on hover instead of more photograph. Undoing the stretch and
+   filling the stretch are opposite goals; this needs the latter.
+   The fix is to stop transforming the image at all and let the frame's own
+   width drive it — see the width animation below. */
+.v6-card-media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+/* REEL FRAMES. Every image of the project is rendered and absolutely stacked
+   in the same box; only opacity animates, so a swap never re-decodes an image,
+   never reflows the card, and never disturbs the sentence around it.
+   Each frame fills whatever box the frame currently is, and object-fit: cover
+   re-crops it as that box widens — so stretching reveals MORE of the
+   photograph rather than scaling the same crop. */
+.v6-card-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  /* Long, symmetric cross-fade. This is ambient background motion inside a
+     headline someone is reading — a fast cut would pull the eye off the words.
+     MOTION.md's dur-micro is for FEEDBACK; this is closer to dur-reveal. */
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.v6-card-frame.is-active {
+  opacity: 1;
+}
+/* ── LABEL, OVERLAID ON THE IMAGE ──
+   Centred on the frame, sitting directly on the photo with NO PLATE and NO
+   TEXT-SHADOW behind it. Both are gone deliberately — the plate was a scrim,
+   and scrims are the thing this direction exists to avoid.
+   The consequence is that NOTHING assists legibility here: the label is bare
+   cream type on whatever pixels the photo happens to put behind it. That
+   holds because the card art is chosen and cropped dark where the label sits,
+   not because the CSS guarantees it. If a lighter image is ever swapped into
+   NOUNS, check this by eye — the failure mode is a label that disappears into
+   a bright patch, and there is no fallback to catch it.
+
+   It lives INSIDE .v6-card-inner (the stretching frame), so `left: 50%`
+   resolves against the frame's CURRENT width and the label re-centres itself
+   as the card opens. Safe to nest here only because the frame animates its
+   real WIDTH rather than scaleX — under the old transform approach anything
+   in this layer got stretched with it and had to be counter-scaled back. */
+.v6-card-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  /* Follows the frame's own easing so the text and the photo edge arrive
+     together — a faster label would visibly overtake the opening card. */
+  transition:
+    left 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.3s ease;
+  font-family: var(--body);
+  /* Declared 900, but be aware of the ceiling: Inter Tight's Google Fonts
+     build has NO cut above 800, so 800/900/1000 all rasterise from the same
+     ExtraBold face (measured: identical 200.14px advance for "ABOUT US" at
+     40px across all three). This is real ExtraBold, not a synthesised fake —
+     900 is registered in app/layout.tsx's next/font weight list, and dropping
+     it there WOULD cause a fake bold. Kept at 900 so the intent survives if
+     the family ever ships a true Black; do not expect it to look heavier than
+     800 today. */
+  font-weight: 900;
+  /* Absolute, not em-relative: the label must stay legible regardless of the
+     headline's fluid scale. Sized UP from --type-vlabel (0.78rem, the site's
+     small-caps label size) — with the plate and the text-shadow both gone,
+     the type itself is the only thing carrying legibility over the photo, so
+     it needs more weight on the page than a standard eyebrow label. */
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  /* WRAPS to two lines. Previously `nowrap`, which forced the CARD to be wide
+     enough for the longest label on one line ("See Projects", ~118px at 1440)
+     — and because the card is em-based while the label is a fixed
+     --type-vlabel, the two diverged as the viewport narrowed and the label
+     overflowed its own card below ~700px. Wrapping means the card only has to
+     clear the longest WORD ("Projects"), not the longest phrase, so the
+     constraint holds at every width without shrinking the type. */
+  white-space: normal;
+  /* Tight leading — this is a two-line UI label, not body copy. */
+  line-height: 1.15;
+  max-width: calc(100% - 12px);
+  color: var(--cream);
+  pointer-events: none;
+}
+/* On hover the label goes accent and re-centres on the widened frame, so the
+   card never becomes an unlabelled image mid-interaction. */
+.v6-card:hover .v6-card-label,
+.v6-card:focus-visible .v6-card-label {
+  color: var(--orange);
+}
+
+.v6-card:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+/* ── STACKED / SMALL ──
+   The composition holds down to 375px because the card is sized in `em` — it
+   shrinks with the headline. Only the type ramp needs adjusting. */
+@media (max-width: 1024px) {
+  .v6-hero {
+    min-height: auto;
+    align-items: flex-start;
+  }
+  .v6-voice {
+    font-size: clamp(1.8rem, 6.6vw, 3.6rem);
+    line-height: 1.14;
+  }
+  /* The card is em-based (it tracks the headline) while the label is a fixed
+     rem, so they diverge as the viewport narrows — at 600px the frame is only
+     36px tall and a two-line label at the desktop size measured 41px, i.e.
+     taller than the card containing it. Scale the label down through this
+     range so it stays inside the frame vertically. Below 560px the cards
+     become inline text links and none of this applies. */
+  .v6-card-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+}
+/* ── SMALL SCREENS: cards become inline TEXT LINKS ──
+   Below 560px the card stops being an image and becomes an underlined phrase
+   in the sentence. Three reasons the image version does not survive here:
+   the hover stretch (the card's whole interaction) does not exist on touch;
+   a card scaled to fit a ~1.38em line box on a 375px screen is roughly
+   50x26px, too small to read as a photograph at all; and the caption has
+   nowhere to go — absolutely positioned under the card it lands on the next
+   line of type.
+   So the composition degrades to what it fundamentally is: a sentence with
+   two links in it. The inline-card idea is a POINTER-SCREEN flourish, and it
+   is allowed to simply not be there on a phone. */
+@media (max-width: 560px) {
+  .v6-voice {
+    font-size: clamp(1.6rem, 8.6vw, 2.5rem);
+    line-height: 1.18;
+  }
+  .v6-card {
+    /* Back to normal inline text flow — no fixed box, no em sizing. */
+    display: inline;
+    width: auto;
+    height: auto;
+    margin: 0;
+    color: var(--orange);
+    border-bottom: 2px solid rgba(var(--orange-rgb), 0.5);
+  }
+  /* Discover Us is removed from the sentence entirely here — see the
+     hideOnMobile note in HeroInlineV6. The wrapper (not the anchor) is what
+     goes, so its trailing space goes with it and the headline starts cleanly
+     on "Brands" instead of leaving a stray gap. */
+  .v6-card-slot.is-mobile-hidden {
+    display: none;
+  }
+  /* The art is what does not fit; the words do. The frame can NOT be
+     display:none any more — the label is nested inside it now (so it can
+     re-centre on the stretched box at pointer sizes), and hiding the frame
+     would hide the link text with it, rendering two empty links. Unwind the
+     frame to a plain inline box and hide only the picture. */
+  .v6-card-inner {
+    position: static;
+    display: inline;
+    width: auto;
+    border-radius: 0;
+    overflow: visible;
+    background: none;
+    transition: none;
+  }
+  .v6-card-media {
+    display: none;
+  }
+  /* The label stops being an overlay and becomes the link text itself —
+     static, inline, in the sentence's own flow. Everything that made it an
+     overlay (positioning, plate, transform, caps) is unwound here. */
+  .v6-card-label {
+    position: static;
+    display: inline;
+    transform: none;
+    transition: none;
+    background: none;
+    text-shadow: none;
+    padding: 0;
+    border-radius: 0;
+    max-width: none;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-transform: none;
+    color: inherit;
+    white-space: normal;
+    pointer-events: auto;
+  }
+}
+
+/* Touch has no hover: the stretch is a pointer affordance only. Without this
+   the card would stick in its stretched state after a tap, since :hover
+   latches on touch. */
+@media (hover: none) {
+  .v6-card:hover .v6-card-inner,
+  .v6-card:hover .v6-card-media {
+    transform: none;
+  }
+  /* Do NOT reveal the caption at rest here. It is absolutely positioned
+     under the card, which on a narrow column drops it straight onto the next
+     line of the sentence — "ABOUT US" landed across "Precision-crafted".
+     Touch gets the inline-link treatment below instead. */
+}
+
+/* MOTION.md: reduced motion keeps hover feedback but drops the movement. */
+@media (prefers-reduced-motion: reduce) {
+  .v6-card-inner,
+  .v6-card-media,
+  .v6-card-label {
+    transition: none;
+  }
+  /* The reel is already halted in the component under reduced motion; kill the
+     cross-fade too so the first frame simply is the card. */
+  .v6-card-frame {
+    transition: none;
+  }
+  .v6-card:hover .v6-card-inner,
+  .v6-card:focus-visible .v6-card-inner {
+    transform: none;
+  }
+  .v6-card:hover .v6-card-media,
+  .v6-card:focus-visible .v6-card-media {
+    transform: none;
+  }
+  /* The label's hover feedback is a COLOUR change, which reduced motion has
+     no quarrel with — it stays. Only the card's stretch is dropped above. */
 }
