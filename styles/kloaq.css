@@ -4977,8 +4977,29 @@
    of em so it is legible regardless of the headline's size at this width. */
 @media (max-width: 560px) {
   .v6-voice {
-    font-size: clamp(1.6rem, 8.6vw, 2.5rem);
-    line-height: 1.18;
+    /* Sized up from clamp(1.6rem, 8.6vw, 2.5rem) — at 375px that resolved to
+       32.25px, and there was 146px of clearance below the after-card inside
+       the hero's 812px height, so the headline had room to take more of the
+       screen. 10.4vw puts 375px at ~39px (up from 32.25px); the floor and
+       ceiling move with it so the same relative increase holds at the ends
+       of the mobile range instead of just at one width. Re-check
+       .v6-after-card-mobile still fits inside the hero if this is tuned
+       further — see the fitsInHero measurement in that block's comment.
+       STILL 3 LINES at this size — checked 320/375/414/560px. If the copy or
+       this clamp changes again, re-verify the line count rather than assume
+       it still holds; the after-card position and hero fit both depend on
+       it staying at 3. */
+    font-size: clamp(2rem, 10.4vw, 2.9rem);
+    line-height: 1.16;
+  }
+  /* Eyebrow sized up to match. It inherits var(--type-vlabel) (0.78rem =
+     12.48px, which resolved to 10.56px at 375px against the headline's old
+     32.25px) — legible but visually thin once the headline jumped to ~39px.
+     Overridden here, not on --type-vlabel itself, so every other [ LABEL ]
+     on the site (which are NOT sized relative to a 39px headline) keeps its
+     existing size; this only touches the hero eyebrow. */
+  .v6-label {
+    font-size: 0.95rem;
   }
   /* The INLINE copy (both Discover Us and See Projects) is removed from the
      sentence entirely here — not just Discover Us as before. See Projects

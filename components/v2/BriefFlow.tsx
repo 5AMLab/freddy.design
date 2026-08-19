@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
-import { CONTACT_EMAIL, RETAINER_SLOTS } from "@/lib/site";
+import { RETAINER_SLOTS } from "@/lib/site";
 
 export const OPEN_BRIEF_EVENT = "fd:open-brief";
 
@@ -34,6 +34,9 @@ export default function BriefFlow() {
   const [timeline, setTimeline] = useState("");
   const [note, setNote] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +49,10 @@ export default function BriefFlow() {
       setDeliverable("");
       setTimeline("");
       setNote("");
+      setName("");
+      setEmail("");
+      setStatus("idle");
+      setErrorMessage("");
       setOpen(true);
     };
     window.addEventListener(OPEN_BRIEF_EVENT, onOpen);
@@ -88,20 +95,25 @@ export default function BriefFlow() {
 
   if (!open) return null;
 
-  const subject = `Design brief — ${deliverable}`;
-  const body = [
-    "Hi Freddy,",
-    "",
-    `What I need: ${deliverable}`,
-    `Timeline: ${timeline}`,
-    "",
-    note,
-    "",
-    name ? `— ${name}` : "",
-  ]
-    .join("\n")
-    .trim();
-  const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const submitBrief = async () => {
+    setStatus("sending");
+    setErrorMessage("");
+    try {
+      const res = await fetch("/api/brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deliverable, timeline, note: note.trim(), name: name.trim(), email: email.trim() }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Something went wrong.");
+      }
+      setStatus("sent");
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  };
 
   const pick = (setter: (v: string) => void) => (value: string) => {
     setter(value);
@@ -294,9 +306,28 @@ export default function BriefFlow() {
                   color: "rgba(249,249,249,0.8)",
                 }}
               />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Your email — so we can reply"
+                style={{
+                  width: "100%",
+                  marginTop: "16px",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: "1px solid rgba(249,249,249,0.15)",
+                  outline: "none",
+                  padding: "8px 0 12px",
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "0.95rem",
+                  fontWeight: 300,
+                  color: "rgba(249,249,249,0.8)",
+                }}
+              />
               <button
                 onClick={() => setStep(3)}
-                disabled={!note.trim()}
+                disabled={!note.trim() || !email.trim()}
                 style={{
                   marginTop: "40px",
                   fontFamily: "var(--font-body), sans-serif",
@@ -305,11 +336,11 @@ export default function BriefFlow() {
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                   color: "var(--off-white)",
-                  background: note.trim() ? "var(--orange)" : "rgba(var(--orange-rgb), 0.25)",
+                  background: note.trim() && email.trim() ? "var(--orange)" : "rgba(var(--orange-rgb), 0.25)",
                   border: "none",
                   borderRadius: "8px",
                   padding: "16px 36px",
-                  cursor: note.trim() ? "pointer" : "not-allowed",
+                  cursor: note.trim() && email.trim() ? "pointer" : "not-allowed",
                   transition: "background 0.3s",
                 }}
               >
@@ -318,7 +349,71 @@ export default function BriefFlow() {
             </div>
           )}
 
-          {step === 3 && (
+          {step === 3 && status === "sent" && (
+            <div>
+              <div
+                style={{
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "0.65rem",
+                  fontWeight: 500,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  color: "var(--orange)",
+                  marginBottom: "24px",
+                }}
+              >
+                Sent
+              </div>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display), sans-serif",
+                  fontSize: "clamp(1.7rem, 3.4vw, 2.8rem)",
+                  fontWeight: 400,
+                  lineHeight: 1.2,
+                  textTransform: "uppercase",
+                  color: "var(--off-white)",
+                  marginBottom: "20px",
+                }}
+              >
+                Got it{name.trim() ? `, ${name.trim()}` : ""}.
+              </h2>
+              <p
+                style={{
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "clamp(1.05rem, 1.8vw, 1.3rem)",
+                  fontWeight: 400,
+                  lineHeight: 1.6,
+                  color: "rgba(249,249,249,0.75)",
+                  maxWidth: "520px",
+                  marginBottom: "16px",
+                }}
+              >
+                Your brief has landed in our inbox — a confirmation is on its way to{" "}
+                {email.trim()}. We&apos;ll be in touch shortly.
+              </p>
+              <button
+                onClick={close}
+                style={{
+                  marginTop: "24px",
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontWeight: 500,
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "var(--off-white)",
+                  background: "var(--orange)",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "16px 36px",
+                  cursor: "pointer",
+                }}
+              >
+                Done
+              </button>
+            </div>
+          )}
+
+          {step === 3 && status !== "sent" && (
             <div>
               <div
                 style={{
@@ -349,8 +444,9 @@ export default function BriefFlow() {
                 {`${deliverable} · ${timeline.toLowerCase()}\n“${note.trim()}”`}
               </blockquote>
 
-              <a
-                href={mailto}
+              <button
+                onClick={submitBrief}
+                disabled={status === "sending"}
                 style={{
                   display: "inline-block",
                   fontFamily: "var(--font-body), sans-serif",
@@ -362,11 +458,26 @@ export default function BriefFlow() {
                   background: "var(--orange)",
                   padding: "18px 44px",
                   borderRadius: "8px",
-                  textDecoration: "none",
+                  border: "none",
+                  cursor: status === "sending" ? "wait" : "pointer",
+                  opacity: status === "sending" ? 0.7 : 1,
                 }}
               >
-                Send it by email
-              </a>
+                {status === "sending" ? "Sending…" : "Submit brief"}
+              </button>
+
+              {status === "error" && (
+                <p
+                  style={{
+                    marginTop: "20px",
+                    fontFamily: "var(--font-body), sans-serif",
+                    fontSize: "0.9rem",
+                    color: "#ff8a6b",
+                  }}
+                >
+                  {errorMessage || "Something went wrong — please try again."}
+                </p>
+              )}
 
               <p
                 style={{
@@ -391,7 +502,7 @@ export default function BriefFlow() {
         </div>
 
         {/* Footer: back */}
-        {step > 0 && (
+        {step > 0 && status !== "sent" && (
           <button
             onClick={() => setStep((s) => s - 1)}
             style={{
