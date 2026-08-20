@@ -27,11 +27,6 @@ import { openBrief } from "@/components/v2/BriefFlow";
 // swaps per hovered item.
 const industries = [
   {
-    name: "Food & Beverage",
-    short: "F&B",
-    img: "/portfolio/maison-01.jpg",
-  },
-  {
     name: "Beauty & Wellness",
     short: "Beauty",
     img: "/portfolio/hermes-01.jpg",

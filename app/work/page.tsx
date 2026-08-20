@@ -5,7 +5,7 @@ import WorkIndex from "@/components/v2/WorkIndex";
 export const metadata: Metadata = {
   title: "Work — Studio Kavea",
   description:
-    "Selected design work — annual reports, investor decks, brand systems, campaigns and packaging.",
+    "Selected design work — annual reports, investor decks, brand systems and campaigns.",
 };
 
 export default function WorkPage() {

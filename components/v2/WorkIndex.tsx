@@ -190,8 +190,8 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
         <div className="work-index-header-pair work-index-fade">
           <h1>Selected Work</h1>
           <p className="work-index-lead">
-            Annual reports, investor decks, brand systems, campaigns and
-            packaging — real client work, a few names kept off the record.
+            Annual reports, investor decks, brand systems and campaigns —
+            real client work, a few names kept off the record.
           </p>
         </div>
       </header>

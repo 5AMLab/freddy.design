@@ -58,7 +58,6 @@ const PROCESS = [
 // mirrors KloaqIndustries' `industries` array — keep the two in sync if the
 // verticals change.
 const INDUSTRIES = [
-  { name: "Food & Beverage", short: "F&B", img: "/portfolio/maison-01.jpg" },
   { name: "Beauty & Wellness", short: "Beauty", img: "/portfolio/hermes-01.jpg" },
   { name: "Technology", short: "Tech", img: "/portfolio/c-ai-hero-01.jpg" },
   { name: "Finance & Banking", short: "Finance", img: "/portfolio/anz_hero-01.jpg" },

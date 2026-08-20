@@ -57,7 +57,7 @@ const plans = [
       "2 requests in parallel",
       "WhatsApp + monthly planning call",
       "All service types",
-      "5hrs rollover · Top-up $120/hr",
+      "Top-up $120/hr",
     ],
     cta: "Get started",
     featured: true,
