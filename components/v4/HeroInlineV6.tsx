@@ -157,6 +157,29 @@ const SEGMENTS: Segment[] = [
 ];
 
 /**
+ * The tagline as a plain sentence, for the <h1>'s accessible name.
+ *
+ * The cards are real anchors sitting INSIDE the headline's inline flow, so
+ * the h1's text content resolves to "Discover Us Brands built to be
+ * remembered — See Projects in a world built to forget." — the CTA labels
+ * interpolated into the middle of the sentence. Anchors inside an h1 are
+ * perfectly valid and Google reads the full text fine; the real cost is that
+ * a screen-reader user navigating by heading hears the claim broken in half.
+ *
+ * Derived from SEGMENTS rather than typed out again so it cannot drift from
+ * the visible copy — the tagline is DO-NOT-REWRITE, and a hand-copied label
+ * silently going stale would be worse than no label at all.
+ *
+ * aria-label overrides the accessible NAME only; it is not aria-hidden, so
+ * both cards remain in the tab order and are announced normally when focused.
+ */
+const TAGLINE = SEGMENTS.filter(
+  (s): s is Extract<Segment, { kind: "text" }> => s.kind === "text"
+)
+  .map((s) => s.value)
+  .join(" ");
+
+/**
  * One inline card: a cross-fading reel of a project's images with the label
  * overlaid, sized to sit inside the headline's line box.
  *
@@ -350,7 +373,7 @@ export default function HeroInlineV6() {
         {/* The headline is ONE <h1> whose inline flow contains the cards. The
             cards are real anchors inside the sentence, so they are reachable
             in the tab order at the point they are read. */}
-        <h1 className="v6-voice">
+        <h1 className="v6-voice" aria-label={TAGLINE}>
           {SEGMENTS.map((seg, i) =>
             seg.kind === "text" ? (
               /* The space AFTER each run is explicit. JSX collapses the

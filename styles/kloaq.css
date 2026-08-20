@@ -2374,6 +2374,13 @@
   width: 100%;
   /* 16/9 matches the flight's target band exactly, so the clone lands 1:1. */
   aspect-ratio: 16 / 9;
+  /* On a wide, short window 16/9 computes TALLER than the viewport (936px at
+     1664px wide against a 679px window), which pushed the bottom-anchored
+     caption — title, client label and the non-commissioned notice — entirely
+     below the fold. Capped rather than re-rationed so the 16/9 rule still
+     governs everywhere it fits and the shared-element flight keeps landing
+     1:1; `cover` on the media trims the sides in the clamped case. */
+  max-height: 88vh;
   overflow: hidden;
   background: var(--black);
 }
@@ -2435,31 +2442,39 @@
   margin: 0;
 }
 
-/* Non-commissioned notice (WorkDetail). Sits under the lede, above the fold.
-   Styled as a VISIBLE notice, not fine print — a left orange rule plus a
-   lifted panel, so it reads as a standing statement about the work rather
-   than legal boilerplate. Sized deliberately below the lede but at/above the
-   beat body, keeping the reading ladder intact while staying unmissable.
-   (The spec's light-theme values don't apply — this site is dark.) */
+/* Non-commissioned notice (WorkDetail), inside the hero caption.
+   Lives over photography, so it needs a real backing plate rather than the
+   4%-white wash used for panels on the flat page background — hence the
+   opaque-ish scrim plus blur. Placed here (not under the intro) because the
+   hero fills the entire first viewport: anything after it is below the fold
+   by construction, and the spec requires this visible without scrolling.
+   Deliberately NOT fine print — full body size, orange rule, own plate. */
 .work-disclaimer {
   display: block;
-  max-width: 720px;
-  margin: 32px 0 0;
-  padding: 18px 22px;
+  max-width: 62ch;
+  margin: 20px 0 0;
+  padding: 14px 18px;
   border-left: 2px solid var(--orange, #F25623);
-  background: rgba(249, 249, 249, 0.04);
+  border-radius: 2px;
+  background: rgba(10, 10, 10, 0.72);
+  backdrop-filter: blur(10px);
   font-family: var(--body);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 400;
-  line-height: 1.6;
-  color: var(--muted);
+  line-height: 1.55;
+  color: rgba(249, 249, 249, 0.92);
 }
 
 @media (max-width: 900px) {
+  /* Tighter on phones: at full body size this plate ate most of the hero and
+     crowded the title. Still a visible notice — own plate, orange rule, and
+     comfortably legible — just no longer competing with the headline. */
   .work-disclaimer {
-    margin-top: 24px;
-    padding: 16px 18px;
-    font-size: 0.9rem;
+    margin-top: 14px;
+    padding: 10px 12px;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    max-width: none;
   }
 }
 

@@ -335,6 +335,20 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
         <div className="work-hero-caption">
           <div className="kloaq-vlabel">{project.client}</div>
           <h1 className="work-hero-title">{project.title}</h1>
+
+          {/* Non-commissioned notice, IN the hero caption (spec 1.2).
+              It first sat under the intro, which measured at ~988px on a
+              720px viewport — below the fold, because the hero alone fills
+              the first screen. Nothing placed after the hero can satisfy
+              "visible without scrolling", so it belongs here, directly under
+              the title making the claim. Styled as a visible notice, not
+              fine print. Content comes from `disclaimer`, which
+              validateProject() makes mandatory for non-commissioned work. */}
+          {project.projectType !== "commissioned" && project.disclaimer && (
+            <aside role="note" className="work-disclaimer">
+              {project.disclaimer}
+            </aside>
+          )}
         </div>
       </section>
 
@@ -342,19 +356,6 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
           image reads as the top section and the framing follows it. */}
       <div className="work-intro">
         <p>{project.intro}</p>
-
-        {/* Non-commissioned work carries a visible notice here — directly
-            under the intro, so it lands above the fold on both mobile and
-            desktop, and ahead of the image run. Deliberately NOT in the
-            footer and NOT styled as fine print: the whole point is that a
-            reader cannot mistake a concept piece for a client engagement.
-            Content comes from `disclaimer`, which validateProject() makes
-            mandatory for any project that is not "commissioned". */}
-        {project.projectType !== "commissioned" && project.disclaimer && (
-          <aside role="note" className="work-disclaimer">
-            {project.disclaimer}
-          </aside>
-        )}
       </div>
 
       {/* Body — sticky meta rail beside the image sequence. The rail rides
