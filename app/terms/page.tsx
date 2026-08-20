@@ -25,7 +25,7 @@ export default function TermsPage() {
         },
         {
           heading: "Services",
-          body: "Studio Kavea provides graphic design services on a retainer or project basis, including but not limited to presentation decks, brand assets, campaign materials, print collateral, and marketplace graphics. The specific scope of work is agreed upon in writing prior to commencement.",
+          body: "Studio Kavea provides graphic design services on a retainer or project basis, including but not limited to presentation decks, brand assets, campaign materials, and print collateral. The specific scope of work is agreed upon in writing prior to commencement.",
         },
         {
           heading: "Retainer Plans",

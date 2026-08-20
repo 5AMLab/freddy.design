@@ -5498,3 +5498,378 @@
     flex: 1 0 100%;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SERVICE PAGES (/services/[slug]) + CONTACT (/contact)
+   ──────────────────────────────────────────────────────────────────────────
+   Both are text-first pages with no hero image, so they lead with type on the
+   black field rather than the full-bleed band the case studies use. Sizes come
+   from the existing scale (compare .work-intro / .work-index-*), and every
+   colour is an existing token — no new values.
+   ══════════════════════════════════════════════════════════════════════════ */
+.service-page,
+.contact-page {
+  background: var(--black);
+  min-height: 100vh;
+}
+
+.service-header,
+.contact-header {
+  padding: 180px 80px 72px;
+  border-bottom: 1px solid rgba(249, 249, 249, 0.06);
+}
+
+.service-eyebrow,
+.contact-eyebrow {
+  font-family: var(--body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 24px;
+}
+
+.service-h1,
+.contact-h1 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 4.4vw, 3.8rem);
+  font-weight: 400;
+  line-height: 1.12;
+  text-transform: uppercase;
+  color: var(--off-white);
+  max-width: 20ch;
+  margin: 0 0 28px;
+}
+
+.service-intro,
+.contact-intro {
+  font-family: var(--body);
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--off-white);
+  max-width: 62ch;
+  margin: 0;
+}
+
+/* Body — the section Farid writes. */
+.service-body {
+  padding: 72px 80px;
+  max-width: 780px;
+}
+.service-section {
+  margin-bottom: 56px;
+}
+.service-h2 {
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin: 0 0 18px;
+}
+/* Visibly provisional ON PURPOSE — a placeholder that looked like finished
+   copy is a placeholder that ships. */
+.service-placeholder {
+  font-family: var(--body);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(249, 249, 249, 0.32);
+  border: 1px dashed rgba(249, 249, 249, 0.16);
+  padding: 16px 18px;
+  margin: 0;
+}
+
+/* Related work */
+.service-cases {
+  padding: 0 80px 88px;
+}
+.service-case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--gap-lg, 32px);
+  margin-top: 28px;
+}
+.service-case {
+  display: block;
+  text-decoration: none;
+}
+.service-case-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: rgba(249, 249, 249, 0.04);
+}
+.service-case-frame img {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.service-case:hover .service-case-frame img {
+  transform: scale(1.04);
+}
+.service-case-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.service-case-tag {
+  font-family: var(--body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(var(--orange-rgb), 0.7);
+}
+.service-case-tag-type {
+  color: var(--orange);
+}
+.service-case-title {
+  display: block;
+  font-family: var(--body);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--off-white);
+  margin-top: 8px;
+}
+
+/* CTA */
+.service-cta {
+  padding: 72px 80px 110px;
+  border-top: 1px solid rgba(249, 249, 249, 0.06);
+}
+.service-cta-title {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--off-white);
+  margin: 0 0 16px;
+}
+.service-cta-body {
+  font-family: var(--body);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 52ch;
+  margin: 0 0 32px;
+}
+.service-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+.service-cta-link {
+  display: inline-block;
+  font-family: var(--body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--black);
+  background: var(--orange);
+  padding: 16px 28px;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+.service-cta-link:hover {
+  opacity: 0.85;
+}
+.service-cta-link-quiet {
+  color: var(--off-white);
+  background: transparent;
+  border: 1px solid rgba(249, 249, 249, 0.18);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+/* Contact */
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 36px;
+}
+.contact-cta {
+  font-family: var(--body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--black);
+  background: var(--orange);
+  border: none;
+  padding: 16px 28px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+.contact-cta:hover {
+  opacity: 0.85;
+}
+.contact-cta-quiet {
+  color: var(--off-white);
+  background: transparent;
+  border: 1px solid rgba(249, 249, 249, 0.18);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.contact-details {
+  padding: 72px 80px 110px;
+}
+.contact-dl {
+  margin: 0;
+  max-width: 640px;
+}
+.contact-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(249, 249, 249, 0.06);
+}
+.contact-row dt {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(249, 249, 249, 0.4);
+}
+.contact-row dd {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--off-white);
+}
+.contact-row dd a {
+  color: var(--orange);
+  text-decoration: none;
+}
+.contact-row dd a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .service-header,
+  .contact-header {
+    padding: 140px 24px 56px;
+  }
+  .service-body {
+    padding: 56px 24px;
+  }
+  .service-cases {
+    padding: 0 24px 64px;
+  }
+  .service-cta,
+  .contact-details {
+    padding: 56px 24px 88px;
+  }
+  .service-intro,
+  .contact-intro {
+    font-size: 1.15rem;
+  }
+  .contact-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+/* "<Service> in Singapore →" — the link out of each homepage service row to
+   its own page. Sits under the description, quiet at rest so it does not
+   compete with the row title, orange on hover like every other link here. */
+.kloaq-service-more {
+  display: inline-block;
+  margin-top: 18px;
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(249, 249, 249, 0.55);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.kloaq-service-more:hover {
+  color: var(--orange);
+}
+
+/* Founder block (/about) — name, role and Behance link beside a short bio.
+   Sits on the ink field below the light "How We Work" section. Two columns
+   on desktop so the identity reads as a unit against the prose; stacked on
+   narrow screens. */
+.kloaq-founder-section {
+  padding: 96px 80px;
+  border-top: 1px solid rgba(249, 249, 249, 0.06);
+}
+.kloaq-founder {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: var(--gap-lg, 56px);
+  margin-top: 32px;
+  align-items: start;
+}
+.kloaq-founder-name {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  font-weight: 400;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: var(--off-white);
+  margin: 0 0 10px;
+}
+.kloaq-founder-role {
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin: 0 0 20px;
+}
+.kloaq-founder-link {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(249, 249, 249, 0.6);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.kloaq-founder-link:hover {
+  color: var(--orange);
+}
+.kloaq-founder-bio p {
+  font-family: var(--body);
+  font-size: 1.05rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--off-white);
+  max-width: 58ch;
+  margin: 0;
+}
+/* Visibly provisional, same reasoning as .service-placeholder. */
+.kloaq-founder-placeholder {
+  color: rgba(249, 249, 249, 0.32) !important;
+  border: 1px dashed rgba(249, 249, 249, 0.16);
+  padding: 16px 18px;
+  font-size: 0.95rem !important;
+}
+
+@media (max-width: 900px) {
+  .kloaq-founder-section {
+    padding: 64px 24px;
+  }
+  .kloaq-founder {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}

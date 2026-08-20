@@ -5,7 +5,7 @@ import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
 import KloaqCTA from "@/components/v2/KloaqCTA";
 import BriefFlow from "@/components/v2/BriefFlow";
-import { RETAINER_SLOTS } from "@/lib/site";
+import { RETAINER_SLOTS, STUDIO } from "@/lib/site";
 
 // Standalone /about page — the long version of the studio pitch, linked from
 // the primary nav (About · Portfolio · Pricing) and the footer "Pages" column.
@@ -176,6 +176,43 @@ export default function KloaqAbout() {
             {RETAINER_SLOTS.open} of {RETAINER_SLOTS.total} retainer slots
             open for {RETAINER_SLOTS.month}.
           </p>
+        </section>
+
+        {/* Founder — spec 3.3. The site, the Behance profile and (once it
+            exists) LinkedIn are three unconnected nodes as far as a search
+            engine or an AI crawler is concerned; naming the person here and
+            linking out is what ties them into one entity. The Person schema
+            on this route (see app/about/page.tsx) says the same thing in
+            machine-readable form, and the two must agree — if the name or
+            title changes here, change lib/schema.ts too. */}
+        <section className="kloaq-founder-section">
+          <div className="kloaq-vlabel">Who You Work With</div>
+          <div className="kloaq-founder">
+            <div className="kloaq-founder-id">
+              <h2 className="kloaq-founder-name">Farid Balian</h2>
+              <p className="kloaq-founder-role">Founder &amp; Creative Director</p>
+              <a
+                className="kloaq-founder-link"
+                href={STUDIO.behance}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Behance portfolio →
+              </a>
+            </div>
+            <div className="kloaq-founder-bio">
+              {/*
+                ⚠ TODO(Farid) — BIO COPY REQUIRED (spec 3.3).
+                Name, role and the Behance link are factual and done. The
+                short bio is yours to write — a few sentences on the ten
+                years, the disciplines, and who you work with. Replace the
+                placeholder below.
+              */}
+              <p className="kloaq-founder-placeholder">
+                [ Short bio to come — see TODO in KloaqAbout.tsx ]
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* Industries — static expanded list of the six verticals, on the

@@ -10,9 +10,12 @@ import { SITE_URL } from "@/lib/site";
  * Legal pages are excluded: they carry `noindex` (2.4), and listing a page
  * you are asking not to index is a contradictory signal.
  *
- * /contact is NOT listed yet — it is built in Phase 3.2 and currently 404s.
- * Add it here in the same commit that creates the route, along with the four
- * /services/* pages from 3.1.
+ * /services/* are deliberately NOT listed yet. The routes exist and work,
+ * but their body copy is still a placeholder (see ServiceDetail.tsx) — asking
+ * Google to index a page that says "[ Copy to come ]" spends the crawl budget
+ * of a brand-new site on a thin page and invites exactly the quality problem
+ * these pages are meant to solve. Uncomment the block below once Farid's copy
+ * is in; nothing else needs to change.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
@@ -22,7 +25,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/work`, priority: 0.9, changeFrequency: "monthly" as const },
     { url: `${SITE_URL}/about`, priority: 0.8, changeFrequency: "yearly" as const },
     { url: `${SITE_URL}/pricing`, priority: 0.8, changeFrequency: "monthly" as const },
+    { url: `${SITE_URL}/contact`, priority: 0.7, changeFrequency: "yearly" as const },
   ];
+
+  // Uncomment once the service pages carry real copy (see the note above):
+  // const serviceRoutes = services.map((s) => ({
+  //   url: `${SITE_URL}/services/${s.slug}`,
+  //   priority: 0.8,
+  //   changeFrequency: "monthly" as const,
+  // }));
 
   const projectRoutes = projects.map((p) => ({
     url: `${SITE_URL}/work/${p.slug}`,

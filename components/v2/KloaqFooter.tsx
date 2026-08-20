@@ -14,10 +14,9 @@ const PAGE_LINKS = [
   { label: "About", href: "/about" },
   { label: "Work", href: "/work" },
   { label: "Pricing", href: "/pricing" },
-  // Was href="#cta" — an anchor that only exists on Home and About, so this
-  // was a dead link on /work, /pricing and all three legal pages (spec 1.6).
-  // Interim mailto until /contact ships in Phase 3; repoint it there then.
-  { label: "Contact", href: "mailto:hello@kavea.studio" },
+  // Was href="#cta" (dead on five routes), then an interim mailto. Now the
+  // real /contact route from spec 3.2.
+  { label: "Contact", href: "/contact" },
 ];
 
 // Ordered deliberately, ANZ first (spec 3.4). This block is sitewide, so

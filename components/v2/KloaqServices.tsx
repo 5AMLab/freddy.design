@@ -1,4 +1,5 @@
 "use client";
+import { services as serviceRoutes } from "@/lib/services";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
@@ -16,6 +17,8 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 const services = [
   {
     num: "01",
+    // Route for this discipline — see lib/services.ts (slugs must match).
+    slug: "brand-identity",
     title: "Brand & Visual Identity",
     desc: "The logo, the type, the colour, the rules that hold it together — a coherent identity and the brand guidelines that keep it that way long after handoff.",
     tags: ["Branding", "Art Direction", "Guidelines"],
@@ -23,6 +26,8 @@ const services = [
   },
   {
     num: "02",
+    // Route for this discipline — see lib/services.ts (slugs must match).
+    slug: "web-design",
     title: "Web Design & Development",
     desc: "Sites that carry the brand across — designed and built in Webflow, quick to load, easy to update, nothing you can't run yourself once it's live.",
     tags: ["Web Design", "Webflow Dev", "UX/UI"],
@@ -30,6 +35,8 @@ const services = [
   },
   {
     num: "03",
+    // Route for this discipline — see lib/services.ts (slugs must match).
+    slug: "campaign-editorial",
     title: "Campaign & Editorial",
     desc: "Key visuals that carry a campaign, editorial spreads that earn the page turn, event identities that hold a room — the work a brand is actually seen through.",
     tags: ["Key Visuals", "Editorial", "Event Identity"],
@@ -37,12 +44,30 @@ const services = [
   },
   {
     num: "04",
+    // Route for this discipline — see lib/services.ts (slugs must match).
+    slug: "decks-collateral",
     title: "Decks & Collateral",
     desc: "Presentation decks that don't fight the speaker, reports, brochures and event collateral — print- and pitch-ready files, delivered clean and on time.",
     tags: ["Decks", "Print", "Reports"],
     img: "/portfolio/coffee-mockup-01.jpg",
   },
 ];
+
+// The homepage rows and the service PAGES are two lists that must agree: a
+// slug typo here produces a homepage link to a 404. Checked at module load
+// rather than trusted — cheap, and it fails loudly in dev instead of quietly
+// in production.
+if (process.env.NODE_ENV !== "production") {
+  const known = new Set(serviceRoutes.map((s) => s.slug));
+  const bad = services.filter((s) => !known.has(s.slug));
+  if (bad.length) {
+    throw new Error(
+      `KloaqServices: unknown service slug(s) ${bad
+        .map((s) => s.slug)
+        .join(", ")} — must match lib/services.ts`
+    );
+  }
+}
 
 function ServiceRow({
   service,
@@ -135,6 +160,19 @@ function ServiceRow({
 
       <div className="kloaq-service-copy">
         <p className="kloaq-service-desc">{service.desc}</p>
+        {/* The row itself is a hover/tap target for the image preview, not a
+            link — so the route gets its own anchor here rather than wrapping
+            the row, which would fight the tap-to-reveal on touch. This is
+            also the internal link that makes /services/* reachable by a
+            crawler (spec 3.1). stopPropagation so following the link never
+            also toggles the row's preview open behind the navigation. */}
+        <a
+          href={`/services/${service.slug}`}
+          className="kloaq-service-more"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {service.title} in Singapore →
+        </a>
         {service.tags.length > 0 && (
           <div className={`kloaq-service-tags${hovered ? " is-active" : ""}`}>
             {service.tags.map((t) => (

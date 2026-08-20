@@ -5,6 +5,7 @@
 
 import { SITE_URL, STUDIO, CONTACT_EMAIL } from "@/lib/site";
 import { type Project, PROJECT_TYPE_LABEL, imageSrc } from "@/lib/work";
+import { type Service } from "@/lib/services";
 
 export const ORG_ID = `${SITE_URL}/#organization`;
 export const FOUNDER_ID = `${SITE_URL}/#founder`;
@@ -110,5 +111,66 @@ export function breadcrumbSchema(project: Project) {
         item: abs(`/work/${project.slug}`),
       },
     ],
+  };
+}
+
+/**
+ * Service node for /services/[slug], provided by the Organization.
+ *
+ * `areaServed` is Singapore because that is the market these pages target —
+ * the studio works remotely, but a local-intent query ("brand identity design
+ * singapore") is what this page exists to answer.
+ */
+export function serviceSchema(service: Service) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${SITE_URL}/services/${service.slug}#service`,
+    name: service.name,
+    url: abs(`/services/${service.slug}`),
+    description: service.metaDescription,
+    serviceType: service.name,
+    provider: { "@id": ORG_ID },
+    areaServed: { "@type": "Country", name: "Singapore" },
+  };
+}
+
+/** Breadcrumbs for a service page: Home → Services → this service. */
+export function serviceBreadcrumbSchema(service: Service) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Services",
+        item: abs("/services"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: service.name,
+        item: abs(`/services/${service.slug}`),
+      },
+    ],
+  };
+}
+
+/**
+ * ContactPage node for /contact, carrying the NAP-consistent details
+ * (name, UEN, country, email) that a local search needs to tie the site to
+ * a real business entity.
+ */
+export function contactPageSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "@id": `${SITE_URL}/contact#contactpage`,
+    url: abs("/contact"),
+    name: `Contact ${STUDIO.name}`,
+    description: `Get in touch with ${STUDIO.name}, a brand and creative direction studio in Singapore.`,
+    mainEntity: { "@id": ORG_ID },
   };
 }
