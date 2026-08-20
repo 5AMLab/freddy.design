@@ -1,4 +1,5 @@
 "use client";
+import ClientRosterNote from "@/components/v2/ClientRosterNote";
 import Image from "next/image";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
@@ -160,10 +161,7 @@ export default function KloaqAbout() {
                 </div>
               ))}
             </div>
-            <p className="kloaq-about-logos-caption">
-              Brands worked with over ten years — in-house and through the
-              studio. Not a current client roster.
-            </p>
+            <ClientRosterNote className="kloaq-about-logos-caption" />
           </div>
 
           <div className="kloaq-stats-row">

@@ -3735,6 +3735,26 @@
   max-width: 44ch;
 }
 
+/* Homepage counterpart to .kloaq-about-logos-caption — same copy (shared via
+   ClientRosterNote) and same muted scale, but centred under the full-bleed
+   marquee rather than left-aligned to the /about content column. */
+.kloaq-logos-caption {
+  margin: 24px auto 0;
+  padding: 0 24px;
+  font-family: var(--body);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  max-width: 52ch;
+  text-align: center;
+}
+@media (max-width: 640px) {
+  .kloaq-logos-caption {
+    font-size: 0.82rem;
+  }
+}
+
 /* Industries — static expanded list on the cream light field. Row layout
    mirrors /work's index rows exactly (.work-index-row in kloaq.css — num +
    [TAG] on one line, bold title below, thumbnail pinned right spanning both

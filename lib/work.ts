@@ -236,12 +236,26 @@ export const projects: Project[] = [
     ],
   },
   {
+    // ────────────────────────────────────────────────────────────────────
+    // TODO(Farid) — COPY REWRITE REQUIRED before launch (spec 1.3).
+    // Structure and framing are done: client, year, beat kickers and the
+    // disclaimer below now read as self-initiated. The prose does NOT — it
+    // still uses client-delivery voice and needs Farid's words, not mine:
+    //   · `summary`  — "Out-of-home and campaign work for a ... push" reads
+    //                  as a delivered engagement. Also used as the meta
+    //                  description, so it needs replacing there too.
+    //   · `intro`    — "The brief was restraint" implies a commissioner.
+    //   · beats[0..2] bodies — past-tense delivery ("We let the fragrance
+    //                  do the talking") should become exercise framing.
+    // Everything else on this entry is launch-ready.
+    // ────────────────────────────────────────────────────────────────────
+
     id: "04",
     slug: "hermes-terre-campaign",
     title: "Terre d'Hermès Campaign",
-    client: "Hermès",
+    client: "Hermès (concept)",
     category: "OOH & Campaign",
-    year: "2023",
+    year: "2024 — self-initiated",
     role: "Art direction, campaign layout, OOH",
     projectType: "self-initiated",
     disclaimer:
@@ -258,17 +272,17 @@ export const projects: Project[] = [
     ],
     beats: [
       {
-        kicker: "The brief",
+        kicker: "The premise",
         body: "A house as established as Hermès leaves no room for noise. The work had to hold decades of codes and still stop someone mid-street.",
         after: 0,
       },
       {
-        kicker: "The move",
+        kicker: "The approach",
         body: "Restraint as the strategy. We let the fragrance, the material and a single confident crop do the talking — art direction that trusts the silence.",
         after: 2,
       },
       {
-        kicker: "The result",
+        kicker: "The outcome",
         body: "Campaign and out-of-home work that reads unmistakably as the house, and still earns a second look at fifty paces.",
         after: 3,
       },

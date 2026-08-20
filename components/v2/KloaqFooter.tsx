@@ -14,11 +14,18 @@ const PAGE_LINKS = [
   { label: "About", href: "/about" },
   { label: "Work", href: "/work" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Contact", href: "#cta" },
+  // Was href="#cta" — an anchor that only exists on Home and About, so this
+  // was a dead link on /work, /pricing and all three legal pages (spec 1.6).
+  // Interim mailto until /contact ships in Phase 3; repoint it there then.
+  { label: "Contact", href: "mailto:hello@kavea.studio" },
 ];
 
+// Ordered deliberately, ANZ first (spec 3.4). This block is sitewide, so
+// whatever leads it collects the most internal links on the site — that was
+// Hermès, pointing the strongest internal signal at the one self-initiated
+// concept piece. Commissioned work leads now.
 const RECENT_WORK = [
-  { label: "Hermès", href: "/work/hermes-terre-campaign" },
+  { label: "ANZ", href: "/work/anz-annual-report" },
   { label: "Cognitiv", href: "/work/cognitiv-ai-brand" },
   { label: "Akuos", href: "/work/akuos-investor-deck" },
 ];

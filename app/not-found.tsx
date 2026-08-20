@@ -140,8 +140,10 @@ export default function NotFound() {
             </a>
 
             <a
-              href="#cta"
-              onClick={() => { window.location.href = "/#cta"; }}
+              /* Absolute, not "#cta": /404 has no such anchor, so the bare
+                 hash was a no-op without JS. The handler is now redundant
+                 belt-and-braces rather than the only thing making it work. */
+              href="/#cta"
               style={{
                 display: "inline-block",
                 fontFamily: "var(--font-body), sans-serif",

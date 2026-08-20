@@ -1,3 +1,4 @@
+import ClientRosterNote from "@/components/v2/ClientRosterNote";
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import HeroInlineV6 from "@/components/v4/HeroInlineV6";
@@ -58,6 +59,10 @@ export default function Home() {
           </div>
         </section>
         <KloaqLogos />
+        {/* The qualifier the logo wall needs (spec 1.4). /about carried this
+            and the homepage did not, so the same marquee read as a current
+            client roster here. Shared component — the two cannot drift. */}
+        <ClientRosterNote className="kloaq-logos-caption" />
 
         {/* 3. Portfolio — four selected cases, hover to reveal the title. */}
         <KloaqPortfolio />
