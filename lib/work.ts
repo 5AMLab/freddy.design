@@ -290,44 +290,6 @@ export const projects: Project[] = [
   },
   {
     id: "05",
-    slug: "maison-freddy-cold-brew",
-    title: "Ethiopia Guji Cold Brew",
-    client: "Maison Freddy",
-    category: "Packaging",
-    year: "2024",
-    role: "Packaging design, label system, art direction",
-    projectType: "commissioned",
-    summary: "Packaging for a single-origin Ethiopia Guji cold brew.",
-    intro:
-      "A single-origin cold brew deserves packaging that signals provenance without shouting. We designed the label system around the Ethiopia Guji origin story — considered, tactile, and built to sit well on a shelf.",
-    images: [
-      "/portfolio/coffee-mockup-01.jpg",
-      "/portfolio/maison-02.jpg",
-      "/portfolio/maison-03.jpg",
-      "/portfolio/maison-04.jpg",
-      "/portfolio/maison-05.jpg",
-    ],
-    beats: [
-      {
-        kicker: "The brief",
-        body: "A single-origin coffee competing on a crowded shelf, where most packaging either shouts or disappears. This one needed to signal provenance without raising its voice.",
-        after: 0,
-      },
-      {
-        kicker: "The move",
-        body: "We built the label system around the Ethiopia Guji origin story — a considered, tactile palette and typography that rewards a closer look rather than demanding one.",
-        after: 2,
-      },
-      {
-        kicker: "The result",
-        body: "Packaging that earns its place on the shelf: quiet, confident, and unmistakably about where the coffee comes from.",
-        after: 3,
-      },
-    ],
-    placeholder: true,
-  },
-  {
-    id: "06",
     slug: "dad-intern-times",
     title: "The Intern Times",
     client: "D&AD",
