@@ -3,7 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { imageSrc, getProject, PROJECT_TYPE_LABEL } from "@/lib/work";
+import {
+  imageSrc,
+  imageAlt,
+  getProject,
+  PROJECT_TYPE_LABEL,
+} from "@/lib/work";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import Magnetic from "@/components/motion/Magnetic";
 
@@ -124,7 +129,14 @@ export default function KloaqPortfolio() {
                   <Image
                     className="kloaq-portfolio-img"
                     src={imageSrc(project.images[0])}
-                    alt={`${project.client} — ${project.title}`}
+                    // Describes the image, falling back to naming the project
+                    // only if a slot declares no alt. The tile's own title
+                    // block already carries client and project name, so
+                    // repeating them here would say nothing new.
+                    alt={
+                      imageAlt(project.images[0]) ||
+                      `${project.client} — ${project.title}`
+                    }
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     style={{ objectFit: "cover" }}

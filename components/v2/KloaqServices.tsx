@@ -158,6 +158,8 @@ function ServiceRow({
               min-height:0 + overflow:hidden so the row can shrink to zero. */}
           <span className="kloaq-service-touch-preview-inner">
             {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* Decorative by decision: a sample image revealed under the
+                service row whose own heading already names the service. */}
             <img src={service.img} alt="" loading="lazy" />
           </span>
         </span>

@@ -12,6 +12,7 @@ import {
   type Beat,
   imageSrc,
   imageLayout,
+  imageAlt,
   PROJECT_TYPE_LABEL,
 } from "@/lib/work";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
@@ -322,7 +323,13 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
           <div className="work-hero-media">
             <Image
               src={imageSrc(project.images[0])}
-              alt={`${project.title} — ${project.client}`}
+              // The slot's own description when it has one; the old
+              // title-and-client string is only a fallback for a slot that
+              // deliberately declares none.
+              alt={
+                imageAlt(project.images[0]) ||
+                `${project.title} — ${project.client}`
+              }
               fill
               sizes="100vw"
               style={{ objectFit: "cover", objectPosition: "center" }}
@@ -396,7 +403,10 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
             const rowStartIndex = row.kind === "pair" ? row.items[0].index : row.index;
             if (rowStartIndex === 0) return null;
 
-            const altFor = (n: number) => `${project.title} — image ${n + 1}`;
+            // Real per-image descriptions from the data model. A slot that
+            // declares no alt resolves to "" and is announced as decorative —
+            // an explicit choice, not the old "— image 3" placeholder.
+            const altFor = (n: number) => imageAlt(project.images[n]);
 
             if (row.kind === "pair") {
               return (

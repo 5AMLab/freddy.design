@@ -17,8 +17,21 @@
  */
 export type ImageLayout = "full" | "wide" | "pair" | "offset";
 
-/** An image slot: either a bare src (auto-paced) or a src + explicit layout. */
-export type ProjectImage = string | { src: string; layout: ImageLayout };
+/**
+ * An image slot: either a bare src (auto-paced, no alt) or an object carrying
+ * an optional layout hint and — for anything that conveys information — an
+ * `alt` description.
+ *
+ * `alt` describes WHAT IS SHOWN, not the project name. The old auto-generated
+ * "Terre d'Hermès Campaign — image 3" told a screen-reader user nothing that
+ * the page title had not already said.
+ *
+ * Omitting `alt` is a DECISION, not a default: a slot with no alt renders
+ * alt="" and is announced as decorative. Make that choice per image.
+ */
+export type ProjectImage =
+  | string
+  | { src: string; layout?: ImageLayout; alt?: string };
 
 /**
  * A narrative "beat" — a short slab of process copy interleaved between the
@@ -109,6 +122,15 @@ export function imageLayout(image: ProjectImage): ImageLayout | undefined {
 }
 
 /**
+ * The alt text for a slot. Returns "" for a slot that declares none —
+ * correct for a decorative image, and the reason `alt` is opt-in rather
+ * than required: a wrong description is worse than none.
+ */
+export function imageAlt(image: ProjectImage): string {
+  return typeof image === "string" ? "" : image.alt ?? "";
+}
+
+/**
  * Short "Client Category" form for compact list rows (/work index) — e.g.
  * "ANZ Annual Report" instead of the case study's own creative headline
  * ("Renminbi Takes Centre Stage"). The creative title still owns the
@@ -134,11 +156,11 @@ export const projects: Project[] = [
     intro:
       "ANZ needed its annual report to do more than account for the year — it needed a point of view. We built the edition around a single editorial thread, the rise of the renminbi, and let typography and data visualisation carry the argument across the document.",
     images: [
-      "/portfolio/anz_hero-01.jpg",
-      "/portfolio/anz-02.jpg",
-      "/portfolio/anz-03.jpg",
-      "/portfolio/anz-04.jpg",
-      "/portfolio/anz-05.jpg",
+      { src: "/portfolio/anz_hero-01.jpg", alt: "Printed copies of the ANZ renminbi report fanned across a blue surface, one open to a navy summary spread of donut charts and icons." },
+      { src: "/portfolio/anz-02.jpg", alt: "The report open at its foreword page, a single column of text and a signature on off-white stock." },
+      { src: "/portfolio/anz-03.jpg", alt: "A chapter-summary spread: navy left page with pin-marker statistics and a combined bar-and-line chart, facing a white page of body copy." },
+      { src: "/portfolio/anz-04.jpg", alt: "A data-heavy spread carrying six charts, from stacked bars to two donut breakdowns of bond issuance." },
+      { src: "/portfolio/anz-05.jpg", alt: "The report lying open to show its back and front covers: a stone guardian lion against a Chinese rooftop, overlaid with the renminbi symbol." },
     ],
     beats: [
       {
@@ -171,11 +193,11 @@ export const projects: Project[] = [
     intro:
       "Akuos came in with a dense story and a tight fundraising window. We rebuilt the deck around a clean narrative spine and a reusable slide system, so every slide earns its place and the numbers land where they should.",
     images: [
-      "/portfolio/akuos-00b.avif",
-      "/portfolio/akuos-01.jpg",
-      "/portfolio/akuos-02.jpg",
-      "/portfolio/akuos-03.jpg",
-      "/portfolio/akuos-04.jpg",
+      { src: "/portfolio/akuos-00b.avif", alt: "A laptop on a concrete plinth showing the Aurello product slide, smart eyewear against ribbons of coloured light." },
+      { src: "/portfolio/akuos-01.jpg", alt: "Three deck slides on a cyan field: a mission and vision statement, a logo slide, and the Aurello product slide with transducer detail call-outs." },
+      { src: "/portfolio/akuos-02.jpg", alt: "Four slides angled across cyan, including a go-to-market timeline, a market-opportunity bar chart, and a dark slide showing the companion app on two phones." },
+      { src: "/portfolio/akuos-03.jpg", alt: "Slides covering the problem-and-solution framework, market opportunity, competitor analysis, and a diagram of bone-conduction hearing." },
+      { src: "/portfolio/akuos-04.jpg", alt: "A laptop at the edge of a grey plinth showing a market-size slide: three nested circles sized 1.15 trillion, 55.5 billion and 16.7 billion." },
     ],
     beats: [
       {
@@ -208,14 +230,14 @@ export const projects: Project[] = [
     intro:
       "Cognitiv AI needed an identity that read as credible and human, not another generic tech brand. We developed the full system — logo, type, colour, motion principles — and documented it in a brandbook the team could actually run with.",
     images: [
-      "/portfolio/cognitiv-07.jpg",
-      "/portfolio/cognitiv-01.webp",
-      "/portfolio/cognitiv-02.webp",
-      "/portfolio/cognitiv-03.webp",
-      "/portfolio/cognitiv-04.webp",
-      "/portfolio/cognitiv-05.webp",
-      "/portfolio/cognitiv-06.webp",
-      "/portfolio/cognitiv-08.webp",
+      { src: "/portfolio/cognitiv-07.jpg", alt: "A purple street-pole sign reading 'Transforming data into human intelligence' above the Cognitiv AI mark." },
+      { src: "/portfolio/cognitiv-01.webp", alt: "Brand guideline pages spread on grey: cover, contents, colour palette, logo specification and business-card layouts." },
+      { src: "/portfolio/cognitiv-02.webp", alt: "A purple logo-specification sheet showing the wordmark on its construction grid, beside business cards." },
+      { src: "/portfolio/cognitiv-03.webp", alt: "A stack of deep-purple business cards on a marble ledge, the top card showing the linked-figures monogram." },
+      { src: "/portfolio/cognitiv-04.webp", alt: "A purple lanyard badge for a named consultant, carrying the monogram, wordmark and a QR code." },
+      { src: "/portfolio/cognitiv-05.webp", alt: "A purple envelope beside a letterhead printed with a faint pattern of the brand monogram." },
+      { src: "/portfolio/cognitiv-06.webp", alt: "A projecting box sign on a tiled facade reading Cognitiv AI, the purple return edge catching light." },
+      { src: "/portfolio/cognitiv-08.webp", alt: "A tablet on a concrete block showing the website homepage: a violet corridor of light behind the positioning statement." },
     ],
     beats: [
       {
@@ -264,11 +286,11 @@ export const projects: Project[] = [
     intro:
       "A fragrance as established as Terre d'Hermès leaves little room for noise. The brief was restraint — campaign and out-of-home work that holds the house codes while still stopping someone on the street.",
     images: [
-      "/portfolio/hermes-01.jpg",
-      "/portfolio/hermes-02.jpg",
-      "/portfolio/hermes-03.jpg",
-      "/portfolio/hermes-04.jpg",
-      "/portfolio/hermes-05.jpg",
+      { src: "/portfolio/hermes-01.jpg", alt: "A perfume bottle on weathered wood in low golden light, olive branches above and an orange behind it." },
+      { src: "/portfolio/hermes-02.jpg", alt: "A long backlit billboard above an airport travelator, the bottle lit against a sunlit olive grove as two travellers pass." },
+      { src: "/portfolio/hermes-03.jpg", alt: "A portrait-format lightbox poster mounted between two escalators in a dark tiled station." },
+      { src: "/portfolio/hermes-04.jpg", alt: "A tall illuminated screen in a darkened event space, guests silhouetted in front of it." },
+      { src: "/portfolio/hermes-05.jpg", alt: "A wide backlit wall inside a truss-framed stage set, guests standing in silhouette against the golden grove." },
     ],
     beats: [
       {
@@ -303,11 +325,11 @@ export const projects: Project[] = [
     intro:
       "Responding to a D&AD brief on internship culture, The Intern Times reframes the conversation as a newspaper — editorial design as the medium and the message. The format gave us room to be sharp about a subject that usually stays polite.",
     images: [
-      "/portfolio/Intern_Times_0.jpg",
-      "/portfolio/Intern_Times_1.jpg",
-      "/portfolio/Intern_Times_2.jpg",
-      "/portfolio/Intern_Times_8.jpg",
-      "/portfolio/intern-09.webp",
+      { src: "/portfolio/Intern_Times_0.jpg", alt: "A stack of folded newspapers on grey, the masthead The Intern Times above the headline FALSE ALARM." },
+      { src: "/portfolio/Intern_Times_1.jpg", alt: "The front page flat: masthead, the FALSE ALARM headline, and a lead story beside a photograph of a civil defence fire engine." },
+      { src: "/portfolio/Intern_Times_2.jpg", alt: "An open spread with a full-page festival poster on the left and a right page mixing a temple procession photograph with two feature articles." },
+      { src: "/portfolio/Intern_Times_8.jpg", alt: "Several issues layered on grey: a portrait feature, a piece on the grid system beside a Volvo advertisement, and a folded copy on top." },
+      { src: "/portfolio/intern-09.webp", alt: "A single page on a scratched metal surface: two black-and-white portraits above an eighteen-point numbered article in narrow columns." },
     ],
     beats: [
       {

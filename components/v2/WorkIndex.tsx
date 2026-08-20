@@ -9,6 +9,7 @@ import {
   type Project,
   imageSrc,
   listTitle,
+  imageAlt,
   PROJECT_TYPE_LABEL,
 } from "@/lib/work";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
@@ -248,7 +249,10 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
                 <span className="work-index-thumb">
                   <Image
                     src={imageSrc(project.images[0])}
-                    alt=""
+                    // Real description from the data model. This thumb is the
+                    // only visual identifying the row, so it is content, not
+                    // decoration.
+                    alt={imageAlt(project.images[0])}
                     fill
                     sizes="(max-width: 820px) 96px, 120px"
                     style={{ objectFit: "cover" }}
@@ -272,6 +276,9 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
         {activeProject && activeProject.images.length > 0 && (
           <span className="kloaq-thumb-frame">
             {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* alt="" is correct: this preview lives inside an
+                aria-hidden container (see .kloaq-thumb above) and duplicates
+                the row thumbnail that is already announced. */}
             <img src={imageSrc(activeProject.images[0])} alt="" />
           </span>
         )}

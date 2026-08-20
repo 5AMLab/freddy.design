@@ -207,6 +207,9 @@ export default function KloaqIndustries({
         <Image
           key={ind.short}
           src={ind.img}
+          // Decorative by decision: this is the hover-swapped backdrop for
+          // the industry list; the industry NAME beside it carries the
+          // meaning, so describing the photo would only duplicate it.
           alt=""
           fill
           sizes="270px"
