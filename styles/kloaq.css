@@ -2435,6 +2435,34 @@
   margin: 0;
 }
 
+/* Non-commissioned notice (WorkDetail). Sits under the lede, above the fold.
+   Styled as a VISIBLE notice, not fine print — a left orange rule plus a
+   lifted panel, so it reads as a standing statement about the work rather
+   than legal boilerplate. Sized deliberately below the lede but at/above the
+   beat body, keeping the reading ladder intact while staying unmissable.
+   (The spec's light-theme values don't apply — this site is dark.) */
+.work-disclaimer {
+  display: block;
+  max-width: 720px;
+  margin: 32px 0 0;
+  padding: 18px 22px;
+  border-left: 2px solid var(--orange, #F25623);
+  background: rgba(249, 249, 249, 0.04);
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .work-disclaimer {
+    margin-top: 24px;
+    padding: 16px 18px;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 900px) {
   .work-hero-frame {
     /* Taller crop on narrow screens so the overlaid title has room. */
@@ -2931,6 +2959,13 @@
   transition: color 0.3s ease;
 }
 .work-index-row:hover .work-index-tag {
+  color: var(--orange);
+}
+/* Project-type tag (self-initiated / awards brief). Same size and rhythm as
+   the discipline tag beside it, but full-strength orange at rest so the
+   distinction reads without hover — that's the whole point of surfacing it
+   before click-through. */
+.work-index-tag-type {
   color: var(--orange);
 }
 /* Sibling dim while one row is hovered — the industries/cloud focus
@@ -3947,6 +3982,37 @@
   gap: 8px;
   z-index: 2;
 }
+/* Project-type badge. Pinned top-RIGHT because .kloaq-portfolio-tags already
+   owns top-left; sharing that corner would collide on narrow tiles. Same
+   panel recipe as the work-type tag (blurred slab, 6px radius) with an
+   orange rule so it reads as a qualifier, not another discipline label. */
+.kloaq-portfolio-type {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  background: rgba(23, 23, 23, 0.72);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(242, 86, 35, 0.55);
+  border-radius: 6px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .kloaq-portfolio-type {
+    top: 12px;
+    right: 12px;
+    font-size: 0.66rem;
+    padding: 6px 10px;
+  }
+}
+
 /* Rectangular tag with a slight corner radius — NOT a pill (999px). */
 .kloaq-portfolio-tag {
   font-family: var(--body);
@@ -5084,4 +5150,316 @@
   }
   /* The label's hover feedback is a COLOUR change, which reduced motion has
      no quarrel with — it stays. Only the card's stretch is dropped above. */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CASE-STUDY CROP-FIX VARIANT (/work-v2/[slug], WorkDetailV2)
+   ──────────────────────────────────────────────────────────────────────────
+   Additive only — nothing above is modified, so /work/[slug] is untouched and
+   the two routes can be compared side by side.
+
+   Body frames get their ratio inline from the image's own dimensions, so they
+   need no CSS here. The hero is the exception: it keeps a deliberate crop
+   (the title sits overlaid on it) but takes a clamped ratio from its image
+   instead of a flat 16/9.
+   ══════════════════════════════════════════════════════════════════════════ */
+.work-hero-frame-native {
+  /* --hero-aspect is set inline by WorkDetailV2 (clamped to 1.5–2.1). The
+     fallback keeps the old behaviour if the variable is ever missing. */
+  aspect-ratio: var(--hero-aspect, 16 / 9);
+  /* The ratio alone can still overshoot the fold: a 1.5 band is 960px tall at
+     1440px wide, which pushed the overlaid title off a 900px-high screen. Cap
+     the band's height so the title always loads visible — the ratio governs
+     until it would exceed this, then cover trims the sides instead. */
+  max-height: var(--hero-max-h, 88vh);
+}
+@media (max-width: 900px) {
+  /* Narrow screens keep the tall 3/4 crop from the base .work-hero-frame
+     rule — the overlaid title needs that height. Repeated here because this
+     block sits later in the file and would otherwise lose to it. */
+  .work-hero-frame-native {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CASE STUDY — FULL-WIDTH VARIANT (/work-v3/[slug], WorkDetailV3)
+   ──────────────────────────────────────────────────────────────────────────
+   Additive only. Every image runs edge to edge; all TYPE stays on the shared
+   --container-max grid with --section-pad-x gutters, so the words align to
+   the same left edge as every other page while the photography breaks off it.
+   That contrast is the layout's whole structural idea — see the component
+   header for the reasoning.
+
+   Everything below derives from the existing tokens (--section-pad-*, --gap-*,
+   --type-section-*, --type-vlabel, --container-max, --orange). No new colours,
+   no one-off sizes.
+   ══════════════════════════════════════════════════════════════════════════ */
+.v3-page {
+  background: var(--black);
+  min-height: 100vh;
+}
+
+/* The shared content column, used by every text block on the page. Same
+   recipe as .site-container — restated here so the case page doesn't depend
+   on a class defined for the marketing sections. */
+.v3-grid {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--section-pad-x);
+  box-sizing: border-box;
+}
+
+/* ── HERO ──
+   Reuses .work-hero/.work-hero-frame from the live page; only the ratio
+   handling differs (viewport-bounded rather than a forced 16/9). */
+.v3-hero-frame {
+  aspect-ratio: var(--hero-aspect, 16 / 9);
+  /* The ratio alone can overshoot the fold — a 1.5 band is 960px tall at
+     1440px wide, which pushes the overlaid title off a 900px screen. Cap the
+     height so the title always loads visible; cover trims the sides instead. */
+  max-height: var(--hero-max-h, 88vh);
+}
+/* Align the overlaid hero caption to the same content column as the body type
+   below it, rather than the live page's flat 80px inset. */
+.v3-hero-caption {
+  left: 0;
+  right: 0;
+  padding-inline: max(var(--section-pad-x), calc((100% - var(--container-max)) / 2 + var(--section-pad-x)));
+}
+
+/* ── INTRO ──
+   The lede: brightest, largest body text on the page, out-ranking the beats
+   woven through the plates below. Reading ladder: title → lede → beats →
+   captions. */
+.v3-intro {
+  padding-block: clamp(56px, 8vw, 96px) clamp(40px, 5vw, 64px);
+}
+.v3-intro-lede {
+  font-family: var(--body);
+  font-size: var(--type-section-copy);
+  font-weight: 300;
+  line-height: 1.4;
+  color: var(--off-white);
+  /* ~46 characters at the top of the ramp — a display measure, not a
+     paragraph measure, because this is set at slogan size. */
+  max-width: 20ch;
+  margin: 0;
+}
+
+/* ── META STRIP ──
+   The old 240px sticky rail, unwound horizontally. Four short facts read once
+   in a single band instead of permanently occupying a column. */
+.v3-meta {
+  padding-bottom: clamp(48px, 6vw, 80px);
+}
+.v3-meta-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap-sm);
+  padding-top: clamp(28px, 3.5vw, 44px);
+  border-top: 1px solid rgba(249, 249, 249, 0.08);
+}
+.v3-meta-label {
+  font-family: var(--body);
+  font-size: var(--type-vlabel);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 12px;
+}
+.v3-meta-value {
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(249, 249, 249, 0.7);
+}
+
+/* ── PLATE ──
+   The full-bleed image. Width is always the viewport; height comes from the
+   image's own ratio, bounded by --plate-max-h so a tall file can't fill more
+   than one screen. No radius, no border: at full width a rounded corner would
+   read as a card, and this is meant to read as a plate. */
+/* Every plate runs the FULL viewport width — that is the premise of this
+   layout, so width wins and height follows from the image's own ratio.
+   The only bound is a ceiling on how tall a single plate may stand, so one
+   photograph can't take more than a screen and a bit to scroll past.
+
+   The two constraints genuinely conflict for 4:3 source: at 1440px wide a 4:3
+   file wants to be 1080px tall, taller than most laptops. Rather than inset
+   the plate (which abandons full-bleed) or clamp it hard (which crops as
+   badly as the old layout did), the ceiling is generous — 112vh, i.e. a plate
+   may stand slightly taller than the fold. Consequences, both deliberate:
+     · 3:2 and 16:9 source — by far the bulk of the library — passes through
+       completely untouched at every common viewport.
+     · 4:3 source is trimmed only on very wide-and-short windows, and by a few
+       percent rather than the 25–45% the previous layout removed.
+   `--plate-max-h` is a variable so a narrower breakpoint can lower it. */
+.v3-plate {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--plate-aspect, 3 / 2);
+  max-height: var(--plate-max-h, 112vh);
+  overflow: hidden;
+  background: #141414;
+}
+/* Over-tall + centred so the parallax drift (±4%, see Plate) has travel at
+   both ends without ever exposing an unpainted edge. */
+.v3-plate-media {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -6%;
+  height: 112%;
+  will-change: transform;
+}
+.reduced-motion .v3-plate-media {
+  /* No drift under reduced motion, so the media just fills the plate. */
+  top: 0;
+  height: 100%;
+}
+
+/* ── PLATE CAPTION ──
+   The /work archive row reused as a caption: index number, display-caps
+   label, bracketed tag, over a hairline. This is what gives a run of
+   full-bleed images structure. Sits on the shared grid, so it aligns with the
+   intro and meta above while the plate it describes runs past both edges. */
+.v3-caption {
+  padding-block: clamp(18px, 2.2vw, 28px) clamp(40px, 6vw, 88px);
+}
+.v3-caption-inner {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--section-pad-x);
+  box-sizing: border-box;
+  display: flex;
+  align-items: baseline;
+  gap: clamp(16px, 2.5vw, 32px);
+  padding-bottom: clamp(14px, 1.8vw, 20px);
+  border-bottom: 1px solid rgba(249, 249, 249, 0.08);
+}
+.v3-caption-num {
+  font-family: var(--body);
+  font-size: var(--type-vlabel);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--orange);
+  flex: none;
+}
+.v3-caption-label {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+  color: var(--off-white);
+  /* Takes the free space so the tag is pushed to the right edge of the grid,
+     echoing the /work index row's num-left / tag-right arrangement. */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.v3-caption-tag {
+  font-family: var(--body);
+  font-size: var(--type-vlabel);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(249, 249, 249, 0.45);
+  flex: none;
+  white-space: nowrap;
+}
+
+/* ── BEAT ──
+   A typographic pause between plates. The site's section inversion: a small
+   orange bracketed kicker beside copy set much larger than it, held on empty
+   ink so the eye rests between images. */
+.v3-beat {
+  padding-block: clamp(64px, 10vw, 140px);
+}
+.v3-beat-inner {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--section-pad-x);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 0.32fr) minmax(0, 0.68fr);
+  gap: var(--gap-lg);
+  align-items: start;
+}
+/* Hidden at rest so there's no flash before the GSAP reveal; reduced motion
+   (or no JS) forces it visible so copy is never stuck hidden. */
+.v3-beat-inner.is-anim {
+  opacity: 0;
+}
+.reduced-motion .v3-beat-inner.is-anim {
+  opacity: 1 !important;
+}
+.v3-beat-kicker {
+  font-family: var(--body);
+  font-size: var(--type-vlabel);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin: 0;
+  /* Optical alignment with the first line of the much larger body beside it. */
+  padding-top: 0.55em;
+}
+.v3-beat-body {
+  font-family: var(--body);
+  font-size: var(--type-section-copy);
+  font-weight: 300;
+  line-height: 1.4;
+  color: var(--off-white);
+  margin: 0;
+  max-width: 24ch;
+}
+
+/* ── FULL-WIDTH VARIANT RESPONSIVE ──
+   The layout is already single-column, so little has to change: the meta
+   strip folds to two columns then the beat drops its label column above the
+   copy. Plates keep running edge to edge at every width — that's the point. */
+@media (max-width: 1024px) {
+  .v3-beat-inner {
+    grid-template-columns: 1fr;
+    gap: var(--gap-sm);
+  }
+  .v3-beat-kicker {
+    padding-top: 0;
+  }
+  .v3-beat-body {
+    max-width: 30ch;
+  }
+  .v3-intro-lede {
+    max-width: 28ch;
+  }
+}
+@media (max-width: 768px) {
+  .v3-meta-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap-sm);
+  }
+  /* A phone screen is portrait, so a landscape plate is nowhere near the
+     height ceiling and always runs the full width. The lower cap only bites
+     on a portrait source, keeping the caption in view beneath it. */
+  .v3-plate {
+    --plate-max-h: 76vh;
+  }
+  .v3-caption-inner {
+    /* The tag would crowd the label at phone widths; drop it below so the
+       number + label keep one clean line. */
+    flex-wrap: wrap;
+  }
+  .v3-caption-label {
+    flex: 1 1 60%;
+  }
+  .v3-caption-tag {
+    flex: 1 0 100%;
+  }
 }

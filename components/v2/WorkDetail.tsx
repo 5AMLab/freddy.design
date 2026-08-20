@@ -12,6 +12,7 @@ import {
   type Beat,
   imageSrc,
   imageLayout,
+  PROJECT_TYPE_LABEL,
 } from "@/lib/work";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
@@ -341,6 +342,19 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
           image reads as the top section and the framing follows it. */}
       <div className="work-intro">
         <p>{project.intro}</p>
+
+        {/* Non-commissioned work carries a visible notice here — directly
+            under the intro, so it lands above the fold on both mobile and
+            desktop, and ahead of the image run. Deliberately NOT in the
+            footer and NOT styled as fine print: the whole point is that a
+            reader cannot mistake a concept piece for a client engagement.
+            Content comes from `disclaimer`, which validateProject() makes
+            mandatory for any project that is not "commissioned". */}
+        {project.projectType !== "commissioned" && project.disclaimer && (
+          <aside role="note" className="work-disclaimer">
+            {project.disclaimer}
+          </aside>
+        )}
       </div>
 
       {/* Body — sticky meta rail beside the image sequence. The rail rides
@@ -350,6 +364,10 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
       <div className="work-body">
         <aside className="work-rail">
           <div className="work-rail-sticky">
+            <MetaItem
+              label="Type"
+              value={PROJECT_TYPE_LABEL[project.projectType]}
+            />
             <MetaItem label="Client" value={project.client} />
             <MetaItem label="Discipline" value={project.category} />
             <MetaItem label="Year" value={project.year} />

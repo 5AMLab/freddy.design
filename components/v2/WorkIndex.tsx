@@ -5,7 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import "@/styles/kloaq.css";
-import { type Project, imageSrc, listTitle } from "@/lib/work";
+import {
+  type Project,
+  imageSrc,
+  listTitle,
+  PROJECT_TYPE_LABEL,
+} from "@/lib/work";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { startTransition } from "@/lib/pageTransition";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
@@ -215,6 +220,14 @@ export default function WorkIndex({ projects }: { projects: Project[] }) {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="work-index-tag">[{project.category.toUpperCase()}]</span>
+                {/* Non-commissioned work is flagged BEFORE click-through, so
+                    the distinction isn't buried on the case-study page. Same
+                    treatment as the discipline tag, accented to separate it. */}
+                {project.projectType !== "commissioned" && (
+                  <span className="work-index-tag work-index-tag-type">
+                    [{PROJECT_TYPE_LABEL[project.projectType].toUpperCase()}]
+                  </span>
+                )}
               </span>
               {/* Short "Client Category" form (e.g. "ANZ Annual Report") for
                   this compact list — the case-study page keeps the full

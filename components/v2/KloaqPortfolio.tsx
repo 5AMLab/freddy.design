@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { imageSrc, getProject } from "@/lib/work";
+import { imageSrc, getProject, PROJECT_TYPE_LABEL } from "@/lib/work";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import Magnetic from "@/components/motion/Magnetic";
 
@@ -132,6 +132,15 @@ export default function KloaqPortfolio() {
                 </span>
                 {/* Dim: an overlay fading in, not a filter animation. */}
                 <span className="kloaq-portfolio-scrim" aria-hidden="true" />
+
+                {/* Project-type badge. NOT inside .kloaq-portfolio-tags —
+                    that group is aria-hidden (decorative work-type labels),
+                    and this one carries meaning a screen reader must get. */}
+                {project.projectType !== "commissioned" && (
+                  <span className="kloaq-portfolio-type">
+                    {PROJECT_TYPE_LABEL[project.projectType].toUpperCase()}
+                  </span>
+                )}
 
                 <span className="kloaq-portfolio-tags" aria-hidden="true">
                   {tags.map((t) => (

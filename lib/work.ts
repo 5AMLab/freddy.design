@@ -38,6 +38,23 @@ export interface Beat {
   after: number;
 }
 
+/**
+ * How a project came to exist. Drives the [TYPE] row in the case-study meta
+ * block and, for anything that is not `commissioned`, a visible disclaimer
+ * above the fold — so self-initiated concept work is never mistaken for a
+ * client engagement. Deliberately has NO default: an unclassified project
+ * fails the build (see validateProject) rather than silently reading as
+ * commissioned, which is how that ambiguity arose in the first place.
+ */
+export type ProjectType = "commissioned" | "self-initiated" | "awards-brief";
+
+/** Human-readable label for the [TYPE] meta row. */
+export const PROJECT_TYPE_LABEL: Record<ProjectType, string> = {
+  commissioned: "Commissioned",
+  "self-initiated": "Self-initiated",
+  "awards-brief": "Awards brief",
+};
+
 export interface Project {
   /** Stable id used for grid ordering / keys. */
   id: string;
@@ -50,6 +67,17 @@ export interface Project {
   year: string;
   /** Freddy's role on the project, shown in detail header meta. */
   role: string;
+  /**
+   * How the project came about. REQUIRED — no default, by design.
+   * Anything other than "commissioned" must also carry a `disclaimer`.
+   */
+  projectType: ProjectType;
+  /**
+   * Shown as a visible notice above the fold on non-commissioned projects.
+   * Required whenever projectType !== "commissioned" (enforced by
+   * validateProject, which runs at module load below).
+   */
+  disclaimer?: string;
   /** One-line summary used on cards and the index page. */
   summary: string;
   /** 2–3 sentence intro shown at the top of the detail page. */
@@ -101,6 +129,7 @@ export const projects: Project[] = [
     category: "Annual Report",
     year: "2023",
     role: "Editorial design, layout, data visualisation",
+    projectType: "commissioned",
     summary: "A flagship annual report positioning the renminbi as the story of the year.",
     intro:
       "ANZ needed its annual report to do more than account for the year — it needed a point of view. We built the edition around a single editorial thread, the rise of the renminbi, and let typography and data visualisation carry the argument across the document.",
@@ -137,6 +166,7 @@ export const projects: Project[] = [
     category: "Pitch Deck",
     year: "2024",
     role: "Narrative design, deck system, slide design",
+    projectType: "commissioned",
     summary: "An investor deck built to carry a raise — clear narrative, confident pacing.",
     intro:
       "Akuos came in with a dense story and a tight fundraising window. We rebuilt the deck around a clean narrative spine and a reusable slide system, so every slide earns its place and the numbers land where they should.",
@@ -173,6 +203,7 @@ export const projects: Project[] = [
     category: "Brandbook",
     year: "2024",
     role: "Brand identity, logo system, guidelines",
+    projectType: "commissioned",
     summary: "A full identity system and brandbook for an AI company finding its voice.",
     intro:
       "Cognitiv AI needed an identity that read as credible and human, not another generic tech brand. We developed the full system — logo, type, colour, motion principles — and documented it in a brandbook the team could actually run with.",
@@ -212,6 +243,9 @@ export const projects: Project[] = [
     category: "OOH & Campaign",
     year: "2023",
     role: "Art direction, campaign layout, OOH",
+    projectType: "self-initiated",
+    disclaimer:
+      "Self-initiated concept work. Studio Kavea has no affiliation with, and was not commissioned by, Hermès. Terre d'Hermès and Hermès are trademarks of Hermès International. Imagery was produced with generative AI tools as an art direction exercise.",
     summary: "Out-of-home and campaign work for a Terre d'Hermès fragrance push.",
     intro:
       "A fragrance as established as Terre d'Hermès leaves little room for noise. The brief was restraint — campaign and out-of-home work that holds the house codes while still stopping someone on the street.",
@@ -248,6 +282,7 @@ export const projects: Project[] = [
     category: "Packaging",
     year: "2024",
     role: "Packaging design, label system, art direction",
+    projectType: "commissioned",
     summary: "Packaging for a single-origin Ethiopia Guji cold brew.",
     intro:
       "A single-origin cold brew deserves packaging that signals provenance without shouting. We designed the label system around the Ethiopia Guji origin story — considered, tactile, and built to sit well on a shelf.",
@@ -285,6 +320,9 @@ export const projects: Project[] = [
     category: "Editorial Design",
     year: "2022",
     role: "Editorial design, art direction, layout",
+    projectType: "awards-brief",
+    disclaimer:
+      "Self-initiated work made in response to a D&AD awards brief. Not commissioned by, and not affiliated with, D&AD or any client named in the brief.",
     summary: "A newspaper concept for a D&AD brief on internship culture.",
     intro:
       "Responding to a D&AD brief on internship culture, The Intern Times reframes the conversation as a newspaper — editorial design as the medium and the message. The format gave us room to be sharp about a subject that usually stays polite.",
@@ -315,6 +353,26 @@ export const projects: Project[] = [
     placeholder: true,
   },
 ];
+
+/**
+ * Fails the build on an unclassified or under-documented project.
+ *
+ * `projectType` being required already makes TypeScript reject a project that
+ * omits it; this covers the half the type system can't express — that a
+ * non-commissioned project MUST carry a disclaimer. Invoked at module load
+ * (below), so `next build` fails loudly rather than shipping a concept piece
+ * that reads as client work.
+ */
+export function validateProject(p: Project): void {
+  if (p.projectType !== "commissioned" && !p.disclaimer) {
+    throw new Error(
+      `Project "${p.slug}" is ${p.projectType} and requires a disclaimer.`
+    );
+  }
+}
+
+// Runs at import time — every consumer of this module triggers it.
+projects.forEach(validateProject);
 
 export function getProject(slug: string): Project | undefined {
   return projects.find((p) => p.slug === slug);
