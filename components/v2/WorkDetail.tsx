@@ -416,7 +416,7 @@ export default function WorkDetail({ project, next }: { project: Project; next: 
                       key={item.src}
                       src={item.src}
                       alt={altFor(item.index)}
-                      aspect="4/5"
+                      aspect="4/3"
                       sizes="(max-width: 900px) 100vw, 40vw"
                     />
                   ))}

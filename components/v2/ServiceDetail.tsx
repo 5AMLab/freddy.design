@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import KloaqFooter from "@/components/v2/KloaqFooter";
+import ServiceBody from "@/components/v2/ServiceBody";
 import { type Service } from "@/lib/services";
 import {
   type Project,
@@ -39,28 +40,15 @@ export default function ServiceDetail({
           <p className="service-intro">{service.intro}</p>
         </header>
 
-        <section className="service-body">
-          {/*
-            ⚠ TODO(Farid) — BODY COPY REQUIRED (spec 3.1).
-            The spec asks for 400–800 words per service page and is explicit
-            that the copy is yours, not mine. The headings below come from
-            `bodyOutline` in lib/services.ts — change them there, and write
-            the paragraphs to sit under each.
-
-            Everything else on this page is finished: metadata, schema, the
-            case-study links and the CTA all work as-is. The page is
-            deliberately NOT in the sitemap until this copy lands — see
-            app/sitemap.ts.
-          */}
-          {service.bodyOutline.map((heading) => (
-            <div className="service-section" key={heading}>
-              <h2 className="service-h2">{heading}</h2>
-              <p className="service-placeholder">
-                [ Copy to come — see TODO in ServiceDetail.tsx ]
-              </p>
-            </div>
-          ))}
-        </section>
+        {/* Body — same sticky-rail layout as the /work case-study body
+            (.work-body): a 240px rail that rides the scroll, paired with a
+            fluid right column so the copy uses the full content width
+            instead of sitting in a narrow centred strip. The rail lists the
+            section headings themselves, since a service page has no
+            client/discipline/year meta to show there — ServiceBody is the
+            one client island on this page, tracking scroll to highlight
+            which section the reader is currently in. */}
+        <ServiceBody service={service} />
 
         {cases.length > 0 && (
           <section className="service-cases">

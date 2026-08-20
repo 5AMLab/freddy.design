@@ -621,7 +621,6 @@
   gap: 24px;
   padding: 44px 0;
   border-bottom: 1px solid var(--hairline);
-  cursor: default;
 }
 .kloaq-service-num {
   grid-column: span 1;
@@ -631,10 +630,6 @@
   color: var(--muted);
   letter-spacing: 0.02em;
   flex-shrink: 0;
-  transition: color 0.3s ease;
-}
-.kloaq-service-num.is-active {
-  color: var(--orange);
 }
 .kloaq-service-title {
   grid-column: span 2;
@@ -645,10 +640,10 @@
   color: color-mix(in srgb, var(--cream) 85%, transparent);
   line-height: 1.25;
 }
-/* Decorative +/× corner marks only — the image itself lives in the single
-   cursor-trailing .kloaq-whatido-preview below, not fixed per row. Sized to
-   the marks' own content (not a fixed 220px) so they never dictate the
-   row's height or squeeze the description column on narrower viewports. */
+/* Decorative +/× corner marks — static texture between title and
+   description, no image or interactive state attached. Sized to the marks'
+   own content (not a fixed 220px) so they never dictate the row's height
+   or squeeze the description column on narrower viewports. */
 .kloaq-service-imgslot {
   /* Spans its own track plus the empty one before copy, then centers its
      content within that combined width — so the marks sit centered in the
@@ -670,34 +665,6 @@
   height: 14px;
   overflow: visible;
   color: var(--hairline);
-  transition: color 0.3s ease;
-}
-.kloaq-service-mark.is-active {
-  color: var(--orange);
-}
-/* Cursor-trailing preview — same behavior as the live site's ServicesV2:
-   follows the mouse via GSAP quickTo (x/y set in JS), crossfades per row.
-   Sized large enough to deliberately overlap the row dividers above/below
-   rather than sit neatly inside a single row's height. */
-.kloaq-whatido-preview {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 270px;
-  height: 354px;
-  border-radius: 16px;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 5;
-  opacity: 0;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-  /* GSAP animates this element's transform continuously as it trails the
-     cursor. The large soft box-shadow is expensive to re-rasterize per frame
-     in Safari (Firefox caches it) — promoting it to its own compositor layer
-     lets the shadow rasterize once and just move as a layer, which is what
-     made the "What I Do" trailing preview feel un-smooth in Safari. */
-  will-change: transform;
-  transform: translateZ(0);
 }
 .kloaq-service-copy {
   grid-column: 6 / span 4;
@@ -713,17 +680,10 @@
   font-weight: 400;
   margin: 0;
 }
-/* Hidden at rest, only revealed on hover — matches the title/image, which
-   also only pick up their active color/visibility when the row is hovered. */
 .kloaq-service-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.kloaq-service-tags.is-active {
-  opacity: 1;
 }
 .kloaq-service-tag {
   font-family: var(--body);
@@ -752,104 +712,6 @@
   border-bottom: 1px solid var(--hairline);
   padding-bottom: 2px;
   transition: color 0.2s, border-color 0.2s, gap 0.2s;
-}
-/* Touch-only accordion image, rendered inline under a row's copy when that
-   row is tapped active (see KloaqServices' ServiceRow onClick) — desktop's
-   cursor-trailing .kloaq-whatido-preview has no touch equivalent, so this
-   is the coarse-pointer replacement. Hidden on fine pointers below; sized
-   as a normal block image rather than an absolutely-positioned follower. */
-.kloaq-service-touch-preview {
-  display: none;
-}
-/* Touch-only "Tap to view" affordance — hidden on fine pointers, which use
-   hover instead. */
-.kloaq-service-taphint {
-  display: none;
-}
-@media (hover: none) and (pointer: coarse) {
-  .kloaq-service-taphint {
-    display: inline-flex;
-    align-items: center;
-    margin-left: 10px;
-    color: var(--muted);
-    vertical-align: middle;
-    transition: color 0.3s ease;
-  }
-  .kloaq-service-taphint.is-active {
-    color: var(--orange);
-  }
-  .kloaq-service-taphint-arrow {
-    width: 16px;
-    height: 16px;
-    display: block;
-    color: currentColor;
-    transition: transform 0.3s ease;
-  }
-  /* Default arrow points down-right (view); rotate to up-right when open (close). */
-  .kloaq-service-taphint.is-active .kloaq-service-taphint-arrow {
-    transform: rotate(90deg);
-  }
-  /* Kept mounted in both states so open AND close animate. Collapse is done
-     with grid-template-rows 0fr→1fr (not max-height): the row interpolates the
-     content's ACTUAL height, so there's no dead-zone delay from easing toward
-     a fixed cap that's taller than the real image, and the reflow is cheaper
-     than max-height's per-frame layout. The visible drop/fade is still done on
-     the img with transform + opacity, which the compositor handles off the
-     main thread. The inner wrapper (min-height:0 + overflow:hidden) is the
-     collapse target the grid row shrinks. */
-  .kloaq-service-touch-preview {
-    display: grid;
-    grid-template-rows: 0fr;
-    width: 100%;
-    max-width: 320px;
-    margin-top: 0;
-    /* Close easing — even ease-in-out so the collapse doesn't snap shut. */
-    transition:
-      grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      margin-top 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .kloaq-service-touch-preview.is-open {
-    grid-template-rows: 1fr;
-    margin-top: 8px;
-    transition:
-      grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-      margin-top 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .kloaq-service-touch-preview-inner {
-    min-height: 0;
-    overflow: hidden;
-  }
-  .kloaq-service-touch-preview > .kloaq-service-touch-preview-inner > img {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: 12px;
-    display: block;
-    opacity: 0;
-    transform: translateY(-14px) scale(0.97);
-    transform-origin: top center;
-    will-change: transform, opacity;
-    transition:
-      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .kloaq-service-touch-preview.is-open > .kloaq-service-touch-preview-inner > img {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    transition:
-      opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .kloaq-service-touch-preview,
-    .kloaq-service-touch-preview > .kloaq-service-touch-preview-inner > img {
-      transition: none;
-    }
-  }
-  /* No cursor to trail — the touch preview above replaces it */
-  .kloaq-whatido-preview {
-    display: none;
-  }
 }
 
 .kloaq-whatido-link:hover {
@@ -1161,76 +1023,6 @@
   transform: translateY(-4px);
 }
 
-.kloaq-footer-newsletter p {
-  font-family: var(--body);
-  font-size: 1.05rem;
-  font-weight: 400;
-  line-height: 1.55;
-  color: var(--cream);
-  max-width: 340px;
-  margin-bottom: 24px;
-}
-
-/* ── NEWSLETTER SUBSCRIBE ──
-   One light rounded field holding the input and its arrow button. The field is
-   the light surface; the input inside it is transparent so the two read as a
-   single control rather than a box inside a box. */
-.kloaq-footer-subscribe {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 340px;
-  background: var(--off-white);
-  border-radius: 12px;
-  padding: 6px 8px 6px 18px;
-}
-.kloaq-footer-subscribe-input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: var(--body);
-  font-size: 1.05rem;
-  font-weight: 400;
-  color: var(--black);
-  padding: 14px 0;
-}
-.kloaq-footer-subscribe-input::placeholder {
-  color: rgba(23, 23, 23, 0.55);
-}
-.kloaq-footer-subscribe-input:focus-visible {
-  outline: none;
-}
-/* Keyboard focus lands on the field as a whole (the input has no border of its
-   own to ring), so ring the wrapper instead of leaving focus invisible. */
-.kloaq-footer-subscribe:focus-within {
-  outline: 2px solid var(--orange);
-  outline-offset: 2px;
-}
-.kloaq-footer-subscribe-btn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--black);
-  font-size: 1.15rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-.kloaq-footer-subscribe-btn:hover,
-.kloaq-footer-subscribe-btn:focus-visible {
-  background: var(--orange);
-  color: var(--off-white);
-}
-/* Direct-contact mailto — replaces the old newsletter form's slot in the
-   column, so it keeps the same 340px measure as the paragraph above it. */
 .kloaq-footer-contact-link {
   display: inline-block;
   font-family: var(--body);
@@ -1610,22 +1402,7 @@
   }
   .kloaq-service-num { margin-bottom: 4px; }
   .kloaq-service-title { margin-bottom: 12px; }
-  .kloaq-service-imgslot { display: none; } /* no cursor on touch — nothing to anchor marks to */
-  /* Whole row is one tap target on touch. Without this, iOS Safari applies
-     double-tap-zoom / text-selection heuristics to the large title & desc
-     blocks — delaying or misrouting the synthetic click so the tap resolves
-     to the wrong row — while the small tag spans (which don't trigger it)
-     worked. manipulation disables the double-tap delay; none-select stops the
-     text-selection gesture from eating the tap. */
-  .kloaq-service-row {
-    touch-action: manipulation;
-    cursor: pointer;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .kloaq-whatido-preview { display: none; } /* cursor-trailing preview needs a fine pointer */
-  .kloaq-service-tags { opacity: 1; } /* no hover on touch — always show tags */
+  .kloaq-service-imgslot { display: none; } /* decorative marks would squeeze the single-column row */
   .kloaq-cases-section > .kloaq-vlabel {
     margin-top: 100px;
   }
@@ -2480,8 +2257,8 @@
 
 @media (max-width: 900px) {
   .work-hero-frame {
-    /* Taller crop on narrow screens so the overlaid title has room. */
-    aspect-ratio: 3 / 4;
+    /* Landscape crop on narrow screens; overlaid title still has room via the scrim. */
+    aspect-ratio: 4 / 3;
   }
   .work-hero-caption {
     left: 24px;
@@ -3263,10 +3040,10 @@
   line-height: 1.05; /* matches .v4-noun-label — keep the two in lockstep */
   /* Interactivity affordance. The nouns give NO at-rest cue that hovering does
      anything. The site's custom cursor (KloaqCursor) is the signal: .v4-noun is
-     in its "pulse" selector — alongside the other hover-but-don't-navigate lists
-     (.kloaq-service-row, .kloaq-industry-item) — so the cursor dot grows as it
-     approaches a noun, before any hover state fires. The label's slide on hover
-     (below) is the second cue.
+     in its "pulse" selector — alongside the other hover-but-don't-navigate list
+     (.kloaq-industry-item) — so the cursor dot grows as it approaches a noun,
+     before any hover state fires. The label's slide on hover (below) is the
+     second cue.
      `cursor: pointer` is the fallback for anyone with the custom cursor
      disabled/unsupported (globals.css sets `cursor: none !important` only under
      html.has-custom-cursor, which KloaqCursor adds at runtime). */
@@ -3357,9 +3134,8 @@
   color: var(--orange);
   text-decoration-color: currentColor;
 }
-/* Arrow treatment matches .kloaq-service-taphint (the "What We Do" mobile
-   tap-hint): a fixed SVG box, not a text glyph, so it never inherits the
-   text's underline and stays crisp at the noun-matched font size. */
+/* Fixed SVG box, not a text glyph, so it never inherits the text's
+   underline and stays crisp at the noun-matched font size. */
 .v4-see-all-arrow {
   display: inline-flex;
   align-items: center;
@@ -5553,13 +5329,27 @@
   margin: 0;
 }
 
-/* Body — the section Farid writes. */
+/* Body */
+/* .service-body reuses .work-body's sticky-rail grid (240px rail / 1fr
+   content, see kloaq.css ~2357) so the copy runs the full content width
+   instead of sitting in a narrow centred column — this rule only overrides
+   the padding, since /work's case-study padding doesn't apply here. */
 .service-body {
   padding: 72px 80px;
-  max-width: 780px;
+}
+.service-rail-sticky {
+  gap: 16px;
+}
+.service-sections {
+  min-width: 0; /* matches .work-detail-images — let the grid column shrink */
+  max-width: 100ch; /* wide enough to fill the grid column at this measure — the
+    68ch cap left ~350px of dead space beside the rail at desktop widths */
 }
 .service-section {
   margin-bottom: 56px;
+}
+.service-section:last-child {
+  margin-bottom: 0;
 }
 .service-h2 {
   font-family: var(--body);
@@ -5570,16 +5360,59 @@
   color: var(--orange);
   margin: 0 0 18px;
 }
-/* Visibly provisional ON PURPOSE — a placeholder that looked like finished
-   copy is a placeholder that ships. */
-.service-placeholder {
+/* The rail's own headings act as a sticky in-page index — quieter than the
+   inline section heading beside the copy, same idea as .work-rail's
+   MetaItem labels, but INTERACTIVE: click jumps to the section, and the
+   entry for whichever section is in view lights up (ServiceBody's
+   IntersectionObserver toggles is-active) so a reader can tell which part
+   of the copy they're currently reading. */
+.service-rail-link {
+  display: block;
   font-family: var(--body);
-  font-size: 0.95rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(var(--orange-rgb), 0.5);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+.service-rail-link:hover,
+.service-rail-link:focus-visible {
+  color: rgba(var(--orange-rgb), 0.85);
+}
+.service-rail-link.is-active {
+  color: var(--orange);
+}
+.service-h2-inline {
+  /* Hidden on desktop, where the rail already shows the heading — restored
+     at the breakpoint where the rail collapses above the copy (see below),
+     so the section is still labelled once the rail stops being a index. */
+  display: none;
+}
+.service-paragraph {
+  font-family: var(--body);
+  font-size: var(--type-section-body);
+  font-weight: 300;
   line-height: 1.7;
-  color: rgba(249, 249, 249, 0.32);
-  border: 1px dashed rgba(249, 249, 249, 0.16);
-  padding: 16px 18px;
-  margin: 0;
+  color: var(--off-white);
+  margin: 0 0 18px;
+}
+.service-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 1100px) {
+  /* The rail becomes a horizontal strip above the copy at this breakpoint
+     (see .work-rail-sticky); for services that strip would just repeat the
+     same headings the inline copy is about to show, so drop it and let each
+     section carry its own heading instead. */
+  .service-rail {
+    display: none;
+  }
+  .service-h2-inline {
+    display: block;
+  }
 }
 
 /* Related work */
@@ -5602,6 +5435,7 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  border-radius: 14px; /* site-wide image radius (--image / rounded-image) */
   background: rgba(249, 249, 249, 0.04);
 }
 .service-case-frame img {
@@ -5673,6 +5507,7 @@
   text-transform: uppercase;
   color: var(--black);
   background: var(--orange);
+  border-radius: 6px; /* the site's one button radius, see .btn */
   padding: 16px 28px;
   text-decoration: none;
   transition: opacity 0.3s ease;
@@ -5784,92 +5619,32 @@
   }
 }
 
-/* "<Service> in Singapore →" — the link out of each homepage service row to
-   its own page. Sits under the description, quiet at rest so it does not
-   compete with the row title, orange on hover like every other link here. */
+/* "Learn more" — the button out of each homepage service row to its own
+   page, same shape/colors as .kloaq-cta-btn ("Let's work together" in the
+   Manifesto section) just smaller: solid orange, white text, orange→
+   transparent on hover. align-self: flex-start is required — .kloaq-service-
+   copy is a flex column with the default align-items: stretch, which would
+   otherwise stretch this to the column's full width despite display:
+   inline-block. */
 .kloaq-service-more {
   display: inline-block;
+  align-self: flex-start;
   margin-top: 18px;
   font-family: var(--body);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(249, 249, 249, 0.55);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-.kloaq-service-more:hover {
-  color: var(--orange);
-}
-
-/* Founder block (/about) — name, role and Behance link beside a short bio.
-   Sits on the ink field below the light "How We Work" section. Two columns
-   on desktop so the identity reads as a unit against the prose; stacked on
-   narrow screens. */
-.kloaq-founder-section {
-  padding: 96px 80px;
-  border-top: 1px solid rgba(249, 249, 249, 0.06);
-}
-.kloaq-founder {
-  display: grid;
-  grid-template-columns: minmax(240px, 320px) 1fr;
-  gap: var(--gap-lg, 56px);
-  margin-top: 32px;
-  align-items: start;
-}
-.kloaq-founder-name {
-  font-family: var(--display);
-  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
-  font-weight: 400;
-  line-height: 1.15;
-  text-transform: uppercase;
-  color: var(--off-white);
-  margin: 0 0 10px;
-}
-.kloaq-founder-role {
-  font-family: var(--body);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--orange);
-  margin: 0 0 20px;
-}
-.kloaq-founder-link {
-  font-family: var(--body);
-  font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(249, 249, 249, 0.6);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-.kloaq-founder-link:hover {
-  color: var(--orange);
-}
-.kloaq-founder-bio p {
-  font-family: var(--body);
-  font-size: 1.05rem;
-  font-weight: 300;
-  line-height: 1.7;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
   color: var(--off-white);
-  max-width: 58ch;
-  margin: 0;
+  background: var(--orange);
+  border: 1px solid var(--orange);
+  border-radius: 6px;
+  padding: 10px 24px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.25s ease, color 0.25s ease;
 }
-/* Visibly provisional, same reasoning as .service-placeholder. */
-.kloaq-founder-placeholder {
-  color: rgba(249, 249, 249, 0.32) !important;
-  border: 1px dashed rgba(249, 249, 249, 0.16);
-  padding: 16px 18px;
-  font-size: 0.95rem !important;
-}
-
-@media (max-width: 900px) {
-  .kloaq-founder-section {
-    padding: 64px 24px;
-  }
-  .kloaq-founder {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
+.kloaq-service-more:hover,
+.kloaq-service-more:focus-visible {
+  background: transparent;
+  color: var(--orange);
 }

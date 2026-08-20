@@ -40,6 +40,11 @@ export interface Service {
   caseStudies: string[];
   /** Section headings for the body Farid will write. */
   bodyOutline: string[];
+  /**
+   * Body copy, one paragraph array per entry in `bodyOutline` (same order,
+   * same length). 400–800 words total per spec 3.1.
+   */
+  body: string[][];
 }
 
 export const services: Service[] = [
@@ -60,6 +65,19 @@ export const services: Service[] = [
       "How the work runs",
       "Who this is for",
     ],
+    body: [
+      [
+        "A brand identity project ends with a logo, a type system, a colour palette and a set of layout rules — but what you're actually paying for is the decisions behind them. Anyone can hand you a wordmark. What holds a brand together six months later, across a deck someone else builds and a social post someone else designs, is the system underneath it.",
+        "You get the primary mark and its variants, a typeface pairing chosen for both screen and print, a colour system with real usage rules (not just five hex codes), and a guidelines document that says what to do with all of it. Everything is delivered in the file formats your team actually uses — no proprietary lock-in, no coming back to us for a PNG.",
+      ],
+      [
+        "We start with a short discovery conversation — what the brand needs to say, who it's competing against, what's worked and what hasn't. From there it's concepts, one round of direction, then refinement until the system is tight. Most identity projects run four to six weeks depending on scope; we'll give you a real timeline once we know what you need.",
+        "You'll see work in progress, not just a big reveal at the end. Two people means fewer handoffs and fewer meetings where nothing gets decided — feedback goes straight to whoever's making the change.",
+      ],
+      [
+        "This is for founders and marketing leads who need a brand that can be picked up and used by other people — an in-house team, a future agency, a freelancer building a landing page. If you need a system that survives contact with people who aren't us, this is the service.",
+      ],
+    ],
   },
   {
     slug: "web-design",
@@ -77,6 +95,19 @@ export const services: Service[] = [
       "What you get",
       "Why Webflow",
       "How the work runs",
+    ],
+    body: [
+      [
+        "A site designed and built to carry the brand it belongs to — not a template with your logo swapped in. That means custom layout, type and motion decisions made for your content specifically, responsive across phone, tablet and desktop, and fast enough that it doesn't undo the first impression the design makes.",
+        "You get a live site plus edit access, so changing a headline or swapping a case study doesn't mean opening a ticket with us. We hand over a CMS structure that matches how your team actually publishes — projects, posts, team members, whatever your content is — set up once so it's simple every time after.",
+      ],
+      [
+        "Webflow gets you a production-grade site without a developer on retainer. It's visual enough that your team can make day-to-day edits themselves, but it still outputs clean, fast, semantic code — not the bloat you get from a page-builder plugin stacked on top of a CMS never built for it.",
+        "It also means we can move fast without sacrificing polish: no build pipeline, no staging environment drift, no waiting on a dev sprint to fix a typo.",
+      ],
+      [
+        "We design in high fidelity first — real content where possible, not lorem ipsum — so what you approve is close to what ships. Build happens in parallel with the later design rounds, and we test across devices and browsers before handoff. Most sites take four to eight weeks depending on page count and whether there's a CMS involved.",
+      ],
     ],
   },
   {
@@ -96,6 +127,18 @@ export const services: Service[] = [
       "Campaign vs editorial",
       "How the work runs",
     ],
+    body: [
+      [
+        "Key visuals built to hold up across every format they'll actually run in — out-of-home, social, print, whatever the media plan calls for — plus the editorial layouts and event identity work that sit around a campaign. One direction, applied consistently, instead of a hero image that falls apart the moment it's resized for a bus stop.",
+        "Deliverables scale to the brief: a single key visual system, a full editorial spread for a report or magazine, or an event identity covering signage, invites and on-site collateral. We scope this per project since campaign work varies more than the other services.",
+      ],
+      [
+        "A campaign visual has one job — stop someone mid-scroll or mid-commute and carry a single idea, fast, across formats that don't give it much time. Editorial has more room: spreads that reward a slower read, sequencing that builds across pages, type doing more of the work than image alone. Most projects are one or the other, though some — an annual report with a campaign-style cover story — ask for both.",
+      ],
+      [
+        "We work from the media plan or the publication's format first, so the concept is built for where it'll actually appear rather than adapted after the fact. Concepts, one direction, then production across every size and format on the plan. Timelines depend heavily on scope — a single key visual system can run two to three weeks; a full editorial issue or event rollout takes longer.",
+      ],
+    ],
   },
   {
     slug: "decks-collateral",
@@ -113,6 +156,18 @@ export const services: Service[] = [
       "What you get",
       "Investor decks vs sales decks",
       "How the work runs",
+    ],
+    body: [
+      [
+        "A deck built around the story you're telling, not a set of slides fighting for attention against whoever's presenting. That means a slide system — layout, chart style, type hierarchy — applied consistently across the full deck, so slide 40 still looks like it belongs with slide 1. Delivered editable, in the format your team presents from.",
+        "Beyond decks, this covers the print and report collateral that tends to travel alongside them — annual reports, one-pagers, leave-behinds — built on the same visual system so nothing looks bolted on.",
+      ],
+      [
+        "An investor deck has to survive being read without you in the room — it needs to work as a document, not just as slides behind a live pitch, because it will get forwarded. A sales deck is built to be presented, with more room to lean on the speaker and less need to stand alone on a screen. We ask which one we're building before the first draft, because it changes the density and pacing of every slide.",
+      ],
+      [
+        "We start from your content and narrative — we don't write the pitch, but we'll flag where the story doesn't land before it's a design problem. From there: a slide system defined early and locked, then production across the full deck so changes stay consistent instead of drifting slide by slide. Most decks take two to four weeks depending on length and how settled the content is going in.",
+      ],
     ],
   },
 ];

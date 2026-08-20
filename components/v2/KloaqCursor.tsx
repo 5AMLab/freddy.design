@@ -25,8 +25,8 @@ import { prefersReducedMotion } from "@/components/motion/MotionProvider";
  *    link): dot grows into a 64px solid badge with a "View" label — sized via
  *    width/height rather than `scale` so the label stays crisp instead of
  *    stretching with the dot.
- *  - pulse (.kloaq-case, .kloaq-service-row, .kloaq-industry-item — Kloaq's
- *    cloud/row hover targets): 3x dot, no label.
+ *  - pulse (.kloaq-case, .kloaq-industry-item — Kloaq's cloud/row hover
+ *    targets): 3x dot, no label.
  *
  * Fine-pointer + motion-allowed only; component bails out entirely otherwise
  * so touch/reduced-motion visitors keep the system cursor (see
@@ -67,7 +67,7 @@ export default function KloaqCursor({ suppressOnKloaq = false }: { suppressOnKlo
 
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest(".kloaq-case, .kloaq-service-row, .kloaq-industry-item, .v4-noun")) setMode("pulse");
+      if (t.closest(".kloaq-case, .kloaq-industry-item, .v4-noun")) setMode("pulse");
       else if (t.closest('[data-cursor="view"]')) setMode("view");
       else if (t.closest("a, button, [role='button'], [data-cursor='link']")) setMode("link");
       else setMode("default");

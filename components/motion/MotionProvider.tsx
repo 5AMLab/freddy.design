@@ -6,9 +6,6 @@ import Lenis from "lenis";
 
 // Motion tokens — see MOTION.md
 export const EASE_OUT_LUXE = "expo.out";
-export const DUR_REVEAL = 1.1;
-export const DUR_FADE = 0.9;
-export const STAGGER_ITEM = 0.1;
 
 export function prefersReducedMotion() {
   return (
@@ -54,50 +51,38 @@ export default function MotionProvider({
     // entrance with visible-by-default markup; see components/v2/WorkIndex.tsx.
     // Don't reintroduce a mount-time batch for content that mounts per-route.)
 
-    // fade-up vocabulary: labels, copy, rows and actions rise 24px + fade,
-    // staggered per batch. Animated via gsap.from inside onEnter — the markup
-    // is visible by default, so slow/absent JS never leaves a blank section
-    // (the lesson from the removed `.v2-fade`, whose CSS hid content up
-    // front). Like every batch here this is built once at provider mount and
-    // only sees elements present then — fine while all navigation is full
-    // document loads (bare <a href>); content mounted by a client-side route
-    // change must own its entrance locally (see WorkIndex).
-    ScrollTrigger.batch(".fade-up", {
-      start: "top 88%",
-      once: true,
-      onEnter: (batch) =>
-        gsap.from(batch, {
-          autoAlpha: 0,
-          y: 24,
-          duration: DUR_FADE,
-          ease: EASE_OUT_LUXE,
-          stagger: STAGGER_ITEM,
-          clearProps: "opacity,visibility,transform",
-        }),
-    });
+    // .fade-up used to rise 24px + fade in via ScrollTrigger.batch's onEnter,
+    // same as .reveal-line below. Removed for the same reason: the markup is
+    // visible by default (no CSS hiding), so onEnter's gsap.from() had to
+    // synchronously snap it to hidden and rise it back — a visible flicker
+    // whenever the batch's trigger fired soon after mount (section already
+    // near/in view at load, or trigger math gone stale once images below it
+    // finished decoding and shifted layout). Labels, copy, CTAs and list rows
+    // now render in their final position immediately. .fade-up markup is kept
+    // on elements (harmless, just no longer animated) rather than stripped
+    // from every file that uses it.
 
-    // line reveal vocabulary: section headlines rise from behind a mask.
+    // .reveal-line used to rise from behind its mask on scroll (gsap.from +
+    // ScrollTrigger). Removed: on this page, section headlines are what the
+    // user scrolls down to read, and a ~0.7-1.1s delay before the title is
+    // legible reads as slow rather than polished — worse, images finishing
+    // decode after mount could shift trigger positions and fire the reveal
+    // at the wrong offset, which read as a flicker. Titles now render in
+    // their final position immediately; .line-mask/.line markup is kept
+    // (harmless, just no longer animated) rather than ripped out everywhere
+    // it's used. The hero's own entrance (HeroInlineV6) is unrelated — it's
+    // gated on the preloader finishing, not scroll, so it never had this
+    // problem and is untouched.
+
+    // mask-scale vocabulary: media settles from 1.12 inside its clipped frame.
     // clearProps matters here beyond the usual "don't leave inline styles
     // around" reason: in dev, StrictMode mounts this effect, tears it down,
-    // then mounts it again. gsap.from() renders its FROM state (yPercent:110)
+    // then mounts it again. gsap.from() renders its FROM state (scale:1.12)
     // synchronously the instant it's created — before the discarded mount's
     // ScrollTrigger ever gets a chance to run and reverse it — so without
     // clearProps that render is the last thing to touch the element's inline
     // transform. The real (second) mount then creates an identical tween on
-    // top of that same stale inline style and the line never visibly moves.
-    const lines = gsap.utils.toArray<HTMLElement>(".reveal-line .line");
-    lines.forEach((line) => {
-      gsap.from(line, {
-        yPercent: 110,
-        duration: DUR_REVEAL,
-        ease: EASE_OUT_LUXE,
-        clearProps: "transform",
-        scrollTrigger: { trigger: line, start: "top 88%", once: true },
-      });
-    });
-
-    // mask-scale vocabulary: media settles from 1.12 inside its clipped frame.
-    // Same StrictMode double-mount reasoning as .reveal-line above.
+    // top of that same stale inline style and the media never visibly moves.
     const media = gsap.utils.toArray<HTMLElement>(".mask-scale-media");
     media.forEach((el) => {
       gsap.from(el, {
@@ -111,15 +96,24 @@ export default function MotionProvider({
 
     ScrollTrigger.refresh();
 
+    // Images (case study thumbnails, hero media) finish decoding after this
+    // first refresh and shift section positions further down the page —
+    // trigger points computed above go stale, so a reveal can fire at the
+    // wrong scroll offset (read as a flicker/jump, worse the further down
+    // the page a section sits). Re-refresh once everything has settled.
+    const onLoad = () => ScrollTrigger.refresh();
+    window.addEventListener("load", onLoad);
+
     return () => {
+      window.removeEventListener("load", onLoad);
       gsap.ticker.remove(raf);
       lenis.destroy();
       activeLenis = null;
       ScrollTrigger.getAll().forEach((st) => st.kill());
       // Undo the synchronous FROM-state render above so a StrictMode-
-      // discarded mount never leaves lines/media stuck mid-animation for
-      // the real mount to inherit (see the .reveal-line comment above).
-      gsap.set([...lines, ...media], { clearProps: "all" });
+      // discarded mount never leaves media stuck mid-animation for the real
+      // mount to inherit (see the .mask-scale-media comment above).
+      gsap.set(media, { clearProps: "all" });
     };
   }, []);
 

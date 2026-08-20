@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/lib/work";
+import { services } from "@/lib/services";
 import { SITE_URL } from "@/lib/site";
 
 /**
@@ -9,13 +10,6 @@ import { SITE_URL } from "@/lib/site";
  *
  * Legal pages are excluded: they carry `noindex` (2.4), and listing a page
  * you are asking not to index is a contradictory signal.
- *
- * /services/* are deliberately NOT listed yet. The routes exist and work,
- * but their body copy is still a placeholder (see ServiceDetail.tsx) — asking
- * Google to index a page that says "[ Copy to come ]" spends the crawl budget
- * of a brand-new site on a thin page and invites exactly the quality problem
- * these pages are meant to solve. Uncomment the block below once Farid's copy
- * is in; nothing else needs to change.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
@@ -28,12 +22,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/contact`, priority: 0.7, changeFrequency: "yearly" as const },
   ];
 
-  // Uncomment once the service pages carry real copy (see the note above):
-  // const serviceRoutes = services.map((s) => ({
-  //   url: `${SITE_URL}/services/${s.slug}`,
-  //   priority: 0.8,
-  //   changeFrequency: "monthly" as const,
-  // }));
+  const serviceRoutes = services.map((s) => ({
+    url: `${SITE_URL}/services/${s.slug}`,
+    priority: 0.8,
+    changeFrequency: "monthly" as const,
+  }));
 
   const projectRoutes = projects.map((p) => ({
     url: `${SITE_URL}/work/${p.slug}`,
@@ -41,5 +34,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "yearly" as const,
   }));
 
-  return [...staticRoutes, ...projectRoutes].map((r) => ({ ...r, lastModified }));
+  return [...staticRoutes, ...serviceRoutes, ...projectRoutes].map((r) => ({
+    ...r,
+    lastModified,
+  }));
 }
