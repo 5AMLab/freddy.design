@@ -9,7 +9,7 @@ export default function PrivacyPage() {
     <LegalLayout
       title="Privacy Policy"
       subtitle="How we collect, use, and protect your personal information when you use kavea.studio."
-      lastUpdated="June 2025"
+      lastUpdated="August 2026"
       sections={[
         {
           heading: "Who We Are",
@@ -20,8 +20,8 @@ export default function PrivacyPage() {
           body: [
             "Contact details you provide voluntarily — name, email address, phone or WhatsApp number — when you reach out via the contact form or directly.",
             "Project details and briefs you share with us in the course of engaging our services.",
-            "Basic usage data collected automatically by our hosting provider (Vercel), such as page views and general geographic region. No personally identifiable information is included.",
-            "No cookies are set by this website for tracking or advertising purposes.",
+            "Basic usage data collected automatically by our hosting provider, such as page views and general geographic region. No personally identifiable information is included. We do not currently run any analytics tool on this website.",
+            "No cookies are set by this website for tracking or advertising purposes. Our hosting infrastructure may set essential technical cookies — see our Cookie Policy for details.",
           ],
         },
         {
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
         },
         {
           heading: "Third-Party Services",
-          body: "We use Vercel for website hosting. Their privacy policy governs any data collected at the infrastructure level. We may use WhatsApp or email to communicate with clients — these platforms have their own privacy policies.",
+          body: "We use Namecheap for website hosting. Their privacy policy governs any data collected at the infrastructure level. We may use WhatsApp or email to communicate with clients — these platforms have their own privacy policies.",
         },
         {
           heading: "Singapore PDPA",

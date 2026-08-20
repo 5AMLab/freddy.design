@@ -9,11 +9,11 @@ export default function CookiesPage() {
     <LegalLayout
       title="Cookie Policy"
       subtitle="A straightforward explanation of how this website uses cookies and similar technologies."
-      lastUpdated="June 2025"
+      lastUpdated="August 2026"
       sections={[
         {
           heading: "The Short Version",
-          body: "Studio Kavea does not use tracking, advertising, or marketing cookies. This website is intentionally minimal — no third-party tracking scripts, no ad networks, no retargeting pixels. We measure basic, anonymous traffic with a privacy-first, cookieless analytics tool, so there is no consent banner to click through.",
+          body: "Studio Kavea does not use tracking, advertising, or marketing cookies. This website is intentionally minimal — no third-party tracking scripts, no ad networks, no retargeting pixels. We do not currently run any analytics at all, and we set no cookies that require your consent, so there is no consent banner to click through.",
         },
         {
           heading: "What Are Cookies",
@@ -22,15 +22,15 @@ export default function CookiesPage() {
         {
           heading: "Cookies We Use",
           body: [
-            "Essential / functional cookies only — these are set by the browser or our hosting infrastructure (Vercel) to ensure basic site functionality such as security and page delivery. They do not track you personally.",
-            "No analytics cookies — traffic is measured with Vercel Analytics, a privacy-first tool that is cookieless and does not collect personally identifiable information. We do not use Google Analytics, Mixpanel, or any analytics platform that sets cookies.",
+            "Essential / functional cookies only — these are set by the browser or our hosting infrastructure to ensure basic site functionality such as security and page delivery. They do not track you personally.",
+            "No analytics cookies — we do not currently use any analytics tool on this website. If we introduce one it will be a cookieless, privacy-first tool such as Plausible. We do not use Google Analytics, Mixpanel, or any analytics platform that sets cookies.",
             "No marketing or advertising cookies — we do not run retargeting campaigns or share data with ad networks.",
             "No social media tracking pixels — no Facebook Pixel, LinkedIn Insight Tag, or similar.",
           ],
         },
         {
           heading: "Third-Party Services",
-          body: "Our site is hosted on Vercel. Vercel may set technical cookies necessary for infrastructure and security purposes. These are outside our direct control. Please refer to Vercel's privacy policy for details.",
+          body: "Our site is hosted on Namecheap. Our host may set technical cookies necessary for infrastructure and security purposes. These are outside our direct control. Please refer to Namecheap's privacy policy for details.",
         },
         {
           heading: "Managing Cookies",

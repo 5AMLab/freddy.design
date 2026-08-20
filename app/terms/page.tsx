@@ -9,7 +9,7 @@ export default function TermsPage() {
     <LegalLayout
       title="Terms & Conditions"
       subtitle="The terms that govern your use of kavea.studio and our design services."
-      lastUpdated="June 2025"
+      lastUpdated="August 2026"
       sections={[
         {
           heading: "Agreement",

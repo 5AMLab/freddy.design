@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter_Tight } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
+import PlausibleProvider from "next-plausible";
 import MotionProvider from "@/components/motion/MotionProvider";
 import Preloader from "@/components/motion/Preloader";
 import SharedElementOverlay from "@/components/motion/SharedElementOverlay";
@@ -51,13 +51,34 @@ export default function RootLayout({
   return (
     <html lang="en" className={interTight.variable}>
       <head>
+        {/* Cookieless analytics. Replaces @vercel/analytics, which was
+            mounted here but collected NOTHING off-platform — Vercel Analytics
+            only reports when the app runs on Vercel, and this site is hosted
+            on Namecheap (LiteSpeed). That shipped a third-party script to
+            every visitor for no data. Plausible is cookieless by design, so
+            /cookies keeps its "no consent banner needed" position honestly.
+
+            ⚠ TODO(Farid) — NOT LIVE YET. next-plausible v4 wants the
+            site-specific script URL from the Plausible dashboard
+            (https://plausible.io/js/pa-XXXXX.js), not a bare domain, so this
+            needs a Plausible account for kavea.studio before it collects
+            anything. Set NEXT_PUBLIC_PLAUSIBLE_SRC in the environment and
+            this starts reporting; until then `enabled` is false and NO
+            third-party script is served — which is the honest state, and
+            matches what /cookies and /privacy now say.
+
+            If you'd rather not run analytics at all, delete this block and
+            the next-plausible dependency, then change the two policy pages
+            to say plainly that no analytics is in use. */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_SRC && (
+          <PlausibleProvider src={process.env.NEXT_PUBLIC_PLAUSIBLE_SRC} />
+        )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Boldonse&display=swap"
           rel="stylesheet"
         />
-        <link rel="preconnect" href="https://va.vercel-scripts.com" />
         {/* NO hero preload. This used to preload /bg/bg-orange-grain.jpg —
             the old HeroStatementV4 hero's rest-state backdrop — but the
             homepage now runs HeroInlineV6 and never paints that image, so the
@@ -77,7 +98,6 @@ export default function RootLayout({
           <KloaqMobileTabbar />
           <div className="grain-overlay" aria-hidden />
         </MotionProvider>
-        <Analytics />
       </body>
     </html>
   );
