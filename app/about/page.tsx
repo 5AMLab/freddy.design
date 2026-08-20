@@ -8,7 +8,11 @@ export const metadata: Metadata = {
   // appends " — Studio Kavea", which made the rendered title read
   // "About Studio Kavea — Brand & Creative Direction, Singapore — Studio
   // Kavea". The spec's suggested string assumed no template.
-  title: "About — Brand & Creative Direction in Singapore",
+  //
+  // Also NOT "About — Brand & Creative Direction in Singapore": that phrase
+  // is the homepage's own title, so this page's rendered title read as a
+  // near-duplicate of "/" rather than a distinct entry.
+  title: "About — One Small Team, One Voice",
   description:
     "One small team, one voice, ten years, no account layer. How Studio Kavea runs briefs from idea to shipped file, and the principles that keep the work consistent.",
   alternates: { canonical: "/about" },

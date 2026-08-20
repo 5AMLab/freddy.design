@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s — Studio Kavea",
   },
   description:
-    "Skip the overhead of a full-time hire. Get a dedicated design team on speed dial — fast turnarounds, direct line, always on brand.",
+    "Studio Kavea is a Singapore brand and creative direction studio building brands to be remembered — for luxury, enterprise and category-defining work.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
