@@ -1,4 +1,6 @@
 import ClientRosterNote from "@/components/v2/ClientRosterNote";
+import JsonLd from "@/components/JsonLd";
+import { organizationSchema } from "@/lib/schema";
 import "@/styles/kloaq.css";
 import KloaqNavbar from "@/components/v2/KloaqNavbar";
 import HeroInlineV6 from "@/components/v4/HeroInlineV6";
@@ -26,6 +28,9 @@ import BriefFlow from "@/components/v2/BriefFlow";
 export default function Home() {
   return (
     <div className="kloaq-root" style={{ minHeight: "100vh", width: "100%" }}>
+      {/* Organization / ProfessionalService node. Every other schema on the
+          site references this by @id, so it belongs on the homepage. */}
+      <JsonLd data={organizationSchema()} />
       <KloaqNavbar />
       <main>
         {/* 1. Hero — the inline-card hero. The work sits INSIDE the

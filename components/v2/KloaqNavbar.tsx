@@ -11,11 +11,11 @@ import { CONTACT_EMAIL } from "@/lib/site";
 
 // Homepage nav (also used on /kloaq). Services and Industries live as
 // sections on the homepage itself (KloaqServices / KloaqIndustries) but are
-// intentionally left out of the menu. About → /about, Portfolio → /work,
+// intentionally left out of the menu. About → /about, Work → /work,
 // Pricing → the standalone /pricing route.
 const MENU_ITEMS: { label: string; href?: string; anchor?: string }[] = [
   { label: "About", href: "/about" },
-  { label: "Portfolio", href: "/work" },
+  { label: "Work", href: "/work" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -224,7 +224,7 @@ export default function KloaqNavbar() {
             active — see useNavBgSample(!scrolled) above); once the bar has
             its own opaque dark fill the logo is always the white mark on it. */}
         <img
-          src={`/studio logo/kavea-${scrolled ? "white" : onLightBg ? "black" : "white"}.svg`}
+          src={`/studio-logo/kavea-${scrolled ? "white" : onLightBg ? "black" : "white"}.svg`}
           alt="Kavea"
           style={{ height: "36px", width: "auto", transition: "opacity 0.3s ease" }}
         />

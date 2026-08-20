@@ -71,7 +71,7 @@ const INDUSTRIES = [
 // the homepage marquee. Marks mirror KloaqLogos' `logos` array.
 const LOGOS = [
   { name: "SK-II", src: "/logos/SK-II.svg" },
-  { name: "Digital Realty", src: "/logos/digital realty.svg" },
+  { name: "Digital Realty", src: "/logos/digital-realty.svg" },
   { name: "LVMH", src: "/logos/lvmh.svg" },
   { name: "Samsung", src: "/logos/samsung.svg" },
   { name: "ANZ", src: "/logos/anz.svg" },

@@ -4,7 +4,7 @@
 //
 // This used to spell "Kavea" out as individual <span> characters styled with
 // -webkit-text-stroke (see git history). That was a stand-in for not having
-// an actual logo file; now that one exists (public/studio logo/kavea-outline.svg)
+// an actual logo file; now that one exists (public/studio-logo/kavea-outline.svg)
 // it replaces the lettering wholesale instead of trying to fake a logo out of
 // type.
 //
@@ -14,7 +14,7 @@
 export default function KloaqFooterWordmark() {
   return (
     <div className="kloaq-footer-watermark" aria-hidden="true">
-      <img src="/studio logo/kavea-outline.svg" alt="" className="kloaq-footer-watermark-img" />
+      <img src="/studio-logo/kavea-outline.svg" alt="" className="kloaq-footer-watermark-img" />
     </div>
   );
 }

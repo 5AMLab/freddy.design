@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter_Tight } from "next/font/google";
-import PlausibleProvider from "next-plausible";
+import { SITE_URL } from "@/lib/site";
 import MotionProvider from "@/components/motion/MotionProvider";
 import Preloader from "@/components/motion/Preloader";
 import SharedElementOverlay from "@/components/motion/SharedElementOverlay";
@@ -27,9 +27,25 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Studio Kavea — Design on Demand, Singapore",
+  // Required for OG/canonical URLs to resolve absolutely. Without it Next
+  // emits relative og:image paths, which LinkedIn and WhatsApp cannot fetch.
+  metadataBase: new URL(SITE_URL),
+  title: {
+    // The homepage's own title. Every other page supplies just its name and
+    // gets " — Studio Kavea" appended by the template, so the studio name is
+    // never doubled up.
+    default: "Brand & Creative Direction Studio in Singapore — Studio Kavea",
+    template: "%s — Studio Kavea",
+  },
   description:
     "Skip the overhead of a full-time hire. Get a dedicated design team on speed dial — fast turnarounds, direct line, always on brand.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "en_SG",
+    siteName: "Studio Kavea",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 // App Router owns the viewport meta via this export — NOT a hand-written
@@ -51,28 +67,25 @@ export default function RootLayout({
   return (
     <html lang="en" className={interTight.variable}>
       <head>
-        {/* Cookieless analytics. Replaces @vercel/analytics, which was
-            mounted here but collected NOTHING off-platform — Vercel Analytics
-            only reports when the app runs on Vercel, and this site is hosted
-            on Namecheap (LiteSpeed). That shipped a third-party script to
-            every visitor for no data. Plausible is cookieless by design, so
-            /cookies keeps its "no consent banner needed" position honestly.
+        {/* NO ANALYTICS IS INSTALLED. This is deliberate and matches what
+            /privacy and /cookies now say.
 
-            ⚠ TODO(Farid) — NOT LIVE YET. next-plausible v4 wants the
-            site-specific script URL from the Plausible dashboard
-            (https://plausible.io/js/pa-XXXXX.js), not a bare domain, so this
-            needs a Plausible account for kavea.studio before it collects
-            anything. Set NEXT_PUBLIC_PLAUSIBLE_SRC in the environment and
-            this starts reporting; until then `enabled` is false and NO
-            third-party script is served — which is the honest state, and
-            matches what /cookies and /privacy now say.
+            @vercel/analytics used to be mounted here and was removed in 1.8:
+            it only reports when the app runs on Vercel, and this site is on
+            Namecheap (LiteSpeed), so it shipped a third-party script to every
+            visitor and collected nothing.
 
-            If you'd rather not run analytics at all, delete this block and
-            the next-plausible dependency, then change the two policy pages
-            to say plainly that no analytics is in use. */}
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_SRC && (
-          <PlausibleProvider src={process.env.NEXT_PUBLIC_PLAUSIBLE_SRC} />
-        )}
+            TODO(Farid) — to turn on cookieless analytics:
+              1. create a Plausible site for kavea.studio
+              2. npm i next-plausible
+              3. render <PlausibleProvider src={"<your script URL>"} /> here
+                 (v4 wants the site-specific script URL, not a bare domain,
+                 and THROWS if rendered without one — so do not mount it
+                 until you have that URL)
+              4. update the analytics paragraphs on /privacy and /cookies,
+                 which currently state that no analytics is in use
+            Plausible is cookieless, so this keeps the "no consent banner"
+            position honest. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

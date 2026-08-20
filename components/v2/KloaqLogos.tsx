@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 // word-cloud accent instead of sitting at their native brand colors.
 const logos = [
   { name: "SK-II", src: "/logos/SK-II.svg" },
-  { name: "Digital Realty", src: "/logos/digital realty.svg" },
+  { name: "Digital Realty", src: "/logos/digital-realty.svg" },
   { name: "LVMH", src: "/logos/lvmh.svg" },
   { name: "Samsung", src: "/logos/samsung.svg" },
   { name: "ANZ", src: "/logos/anz.svg" },

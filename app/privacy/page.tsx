@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import LegalLayout from "@/components/v2/LegalLayout";
 
-export const metadata = {
-  title: "Privacy Policy — Studio Kavea",
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How Studio Kavea collects, uses and protects visitor and client data, and the rights you have over it under Singapore PDPA.",
+  alternates: { canonical: "/privacy" },
+  // noindex, FOLLOW: these will never rank and, on a brand-new site, risk
+  // being the first pages indexed. `follow` is deliberate — the crawler
+  // still passes through the footer links to the pages that should rank.
+  robots: { index: false, follow: true },
 };
 
 export default function PrivacyPage() {

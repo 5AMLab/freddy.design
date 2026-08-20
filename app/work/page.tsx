@@ -3,9 +3,10 @@ import { projects } from "@/lib/work";
 import WorkIndex from "@/components/v2/WorkIndex";
 
 export const metadata: Metadata = {
-  title: "Work — Studio Kavea",
+  title: "Selected Work — Brand, Campaign & Editorial Design",
   description:
     "Selected design work — annual reports, investor decks, brand systems and campaigns.",
+  alternates: { canonical: "/work" },
 };
 
 export default function WorkPage() {

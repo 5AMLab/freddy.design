@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import LegalLayout from "@/components/v2/LegalLayout";
 
-export const metadata = {
-  title: "Terms & Conditions — Studio Kavea",
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description:
+    "The terms governing Studio Kavea design engagements — scope, retainers, payment, revisions, ownership and confidentiality.",
+  alternates: { canonical: "/terms" },
+  // noindex, FOLLOW: these will never rank and, on a brand-new site, risk
+  // being the first pages indexed. `follow` is deliberate — the crawler
+  // still passes through the footer links to the pages that should rank.
+  robots: { index: false, follow: true },
 };
 
 export default function TermsPage() {
