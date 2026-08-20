@@ -18,6 +18,13 @@ const PAGE_LINKS = [
   { label: "Contact", href: "/contact" },
 ];
 
+const SERVICES = [
+  { label: "Brand Identity", href: "/services/brand-identity" },
+  { label: "Web Design", href: "/services/web-design" },
+  { label: "Editorial", href: "/services/campaign-editorial" },
+  { label: "Collateral", href: "/services/decks-collateral" },
+];
+
 // Ordered deliberately, ANZ first (spec 3.4). This block is sitewide, so
 // whatever leads it collects the most internal links on the site — that was
 // Hermès, pointing the strongest internal signal at the one self-initiated
@@ -72,6 +79,16 @@ export default function KloaqFooter() {
             </ul>
           </FooterColumn>
 
+          <FooterColumn title="Services" className="kloaq-footer-col-services">
+            <ul>
+              {SERVICES.map((l) => (
+                <li key={l.label}>
+                  <a href={l.href}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </FooterColumn>
+
           <FooterColumn title="Recent Works" className="kloaq-footer-col-recent">
             <ul>
               {RECENT_WORK.map((l) => (
@@ -93,25 +110,22 @@ export default function KloaqFooter() {
               ))}
             </ul>
           </FooterColumn>
-
-          <div className="kloaq-footer-newsletter">
-            <div className="kloaq-footer-bottom">
-              <ul className="kloaq-footer-legal">
-                {LEGAL_LINKS.map(({ label, href }) => (
-                  <li key={label}>
-                    <Link href={href}>{label}</Link>
-                  </li>
-                ))}
-              </ul>
-              <div className="kloaq-footer-uen">UEN 53529765C</div>
-            </div>
-          </div>
         </div>
       </div>
 
       <div className="kloaq-footer-mark-row">
         <KloaqFooterWordmark />
         <BackToTop />
+      </div>
+
+      <div className="kloaq-footer-bottom">
+        <ul className="kloaq-footer-legal">
+          {LEGAL_LINKS.map(({ label, href }) => (
+            <li key={label}>
+              <Link href={href}>{label}</Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </footer>
   );

@@ -40,6 +40,17 @@ export default function KloaqNavbar() {
   // background so it doesn't paint a solid plate over the still-visible
   // hero at y≈0 while `!hidden` is otherwise already true there.
   const [scrolled, setScrolled] = useState(false);
+  // True once the page is scrolled to its absolute max. The CTA (unlike the
+  // logo/links) stays pinned through ordinary scroll-down so it's always
+  // reachable — but `position: fixed` removes it from flow entirely, so both
+  // the sticky-curtain footer (tall viewports) and the plain-flow footer
+  // (short viewports, see kloaq.css's max-height fallback) end their last
+  // real content flush with the viewport bottom at max scroll, with no
+  // further scroll room to carry it out from under the fixed bar. Fading the
+  // CTA out here mirrors what the mobile nav already does at rest (it goes
+  // transparent + pointer-events:none once scrolling stops) rather than
+  // leaving it floating over the footer's top row.
+  const [atBottom, setAtBottom] = useState(false);
   const lastY = useRef(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const mounted = useRef(false);
@@ -115,10 +126,19 @@ export default function KloaqNavbar() {
       // any more, so scrolling down even a little now hides the bar exactly
       // as scrolling up even a little reveals it.
       setHidden(y > 40 && y > lastY.current);
+      // 2px slop for sub-pixel scroll positions/zoom rounding.
+      setAtBottom(
+        y + window.innerHeight >= document.documentElement.scrollHeight - 2
+      );
       lastY.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll, { passive: true });
+    onScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   return (
@@ -277,10 +297,19 @@ export default function KloaqNavbar() {
       </ul>
 
       {/* Zone 3 — the CTA, pinned right. Hidden ≤768px (the hamburger takes
-          over), where it would otherwise sit on top of the burger. */}
+          over), where it would otherwise sit on top of the burger. Unlike the
+          logo/links it stays visible through ordinary scroll-down — but it
+          still fades out at true max-scroll (atBottom), the one point where
+          nothing can carry it clear of the footer's content underneath it
+          (see the atBottom state comment above). */}
       <div
         className="kloaq-nav-cta"
-        style={{ justifySelf: "end", pointerEvents: "auto" }}
+        style={{
+          justifySelf: "end",
+          opacity: atBottom ? 0 : 1,
+          pointerEvents: atBottom ? "none" : "auto",
+          transition: "opacity 0.35s ease",
+        }}
       >
         <Magnetic strength={8}>
         {/* Opens the brief flow directly — was an <a href="#cta"> that scrolled

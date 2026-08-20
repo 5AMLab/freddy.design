@@ -1042,7 +1042,7 @@
 
 .kloaq-footer-links {
   display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 0.6fr)) 1.4fr;
+  grid-template-columns: repeat(4, minmax(120px, 0.6fr));
   gap: 40px;
 }
 .kloaq-footer-col-title {
@@ -1077,9 +1077,6 @@
   color: var(--orange);
 }
 
-.kloaq-footer-bottom {
-  margin-top: 28px;
-}
 .kloaq-footer-legal {
   display: flex;
   align-items: center;
@@ -1088,9 +1085,8 @@
   flex-wrap: wrap;
 }
 /* "Privacy | Terms & Conditions | Cookies" — the rules are drawn between the
-   items rather than typed as characters, so the last one has none. The UEN
-   item sits after its own gap instead, so it doesn't get a rule either. */
-.kloaq-footer-legal li + li:not(.kloaq-footer-uen)::before {
+   items rather than typed as characters, so the last one has none. */
+.kloaq-footer-legal li + li::before {
   content: "|";
   margin-right: 14px;
   color: var(--muted);
@@ -1105,12 +1101,6 @@
 }
 .kloaq-footer-legal a:hover {
   color: var(--orange);
-}
-.kloaq-footer-uen {
-  font-family: var(--body);
-  font-size: 1.05rem;
-  font-weight: 400;
-  color: var(--muted);
 }
 
 /* Huge ghost wordmark, anchoring the footer as the page's true final
@@ -1131,7 +1121,9 @@
    bottom edge lands flush with the viewport bottom. A small gap below the
    "y" descender reads as "cut off" against that edge even though nothing
    is technically clipped — this padding is what actually reads as clear
-   air below the glyph once you're scrolled all the way down. */
+   air below the glyph once you're scrolled all the way down. That role now
+   belongs to .kloaq-footer-bottom below (the true last element), so the
+   watermark's own bottom padding is trimmed to just the gap before it. */
 .kloaq-footer-mark-row {
   /* Single source of truth for the wordmark's font-size — .back-to-top's
      arrow reads --footer-mark-size / 2 so it always stands at exactly half
@@ -1147,11 +1139,28 @@
      with the footer content above it (was a one-off 72px side padding). */
   max-width: var(--container-max);
   margin: 48px auto 0;
-  padding: 8px var(--section-pad-x) 96px;
+  padding: 8px var(--section-pad-x) 32px;
   display: flex;
   align-items: center;
   pointer-events: none;
   user-select: none;
+}
+/* Privacy/Terms/Cookies + UEN — moved here from the link grid so they read as
+   the footer's closing legal line under the logo, not a fifth nav column.
+   Shares the wordmark's container cap + gutter so it lines up with the "K" of
+   the ghost mark above it. padding-bottom: 96px carries forward the "flush
+   with viewport bottom at max scroll" reasoning documented on the watermark
+   above — this is the true last element now. */
+.kloaq-footer-bottom {
+  position: relative;
+  z-index: 1;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--section-pad-x) 96px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 /* The logotype's outline variant (hollow letterforms, transparent fill) — the
    footer's dark field shows through the letters exactly as the old CSS
@@ -1167,36 +1176,32 @@
 
 /* Tablet (600–900px): the desktop 4-across row doesn't fit, but collapsing
    straight to a single column (the old ≤900px behaviour) wastes the width and
-   makes the footer feel like a phone screen. Instead keep the three link
-   columns — Pages, Recent Works, Socials — side by side in a 3-up row, and let
-   the Newsletter block span the full width on its own line beneath them. The
-   nav links stay scannable in columns, and the newsletter copy + email input
-   get the room they need rather than being crushed into a narrow 4th track. */
+   makes the footer feel like a phone screen. Keep the four link columns —
+   Pages, Services, Recent Works, Socials — side by side in a 4-up row; the
+   legal/UEN line lives under the wordmark now, outside this grid. */
 @media (min-width: 600px) and (max-width: 900px) {
   .kloaq-footer-inner { padding: 80px 40px 48px; }
   .kloaq-footer-links {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 40px 32px;
   }
-  .kloaq-footer-newsletter {
-    grid-column: 1 / -1;
-    max-width: 480px;
-  }
   .kloaq-footer-mark-row { --footer-mark-size: 20vw; }
-  .kloaq-footer-watermark { margin-top: 40px; padding: 8px 40px 80px; }
+  .kloaq-footer-watermark { margin-top: 40px; padding: 8px 40px 32px; }
+  .kloaq-footer-bottom { padding: 0 40px 80px; }
   .back-to-top { right: 40px; bottom: 80px; }
 }
 
 @media (max-width: 599px) {
   .kloaq-footer-inner { padding: 72px 24px 40px; }
-  /* Single column: Pages, Recent Works, Socials and Newsletter stack in DOM
+  /* Single column: Pages, Services, Recent Works and Socials stack in DOM
      order rather than the desktop 4-across row. */
   .kloaq-footer-links {
     grid-template-columns: 1fr;
     gap: 40px;
   }
   .kloaq-footer-mark-row { --footer-mark-size: 20vw; }
-  .kloaq-footer-watermark { margin-top: 32px; padding: 8px 24px 72px; }
+  .kloaq-footer-watermark { margin-top: 32px; padding: 8px 24px 32px; }
+  .kloaq-footer-bottom { padding: 0 24px 72px; }
   .back-to-top { right: 24px; bottom: 72px; }
 
   /* Disable the sticky footer curtain here. Once the link groups stack into a
@@ -1208,6 +1213,21 @@
      flow lets the whole footer scroll into view. The curtain is a large-screen
      flourish; on phones a normally-scrolling footer is the correct behaviour.
      `contain` is also cleared so nothing paint-clips the now-static footer. */
+  .kloaq-root .kloaq-footer {
+    position: static;
+    contain: none;
+  }
+}
+
+/* Same failure mode as the ≤599px-width case just above (sticky footer taller
+   than the viewport, so its top edge — the Pages/Services/Recent Works/Socials
+   row — permanently overlaps the fixed nav's always-visible CTA), but keyed
+   off HEIGHT: any desktop-WIDTH window shorter than the footer's own height
+   (~740px, 4-column layout) hits it too — a small laptop viewport, a resized
+   browser, an embedded preview pane. Same fix, same reasoning: drop the
+   curtain and let the footer scroll normally.
+
+@media (min-width: 600px) and (max-height: 760px) {
   .kloaq-root .kloaq-footer {
     position: static;
     contain: none;
@@ -4478,6 +4498,25 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+/* The source footage has dark margins baked into the frame edges (not a
+   crop artifact — verified by scrubbing the file). `cover` fills the box
+   correctly at any size, but past --container-max the crop window widens
+   enough that those dark margins become visible on ultrawide monitors.
+   Scale the video up beyond `cover` here to push the margins out of frame.
+   Zoom grows with viewport width so it stays subtle just past the
+   threshold and only gets aggressive on genuinely ultrawide screens. */
+@media (min-width: 1600px) {
+  .v6-bg-video {
+    /* scale() takes a unitless <number>, so the ramp is built with calc()
+       dividing 1vw by 1px — that cancels the length unit and leaves a
+       plain number the browser will accept (a bare `vw` term here is
+       invalid: you cannot add a <length> to a <number>).
+       1 at 1600px, 1.35 at 3440px: solve a + b*(W/100) for those two
+       points → a = 0.69565, b = 0.019022. */
+    transform: scale(clamp(1, calc(0.69565 + 0.019022 * 1vw / 1px), 1.35));
+    transform-origin: center;
+  }
 }
 /* NO SCRIM. Measured rather than assumed: sampled across six timestamps in
    the exact region the headline occupies, the raw footage runs 16–29 mean
