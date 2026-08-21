@@ -15,6 +15,28 @@ const TIMELINES = ["Within 48 hours", "This week", "This month", "Just exploring
 // Sender address must live on a domain verified in Resend.
 const FROM_ADDRESS = "Studio Kavea <hello@kavea.studio>";
 
+// Verifies a Cloudflare Turnstile token server-side. Never trust a token
+// that only passed a client-side check — that's just JS, any bot can skip it.
+async function verifyTurnstile(token: string, remoteIp: string | null): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // captcha not configured — don't block submissions
+
+  const body = new URLSearchParams({ secret, response: token });
+  if (remoteIp) body.set("remoteip", remoteIp);
+
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body,
+    });
+    const data = (await res.json()) as { success?: boolean };
+    return data.success === true;
+  } catch (err) {
+    console.error("Turnstile verification request failed", err);
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -29,7 +51,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { deliverable, timeline, note, name, email } = (payload ?? {}) as Record<string, unknown>;
+  const { deliverable, timeline, note, name, email, company, turnstileToken } =
+    (payload ?? {}) as Record<string, unknown>;
+
+  // Honeypot: a real visitor never fills this field. Pretend success so a
+  // bot doesn't learn its submission was rejected.
+  if (typeof company === "string" && company.trim()) {
+    return NextResponse.json({ ok: true });
+  }
+
+  if (process.env.TURNSTILE_SECRET_KEY) {
+    if (typeof turnstileToken !== "string" || !turnstileToken) {
+      return NextResponse.json({ error: "Please complete the verification check." }, { status: 400 });
+    }
+    const remoteIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null;
+    const human = await verifyTurnstile(turnstileToken, remoteIp);
+    if (!human) {
+      return NextResponse.json({ error: "Verification failed. Please try again." }, { status: 400 });
+    }
+  }
 
   if (
     typeof deliverable !== "string" ||

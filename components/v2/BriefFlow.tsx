@@ -1,10 +1,32 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Script from "next/script";
 import gsap from "gsap";
 import { prefersReducedMotion } from "@/components/motion/MotionProvider";
 import { RETAINER_SLOTS } from "@/lib/site";
 
 export const OPEN_BRIEF_EVENT = "fd:open-brief";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          theme?: "light" | "dark" | "auto";
+          callback: (token: string) => void;
+          "expired-callback"?: () => void;
+          "error-callback"?: () => void;
+        }
+      ) => string;
+      reset: (widgetId?: string) => void;
+      remove: (widgetId?: string) => void;
+    };
+  }
+}
 
 export function openBrief() {
   window.dispatchEvent(new Event(OPEN_BRIEF_EVENT));
@@ -37,8 +59,15 @@ export default function BriefFlow() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  // Honeypot: real visitors never see or fill this field (off-screen, no
+  // label). Bots that blindly fill every input trip it; checked server-side.
+  const [company, setCompany] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReady, setTurnstileReady] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef<HTMLDivElement>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | undefined>(undefined);
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -51,6 +80,8 @@ export default function BriefFlow() {
       setNote("");
       setName("");
       setEmail("");
+      setCompany("");
+      setTurnstileToken("");
       setStatus("idle");
       setErrorMessage("");
       setOpen(true);
@@ -93,6 +124,32 @@ export default function BriefFlow() {
     );
   }, [step, open]);
 
+  // Mount the Turnstile widget once the review step is reached and the
+  // script has loaded — not earlier, so it never renders for people who
+  // close the flow before getting there.
+  useEffect(() => {
+    if (!open || step !== 3 || status === "sent") return;
+    if (!turnstileReady || !turnstileRef.current || !TURNSTILE_SITE_KEY) return;
+    if (turnstileWidgetId.current) return;
+    turnstileWidgetId.current = window.turnstile?.render(turnstileRef.current, {
+      sitekey: TURNSTILE_SITE_KEY,
+      theme: "dark",
+      callback: (token) => setTurnstileToken(token),
+      "expired-callback": () => setTurnstileToken(""),
+      "error-callback": () => setTurnstileToken(""),
+    });
+  }, [open, step, status, turnstileReady]);
+
+  // Drop the widget when the flow closes so a stale token/id can't linger
+  // into the next open.
+  useEffect(() => {
+    if (open) return;
+    if (turnstileWidgetId.current) {
+      window.turnstile?.remove(turnstileWidgetId.current);
+      turnstileWidgetId.current = undefined;
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const submitBrief = async () => {
@@ -102,7 +159,15 @@ export default function BriefFlow() {
       const res = await fetch("/api/brief", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deliverable, timeline, note: note.trim(), name: name.trim(), email: email.trim() }),
+        body: JSON.stringify({
+          deliverable,
+          timeline,
+          note: note.trim(),
+          name: name.trim(),
+          email: email.trim(),
+          company, // honeypot — should always be empty
+          turnstileToken,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -267,6 +332,29 @@ export default function BriefFlow() {
 
           {step === 2 && (
             <div>
+              {/* Honeypot — hidden from sighted and screen-reader users alike,
+                  left unlabeled so autofill won't touch it either. Any bot
+                  that fills every field trips this. */}
+              <input
+                type="text"
+                name="company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  width: "1px",
+                  height: "1px",
+                  padding: 0,
+                  margin: "-1px",
+                  overflow: "hidden",
+                  clip: "rect(0,0,0,0)",
+                  whiteSpace: "nowrap",
+                  border: 0,
+                }}
+              />
               <textarea
                 autoFocus
                 value={note}
@@ -444,9 +532,20 @@ export default function BriefFlow() {
                 {`${deliverable} · ${timeline.toLowerCase()}\n“${note.trim()}”`}
               </blockquote>
 
+              {TURNSTILE_SITE_KEY && (
+                <>
+                  <Script
+                    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+                    strategy="lazyOnload"
+                    onLoad={() => setTurnstileReady(true)}
+                  />
+                  <div ref={turnstileRef} style={{ marginBottom: "24px" }} />
+                </>
+              )}
+
               <button
                 onClick={submitBrief}
-                disabled={status === "sending"}
+                disabled={status === "sending" || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
                 style={{
                   display: "inline-block",
                   fontFamily: "var(--font-body), sans-serif",
@@ -459,8 +558,11 @@ export default function BriefFlow() {
                   padding: "18px 44px",
                   borderRadius: "8px",
                   border: "none",
-                  cursor: status === "sending" ? "wait" : "pointer",
-                  opacity: status === "sending" ? 0.7 : 1,
+                  cursor:
+                    status === "sending" || (!!TURNSTILE_SITE_KEY && !turnstileToken)
+                      ? "wait"
+                      : "pointer",
+                  opacity: status === "sending" || (!!TURNSTILE_SITE_KEY && !turnstileToken) ? 0.7 : 1,
                 }}
               >
                 {status === "sending" ? "Sending…" : "Submit brief"}
